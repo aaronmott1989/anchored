@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#12100C">
+<title>Anchored — The 21-Day Anchor ($7)</title>
+<meta name="description" content="Build a daily time with God that actually sticks. A dated 21-day plan for $7 once. 30-day money-back guarantee.">
+<!--
+  Anchored tripwire pre-sell page. THIRD-MACHINE demand-test clone of
+  spotted-tripwire-lp.html. ONE file, two offers.
+  Usage: point the Meta ad at  anchored-tripwire-lp.html?offer=anchor  (default)
+                          or    anchored-tripwire-lp.html?offer=peace
+  Buyers go to the checkout link; the checkout captures their email at purchase.
+  Non-buyers are caught by the inline opt-in + one exit-intent prompt.
+
+  === STAGED — WIRING TODO (see faith-app/BUILD-CHECKLIST.md) ===
+  1) CHECKOUT is a PLACEHOLDER (checkout: "#staged-..."). Replace with a real
+     Gumroad/Stripe checkout link before launch. Buy button is inert until then.
+  2) LEAD_ENDPOINT is empty (capture stubbed). Set it to a real capture endpoint
+     before launch. Contract: POST JSON { email, offer, source:"tripwire_lp", ts };
+     any 2xx = success. Capture is NON-BLOCKING. No secret is committed here.
+  3) /privacy.html must exist at deploy root before this is public.
+-->
+<style>
+  :root{
+    --bg:#12100C; --bg2:#181510; --card:#1C1913; --line:#38311F;
+    --gold:#E5B85C; --gold-ink:#1A150C; --text:#F5F0E6; --muted:#A79B84;
+    --red:#E06A5A; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.55;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;
+  }
+  a{color:inherit;}
+  .wrap{max-width:640px;margin:0 auto;padding:0 20px;}
+  .kicker{text-transform:uppercase;letter-spacing:.2em;font-size:12px;font-weight:800;color:var(--gold);}
+  h1{font-size:clamp(30px,8.4vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.08;font-family:Georgia,"Times New Roman",serif;}
+  h1 .hl{color:var(--gold);}
+  h2{font-size:clamp(23px,6.4vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.15;font-family:Georgia,"Times New Roman",serif;}
+  p{color:var(--text);}
+  .muted{color:var(--muted);}
+  header{position:sticky;top:0;z-index:40;background:rgba(18,16,12,.85);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line);}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .logo{font-weight:800;letter-spacing:-.01em;font-size:19px;font-family:Georgia,serif;}
+  .logo .dot{color:var(--gold);}
+  .pricepill{background:var(--gold);color:var(--gold-ink);font-weight:850;font-size:13px;padding:7px 13px;border-radius:999px;letter-spacing:.01em;}
+  .hero{padding:38px 0 8px;background:
+      radial-gradient(120% 80% at 12% -10%, rgba(229,184,92,.12), transparent 60%),
+      radial-gradient(90% 60% at 100% 0%, rgba(127,176,166,.06), transparent 55%);}
+  .hero .sub{font-size:clamp(16px,4.4vw,19px);color:var(--text);margin-top:16px;font-weight:600;}
+  .hero .promise{color:var(--muted);margin-top:12px;font-size:15.5px;}
+  .cta{
+    display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+    background:var(--gold);color:var(--gold-ink);font-weight:850;font-size:18px;
+    border:0;border-radius:14px;padding:17px 20px;cursor:pointer;text-decoration:none;
+    box-shadow:0 10px 30px rgba(229,184,92,.24);transition:transform .06s ease, box-shadow .2s ease;letter-spacing:.01em;
+  }
+  .cta:active{transform:translateY(1px) scale(.995);}
+  .cta .arrow{font-weight:900;}
+  .ctanote{text-align:center;color:var(--muted);font-size:13px;margin-top:11px;}
+  .ctanote b{color:var(--text);}
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 4px;}
+  .trust .t{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;}
+  .trust .t .ic{color:var(--gold);font-size:16px;line-height:1;}
+  .trust .t .lbl{font-size:11.5px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
+  .trust .t .sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  section{padding:30px 0;}
+  .lead{font-size:17px;}
+  .divider{height:1px;background:var(--line);margin:0;border:0;}
+  .stack{margin-top:18px;display:flex;flex-direction:column;gap:12px;}
+  .item{display:flex;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;}
+  .item .chk{flex:0 0 22px;height:22px;border-radius:7px;background:rgba(229,184,92,.16);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;margin-top:1px;}
+  .item .txt b{display:block;font-size:15.5px;margin-bottom:2px;}
+  .item .txt span{color:var(--muted);font-size:14px;}
+  .guarantee{border:1.5px solid var(--gold);border-radius:var(--radius);padding:20px;background:linear-gradient(180deg, rgba(229,184,92,.07), transparent);}
+  .guarantee .g-h{display:flex;align-items:center;gap:10px;font-weight:850;font-size:17px;}
+  .guarantee .seal{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;}
+  .guarantee p{margin-top:10px;color:var(--muted);font-size:14.5px;}
+  .why{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .why b{color:var(--text);}
+  .app{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .app .tag{color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;}
+  .optin{background:var(--bg2);border:1px dashed #4a4029;border-radius:var(--radius);padding:20px;}
+  .optin h3{font-size:18px;font-weight:800;}
+  .optin p{color:var(--muted);font-size:14px;margin-top:6px;}
+  form.cap{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+  form.cap input[type=email]{flex:1 1 200px;min-width:0;background:#0f0d09;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:14px 14px;font-size:16px;}
+  form.cap input[type=email]:focus{outline:none;border-color:var(--gold);}
+  form.cap button{flex:0 0 auto;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;padding:0 18px;font-size:15px;cursor:pointer;}
+  .capdone{color:var(--gold);font-weight:700;font-size:14.5px;margin-top:12px;display:none;}
+  .consent{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.5;}
+  .consent a{color:var(--muted);text-decoration:underline;}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin-top:10px;background:var(--card);}
+  details summary{list-style:none;cursor:pointer;padding:15px 0;font-weight:700;font-size:15.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary .plus{color:var(--gold);font-weight:900;font-size:20px;transition:transform .2s;}
+  details[open] summary .plus{transform:rotate(45deg);}
+  details .ans{color:var(--muted);font-size:14.5px;padding:0 0 16px;}
+  .finalcta{text-align:center;padding:34px 0 40px;}
+  .finalcta h2{margin-bottom:18px;}
+  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;}
+  footer a{color:var(--muted);text-decoration:underline;}
+  .stickybuy{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(18,16,12,.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 20px calc(10px + env(safe-area-inset-bottom));transform:translateY(120%);transition:transform .25s ease;}
+  .stickybuy.show{transform:translateY(0);}
+  .stickybuy .cta{font-size:16px;padding:14px 18px;}
+  .modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.66);display:none;align-items:flex-end;justify-content:center;}
+  .modal.show{display:flex;}
+  .sheet{background:var(--bg2);border-top-left-radius:22px;border-top-right-radius:22px;border:1px solid var(--line);border-bottom:0;width:100%;max-width:640px;padding:24px 22px calc(26px + env(safe-area-inset-bottom));animation:up .25s ease;}
+  @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .sheet h3{font-size:21px;font-weight:850;letter-spacing:-.01em;}
+  .sheet p{color:var(--muted);font-size:14.5px;margin-top:8px;}
+  .sheet .skip{display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;}
+  @media(min-width:560px){.modal{align-items:center;}.sheet{border-radius:22px;border-bottom:1px solid var(--line);}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="logo">Anchored<span class="dot">.</span></div>
+    <div class="pricepill">$7 · one time</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker" id="k-kicker">Anchored · The 21-Day Anchor</div>
+    <h1 id="k-h1" style="margin-top:14px;">Quiet times don't fail on day 1. <span class="hl">They fail on day 4.</span></h1>
+    <p class="sub" id="k-sub">A dated 21-day plan that finally makes time with God a daily habit — in 10 minutes a day.</p>
+    <p class="promise" id="k-promise">You don't lose the habit because you don't love God. You lose it around day four, when life gets loud and nobody tells you what to read next or what to do when you miss a day. This is the simple, dated plan that carries you through it.</p>
+    <div style="margin-top:24px;">
+      <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
+      <div class="ctanote"><b>Instant access.</b> 30-day, no-questions money-back guarantee.</div>
+    </div>
+    <div class="trust">
+      <div class="t"><div class="ic">↓</div><div class="lbl">Instant access</div><div class="sub">Delivered on the spot</div></div>
+      <div class="t"><div class="ic">↺</div><div class="lbl">30-day refund</div><div class="sub">No questions asked</div></div>
+      <div class="t"><div class="ic">$</div><div class="lbl">$7 once</div><div class="sub">No subscription</div></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- PROBLEM -->
+<section>
+  <div class="wrap">
+    <h2 id="k-prob-h">Day 4 is where it dies.</h2>
+    <p class="lead muted" id="k-prob-b" style="margin-top:14px;">The first morning feels great. You open the Bible, you pray, you mean it. Then day four shows up: a rough night, a packed morning, and you don't know where you left off or what to read. One missed day becomes three, and the guilt makes it harder to come back than to start. You didn't fail because your faith is weak. You failed because nobody handed you the next step. This closes that gap.</p>
+  </div>
+</section>
+
+<!-- VALUE STACK -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <h2>What you get <span class="muted" style="font-size:15px;font-weight:600;">(instant access)</span></h2>
+    <div class="stack" id="k-stack">
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>A dated 21-day plan</b><span>Open to today's page and you know exactly what to read, pray, and reflect on. No deciding, no flipping around — just show up.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>10 minutes, morning or night</b><span>Built for a real, busy life — a short reading, a guided prayer, and one honest reflection. Small enough that you can't fail.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>The "I missed a day" page</b><span>The single page most plans skip: exactly what to do when you fall behind, so a missed day becomes a step instead of the end.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>21 guided prayer prompts</b><span>If you've never known what to say, these give you the words — and teach you to pray in your own.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>3 verses to carry with you</b><span>Short enough to memorize, chosen for the days that are hard. Hidden in your heart, not just read once.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>A simple reflection journal</b><span>One line a day. Look back in three weeks and see how far God has carried you.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="guarantee">
+      <div class="g-h"><span class="seal">✓</span> Your $7 is protected.</div>
+      <p><b style="color:var(--text)">30-day, 100% money-back, no-questions-asked.</b> Use it, and if it doesn't help you build a daily time with God that finally sticks, email <a style="color:var(--gold)" href="mailto:support@anchored.app">support@anchored.app</a> and get every cent back. You keep the plan. The only risk here is another month of meaning to and not doing it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY $7 -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="why">
+      <h2 style="font-size:22px;">Why $7?</h2>
+      <p class="muted" style="margin-top:12px;" id="k-why">A devotional book runs $15–$25 and still leaves you deciding when and how. Free plans online hand you a list and vanish the day you fall behind. This is <b>$7, once,</b> for the full 21-day dated plan, the prayer prompts, and the "I missed a day" page free plans refuse to include. Seven dollars vs. another season of meaning to grow closer to God and never quite starting. Easy math.</p>
+    </div>
+  </div>
+</section>
+
+<!-- APP HANDOFF -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="app">
+      <div class="tag">What happens after</div>
+      <h2 style="font-size:21px;margin-top:8px;" id="k-app-h">When the 21 days end, the Anchored app takes over.</h2>
+      <p class="muted" style="margin-top:10px;" id="k-app-b">It keeps your streak, sends the day's verse to you, and your Companion — a warm, encouraging guide — checks in during the windows you tend to drift, and answers your questions about faith and the Bible any time. This plan is your start. The app keeps you walking.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INLINE OPT-IN -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="optin">
+      <h3 id="k-opt-h">Not ready to buy? Take the free "5-Minute Morning" card.</h3>
+      <p id="k-opt-p">The one page that makes starting easy: a simple 5-minute morning rhythm you can begin tomorrow. We'll email it to you, plus a couple of genuinely encouraging reflections. No spam, unsubscribe anytime.</p>
+      <form class="cap" data-cap>
+        <input type="email" required placeholder="you@email.com" aria-label="Your email">
+        <button type="submit">Send it</button>
+      </form>
+      <p class="consent">By entering your email you agree to receive emails from Anchored. No spam — unsubscribe anytime. See our <a href="privacy.html">Privacy Policy</a>.</p>
+      <div class="capdone" data-capdone>✓ On its way. Check your inbox in a minute.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <div id="k-faq">
+      <details><summary>I'm new to the Bible. Is this too advanced? <span class="plus">+</span></summary><div class="ans">No. It's dated and day-by-day, with short readings and plain-language prompts, so you always know what to do. You don't need any background — just 10 minutes and a willingness to show up.</div></details>
+      <details><summary>What if I miss a day? <span class="plus">+</span></summary><div class="ans">That's exactly what the "I missed a day" page is for. You don't catch up or start over — you just take today. Grace is the whole point, and one faithful day is a win.</div></details>
+      <details><summary>Which Bible translation do I need? <span class="plus">+</span></summary><div class="ans">Any you like. The plan gives you the passage to read in your own Bible, and quotes Scripture from the public-domain World English Bible so it works with whatever version you own.</div></details>
+      <details><summary>How do I get it? <span class="plus">+</span></summary><div class="ans">Instant access after a $7 checkout. Yours to keep. Backed by a 30-day, no-questions money-back guarantee.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="finalcta">
+  <div class="wrap">
+    <h2 id="k-final">Ten minutes a day. Twenty-one days. A habit that finally holds.</h2>
+    <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
+    <div class="ctanote">30-day money-back guarantee · instant access</div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="logo" style="font-size:16px;justify-content:center;">Anchored<span class="dot">.</span></div>
+    <p style="margin-top:8px;">A daily walk with God, made simple. Questions? <a href="mailto:support@anchored.app">support@anchored.app</a></p>
+    <p style="margin-top:10px;">Anchored is a spiritual-growth tool for daily discipline. It is not medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. If you are in crisis or thinking about harming yourself, call or text <b>988</b> (US Suicide &amp; Crisis Lifeline) or dial 911.</p>
+    <p style="margin-top:8px;">Results depend on your own effort and consistency. Scripture quoted is the World English Bible (public domain). Bible translation names are trademarks of their respective publishers and are referenced for identification only.</p>
+    <p style="margin-top:8px;">&copy; <span id="yr"></span> Anchored. · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<!-- sticky mobile buy bar -->
+<div class="stickybuy" id="stickybuy">
+  <div class="wrap" style="padding:0;">
+    <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
+  </div>
+</div>
+
+<!-- exit-intent / non-buyer capture modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3 id="k-m-h">Before you go — grab the free "5-Minute Morning" card.</h3>
+    <p id="k-m-p">The simplest way to start: a 5-minute morning rhythm you can begin tomorrow. We'll email it to you free. No spam.</p>
+    <form class="cap" data-cap style="margin-top:16px;">
+      <input type="email" required placeholder="you@email.com" aria-label="Your email">
+      <button type="submit">Email me the card</button>
+    </form>
+    <p class="consent">By entering your email you agree to receive emails from Anchored. Unsubscribe anytime. See our <a href="privacy.html">Privacy Policy</a>.</p>
+    <div class="capdone" data-capdone>✓ On its way. Check your inbox in a minute.</div>
+    <span class="skip" id="modalskip">No thanks, take me to the $7 plan</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- WIRING: set to a real capture endpoint before launch (see head comment) ----
+  var LEAD_ENDPOINT = ""; // STAGED: empty = capture stubbed, buy flow still works. Set to Supabase Edge Function / Worker before launch.
+
+  // ---- Offer config: one page, two ad sets ----
+  var OFFERS = {
+    anchor: {
+      title: "Anchored — The 21-Day Anchor ($7)",
+      // STAGED: replace with a real Gumroad/Stripe checkout link before launch.
+      checkout: "#staged-anchor-checkout"
+    },
+    peace: {
+      title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
+      checkout: "#staged-peace-checkout",
+      kicker: "Anchored · Peace in 14 Days",
+      h1: 'Your mind won\'t stop. <span class="hl">Scripture speaks straight to it.</span>',
+      sub: "14 days of Scripture, prayer, and a simple practice for an anxious, racing mind — 10 minutes a day.",
+      promise: "Worry doesn't back down because someone tells you to calm down. It quiets when you have something truer to hold onto, day after day. This is 14 dated days of Scripture for worry, with a prayer and one small practice to steady you each morning.",
+      buy: "Start Peace in 14 Days — $7",
+      probH: "You can't think your way out of worry.",
+      probB: "The racing thoughts, the 3am spiral, the tight chest — willpower doesn't touch it, and 'just have more faith' only adds guilt. What actually helps is a daily anchor: a true word to return to, a prayer to pray, and one small thing to do. This gives you exactly that, dated for 14 days so you never have to decide when your mind is already loud.",
+      whyH: "Why $7?",
+      why: 'A single counseling session runs $100+, and a devotional book leaves you deciding when and how. This is <b>$7, once,</b> for 14 dated days built specifically for an anxious mind — Scripture, prayer, and a small daily practice. Not a replacement for a counselor if you need one, but a daily anchor anyone can start tomorrow.',
+      appH: "When the 14 days end, the Anchored app takes over.",
+      appB: "It keeps sending you a daily verse and a steadying practice, holds your streak, and your Companion checks in on the anxious days. This plan is your start.",
+      optH: "Not ready to buy? Take the free \"When Worry Hits\" card.",
+      optP: "Three verses and a 60-second prayer for the moment anxiety spikes. We'll email it to you, plus a couple of steadying reflections. No spam, unsubscribe anytime.",
+      mH: "Before you go — grab the free \"When Worry Hits\" card.",
+      mP: "Three verses and a 60-second prayer for the moment anxiety spikes. We'll email it to you free. No spam.",
+      final: "Ten minutes a day. Fourteen days. A quieter mind.",
+      stack: [
+        ["14 dated days for an anxious mind","Open to today and know exactly what to read, pray, and do. No deciding when your mind is already racing."],
+        ["A steadying practice each day","One small, doable thing — breath, gratitude, a verse to carry — that meets worry in the moment."],
+        ["Scripture chosen for worry","The passages that speak straight to fear and anxiety, in plain language, in short readings."],
+        ["The \"when it spikes\" page","Exactly what to reach for when anxiety hits hard, so you're never scrambling in the moment."]
+      ],
+      faq: [
+        ["Is this a replacement for therapy or medication?","No. It's a daily spiritual anchor, not medical or mental-health treatment. If anxiety is overwhelming your daily life, please also talk to a counselor or doctor — that's a wise, faithful step, and this plan says so plainly."],
+        ["I'm not sure how strong my faith is. Is this for me?","Yes. You don't need a strong faith or any Bible background — just 10 minutes and a willingness to try. The prayers give you the words if you've never known what to say."],
+        ["What if I miss a day?","You just take today. There's no catching up and no starting over. Grace is the whole point."],
+        ["How do I get it?","Instant access after a $7 checkout. Backed by a 30-day, no-questions money-back guarantee."]
+      ]
+    }
+  };
+
+  function qp(n){ return new URLSearchParams(location.search).get(n); }
+  var key = (qp("offer") || "anchor").toLowerCase();
+  var o = OFFERS[key] || OFFERS.anchor;
+
+  function set(id, html){ var el=document.getElementById(id); if(el && html!=null) el.innerHTML=html; }
+  document.title = o.title;
+  if(key !== "anchor"){
+    set("k-kicker", o.kicker); set("k-h1", o.h1); set("k-sub", o.sub); set("k-promise", o.promise);
+    set("k-prob-h", o.probH); set("k-prob-b", o.probB);
+    set("k-why", o.why); set("k-app-h", o.appH); set("k-app-b", o.appB);
+    set("k-opt-h", o.optH); set("k-opt-p", o.optP); set("k-m-h", o.mH); set("k-m-p", o.mP);
+    set("k-final", o.final);
+    if(o.stack){ document.getElementById("k-stack").innerHTML = o.stack.map(function(s){
+      return '<div class="item"><div class="chk">✓</div><div class="txt"><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>';
+    }).join(""); }
+    if(o.faq){ document.getElementById("k-faq").innerHTML = o.faq.map(function(f){
+      return '<details><summary>'+f[0]+' <span class="plus">+</span></summary><div class="ans">'+f[1]+'</div></details>';
+    }).join(""); }
+    document.querySelectorAll('[data-buy] span:first-child').forEach(function(s){ s.textContent = o.buy; });
+  }
+
+  // ---- buy: to checkout (STAGED placeholder until a real link is set) ----
+  function goCheckout(){
+    try{ if(window.fbq) fbq('track','InitiateCheckout'); }catch(e){}
+    if(!o.checkout || o.checkout.charAt(0) === "#"){
+      alert("This is a staged demo — checkout isn't wired yet. (See BUILD-CHECKLIST.md.)");
+      return;
+    }
+    location.href = o.checkout;
+  }
+  document.querySelectorAll('[data-buy]').forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); goCheckout(); });
+  });
+
+  // ---- email capture (non-blocking) ----
+  function capture(email, ctx){
+    var payload = { email: email, offer: key, source: "tripwire_lp", context: ctx, ts: Date.now() };
+    try{ localStorage.setItem('anchored_lead', email); }catch(e){}
+    try{ if(window.fbq) fbq('track','Lead'); }catch(e){}
+    if(!LEAD_ENDPOINT) return Promise.resolve(); // stubbed until wired
+    return fetch(LEAD_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)}).catch(function(){});
+  }
+  document.querySelectorAll('form[data-cap]').forEach(function(f){
+    f.addEventListener('submit', function(e){
+      e.preventDefault();
+      var input = f.querySelector('input[type=email]');
+      var email = (input.value||'').trim();
+      if(!email || email.indexOf('@')<1) { input.focus(); return; }
+      capture(email, f.closest('#modal') ? 'exit_modal' : 'inline');
+      f.style.display='none';
+      var done = f.parentElement.querySelector('[data-capdone]');
+      if(done) done.style.display='block';
+      try{ localStorage.setItem('anchored_captured','1'); }catch(e){}
+    });
+  });
+
+  // ---- sticky mobile buy bar ----
+  var sticky = document.getElementById('stickybuy');
+  var hero = document.querySelector('.hero');
+  if('IntersectionObserver' in window && hero){
+    new IntersectionObserver(function(ents){
+      ents.forEach(function(en){ sticky.classList.toggle('show', !en.isIntersecting); });
+    },{rootMargin:'-60px 0px 0px 0px'}).observe(hero);
+  }
+
+  // ---- exit-intent / non-buyer prompt: once per visitor ----
+  var modal = document.getElementById('modal');
+  var shown = false;
+  function alreadyDone(){ try{ return localStorage.getItem('anchored_captured')==='1' || sessionStorage.getItem('anchored_modal')==='1'; }catch(e){ return false; } }
+  function showModal(){
+    if(shown || alreadyDone()) return;
+    shown = true;
+    try{ sessionStorage.setItem('anchored_modal','1'); }catch(e){}
+    modal.classList.add('show');
+  }
+  function hideModal(){ modal.classList.remove('show'); }
+  document.getElementById('modalskip').addEventListener('click', function(){ hideModal(); goCheckout(); });
+  modal.addEventListener('click', function(e){ if(e.target===modal) hideModal(); });
+  document.addEventListener('mouseout', function(e){ if(e.clientY<=0 && !e.relatedTarget) showModal(); });
+  var maxY=0, dwell=false;
+  setTimeout(function(){ dwell=true; }, 15000);
+  var lastY = window.scrollY;
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY; maxY=Math.max(maxY,y);
+    var pct = (y+window.innerHeight)/document.body.scrollHeight;
+    if(dwell && pct>0.5 && y < lastY - 40 && maxY>600) showModal();
+    lastY = y;
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>

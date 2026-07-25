@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Anchored — Your Daily Walk</title>
+<!--
+  ANCHORED — daily-Christian-discipline accountability app.
+  THIRD MACHINE demand-test clone of spotted-app.html. Same shell (login gate,
+  trial→paywall, tabs, questionnaire→plan engine, AI companion, check-ins/streak,
+  installable PWA, dev self-test) re-skinned into the faith niche.
+
+  STAGED — NOT LIVE. No backend, no live Stripe links (paywall CTAs are clearly
+  marked placeholders). Accounts are client-side only, exactly like Spotted's
+  original local-profile gate. See faith-app/BUILD-CHECKLIST.md before shipping.
+
+  Bible text embedded here is the WORLD ENGLISH BIBLE (WEB) — public domain — so
+  nothing copyrighted ships. Modern translations (ESV/NIV/NLT/CSB) are a label
+  the member can pick; we never reproduce their copyrighted text. (Flag to
+  security-compliance before any launch — see checklist.)
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#12100C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Anchored">
+<link rel="apple-touch-icon" href="anchored-icon.svg">
+<link rel="icon" href="anchored-icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    color-scheme: dark;
+    /* warm, reverent palette — candlelit dark canvas + gold accent */
+    --bg:#12100C; --surface:#1C1913; --surface-2:#241F17; --border:#38311F;
+    --text:#F5F0E6; --muted:#A79B84; --accent:#E5B85C; --accent-ink:#1A150C;
+    --accent-fill:#E5B85C; --accent-2:#7FB0A6;
+    --flag:#D9CDB6; --flag-bg:#241F17; --good:#E5B85C; --good-bg:#26200F;
+    --warn:#E0A82E; --danger:#E06A5A;
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 12px 32px -14px rgba(0,0,0,.7);
+    --glow: 0 0 0 1px rgba(229,184,92,.14), 0 8px 30px -8px rgba(229,184,92,.30);
+    --radius: 16px; --radius-lg: 22px; --radius-sm: 10px;
+    --glass-bg: rgba(28,25,19,.66); --glass-brd: rgba(255,255,255,.08);
+    --spring: cubic-bezier(.34,1.56,.64,1);
+    --smooth: cubic-bezier(.22,1,.36,1);
+    --fast: .18s; --base: .32s;
+    --step-hero: clamp(2.4rem, 1.4rem + 4.6vw, 3.8rem);
+    --step-h1: clamp(1.4rem, 1.1rem + 1.6vw, 1.85rem);
+    --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+    --font-body: "Inter", ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; color:var(--text);
+    font-family: var(--font-body);
+    line-height:1.5; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    background:
+      radial-gradient(62% 48% at 12% -4%, rgba(229,184,92,.10), transparent 60%),
+      radial-gradient(52% 42% at 104% 8%, rgba(127,176,166,.07), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  body::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.035;
+    background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter><rect width="100%25" height="100%25" filter="url(%23n)"/></svg>'); }
+  .display, .value, .split-name, .wordmark { font-family: var(--font-display); letter-spacing:-.01em; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important;
+      transition-duration:.001ms !important; scroll-behavior:auto !important; }
+  }
+  .wrap { position:relative; z-index:1; max-width: 680px; margin: 0 auto; padding: 32px 20px calc(112px + var(--safe-b)); }
+  header.masthead {
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin:-32px -20px 20px; padding:calc(18px + var(--safe-t)) 20px 16px;
+    background:var(--glass-bg); backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    border-bottom:1px solid var(--glass-brd);
+  }
+  .wordmark { font-weight:600; letter-spacing:.01em; font-size:26px; }
+  .wordmark span { color: var(--accent); }
+  .tagline { color:var(--muted); font-size:13px; letter-spacing:.02em; }
+  .theme-btn {
+    background:var(--surface-2); border:1px solid var(--border); color:var(--muted);
+    border-radius:10px; padding:8px 10px; cursor:pointer; font:inherit; font-size:13px;
+    transition:transform var(--fast) var(--spring), border-color var(--fast), color var(--fast);
+  }
+  .theme-btn:hover { border-color:var(--accent); color:var(--text); }
+  .theme-btn:active { transform:scale(.94); }
+  nav.tabs { display:flex; gap:6px; margin-bottom:26px; flex-wrap:wrap; }
+  .tab-btn {
+    font:inherit; font-size:13px; font-weight:600; letter-spacing:.02em;
+    background:var(--surface-2); color:var(--muted); border:1px solid var(--border);
+    padding:9px 14px; border-radius:999px; cursor:pointer;
+    transition:transform var(--fast) var(--spring), background var(--fast), color var(--fast), border-color var(--fast);
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+  }
+  .tab-btn:hover { color:var(--text); border-color:var(--accent); }
+  .tab-btn:active { transform:scale(.93); }
+  .tab-btn[aria-selected="true"] { background:var(--accent-fill); color:var(--accent-ink); border-color:var(--accent-fill); box-shadow:var(--glow); }
+  @media (max-width:640px) {
+    nav.tabs {
+      position:fixed; left:0; right:0; bottom:0; z-index:50; margin:0;
+      display:grid; grid-template-columns:repeat(5,1fr); gap:2px; flex-wrap:nowrap;
+      padding:8px 8px calc(8px + var(--safe-b));
+      background:var(--glass-bg); backdrop-filter:blur(20px) saturate(150%);
+      -webkit-backdrop-filter:blur(20px) saturate(150%);
+      border-top:1px solid var(--glass-brd);
+    }
+    .tab-btn { border:none; background:none; border-radius:12px; padding:8px 2px; font-size:11px; text-align:center; min-height:44px; }
+    .tab-btn[aria-selected="true"] { background:rgba(229,184,92,.14); color:var(--accent); box-shadow:none; }
+  }
+  .panel-view { display:none; }
+  .panel-view.active { display:block; animation: fade .32s var(--smooth); }
+  @keyframes fade { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  h1.page-title { font-size: clamp(20px,4.5vw,26px); margin:0 0 6px; text-wrap:balance; font-family:var(--font-display); font-weight:600; }
+  p.lede { color:var(--muted); margin:0 0 24px; max-width:54ch; font-size:15px; }
+  .step-label {
+    display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.08em;
+    color:var(--accent); font-weight:700; text-transform:uppercase; margin-bottom:6px;
+  }
+  form { display:grid; gap:16px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:22px; box-shadow:var(--shadow); }
+  .field { display:grid; gap:6px; }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:480px){ .field-row{ grid-template-columns:1fr; } }
+  label { font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  input, select, textarea {
+    font:inherit; font-size:16px; padding:12px 13px; border-radius:10px;
+    border:1px solid var(--border); background:var(--surface-2); color:var(--text); width:100%;
+    transition:border-color var(--fast), box-shadow var(--fast), background var(--fast);
+  }
+  input:hover, select:hover, textarea:hover { border-color:#4a4029; }
+  input:focus, select:focus, textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(229,184,92,.16); }
+  textarea { resize:vertical; min-height:70px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:22px 0 18px; }
+  @media (max-width:480px){ .stat-grid{ grid-template-columns:repeat(2,1fr);} }
+  .stat-tile { background:linear-gradient(160deg, var(--surface-2), var(--surface)); border:1px solid var(--border); border-radius:var(--radius);
+    padding:15px 13px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+    transition:transform var(--base) var(--spring), border-color var(--base), box-shadow var(--base); }
+  .stat-tile::before { content:''; position:absolute; inset:0 0 auto 0; height:2px;
+    background:linear-gradient(90deg, var(--accent), transparent 70%); opacity:.9; }
+  .stat-tile:hover { transform:translateY(-4px); border-color:rgba(229,184,92,.32); box-shadow:var(--glow); }
+  .stat-tile .value { font-family:var(--font-display); font-weight:700; font-size:clamp(22px,5.4vw,30px); font-variant-numeric:tabular-nums; line-height:1.05; color:var(--accent); }
+  .stat-tile .value .unit { font-size:12px; color:var(--muted); font-weight:600; margin-left:2px; }
+  .stat-tile .label { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:4px; font-weight:600; }
+  .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 20px; box-shadow:var(--shadow); margin-bottom:14px; }
+  .panel h3 { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin:0 0 12px; font-weight:700; }
+  .split-name { font-weight:700; letter-spacing:.01em; font-size:18px; margin-bottom:4px; font-family:var(--font-display); }
+  .rule-note { font-size:13px; color:var(--muted); border-left:2px solid var(--accent); padding-left:12px; margin-top:10px; }
+  .callout { border-left:3px solid var(--flag); background:var(--flag-bg); border-radius:8px;
+    padding:14px 16px; font-size:14px; margin-bottom:14px; }
+  .callout strong { color:var(--flag); }
+  .verse { font-family:var(--font-display); font-size:19px; line-height:1.5; color:var(--text); font-weight:500; }
+  .verse-ref { display:block; margin-top:10px; font-family:var(--font-body); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; }
+  .rhythm-item { padding:14px 0; border-bottom:1px solid var(--border); }
+  .rhythm-item:last-child { border-bottom:none; }
+  .rhythm-k { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .rhythm-v { font-size:15px; color:var(--text); }
+  .rhythm-v .ref { color:var(--accent); font-weight:700; }
+  .empty-state { color:var(--muted); font-size:14px; padding:24px; text-align:center;
+    background:var(--surface-2); border:1px dashed var(--border); border-radius:var(--radius); }
+  button.primary { font:inherit; font-weight:700; font-size:14px; letter-spacing:.02em;
+    background:var(--accent-fill); color:var(--accent-ink); border:none; padding:12px 22px;
+    border-radius:999px; cursor:pointer; box-shadow:0 8px 22px -8px rgba(229,184,92,.5);
+    transition:transform var(--fast) var(--spring), filter var(--fast), box-shadow var(--fast);
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+  button.primary:hover { filter:brightness(1.06); box-shadow:0 10px 28px -6px rgba(229,184,92,.6); }
+  button.primary:active { transform:scale(.96); }
+  button.ghost { font:inherit; font-weight:700; font-size:13px; background:transparent;
+    color:var(--muted); border:1px solid var(--border); padding:10px 16px; border-radius:999px; cursor:pointer;
+    transition:transform var(--fast) var(--spring), border-color var(--fast), color var(--fast); }
+  button.ghost:hover { border-color:var(--accent); color:var(--text); }
+  button.ghost:active { transform:scale(.96); }
+  .done-btn.is-done { background:var(--good-bg); color:var(--accent); border:1px solid var(--accent); box-shadow:none; }
+  .day-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+  .day-tab { font:inherit; font-size:12px; font-weight:700; background:var(--surface-2);
+    color:var(--muted); border:1px solid var(--border); padding:7px 12px; border-radius:8px; cursor:pointer; }
+  .day-tab[aria-selected="true"] { background:var(--text); color:var(--bg); border-color:var(--text); }
+  .plan-day { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+    padding:11px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .plan-day:last-child { border-bottom:none; }
+  .plan-day .pd-n { font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; min-width:52px; }
+  .plan-day .pd-check { color:var(--accent); font-weight:800; }
+  /* Check-in */
+  .ci-entry { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+    padding:12px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .ci-entry:last-child { border-bottom:none; }
+  .ci-date { font-weight:700; font-variant-numeric:tabular-nums; }
+  .ci-meta { color:var(--muted); font-size:13px; }
+  .streak { display:inline-flex; align-items:center; gap:8px; background:var(--good-bg);
+    color:var(--good); border-radius:999px; padding:6px 14px; font-size:13px; font-weight:700; margin-bottom:16px; }
+  footer.foot { margin-top:32px; padding-top:20px; border-top:1px solid var(--border);
+    color:var(--muted); font-size:12.5px; text-wrap:balance; }
+  /* Login / gate + paywall (mirrors Spotted) */
+  body.gated .wrap { display:none; }
+  .gate { display:none; }
+  body.gated .gate { display:flex; min-height:100vh; min-height:100dvh; align-items:center; justify-content:center; padding:calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b)); }
+  .gate-card { width:100%; max-width:440px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px 24px; box-shadow:var(--shadow); }
+  .gate-card .wordmark { font-size:30px; margin-bottom:2px; }
+  .gate-lede { color:var(--muted); font-size:14px; margin:10px 0 20px; }
+  .gate .field { margin-bottom:14px; }
+  .consent-row { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text);
+    text-transform:none; letter-spacing:0; font-weight:400; cursor:pointer; }
+  .consent-row input { width:auto; margin-top:2px; flex:none; }
+  .gate-note { font-size:12px; color:var(--muted); margin-top:16px; border-left:2px solid var(--border); padding-left:10px; }
+  .gate-switch { background:none; border:none; color:var(--accent); font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:0; }
+  .gate-err { color:#ff8a7a; font-size:13px; min-height:1em; margin:4px 0; }
+  .acct-chip { display:flex; gap:10px; align-items:center; }
+  .acct-name { font-size:13px; color:var(--muted); font-weight:600; }
+  body.paywalled .wrap { display:none; }
+  body.paywalled .gate { display:none; }
+  .paywall { display:none; }
+  body.paywalled .paywall { display:flex; min-height:100vh; min-height:100dvh; align-items:center; justify-content:center; padding:calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b)); }
+  .paywall-card { width:100%; max-width:460px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px 24px; box-shadow:var(--shadow); }
+  .paywall-card .wordmark { font-size:30px; margin-bottom:2px; }
+  .pw-banner { margin:16px 0 4px; border:1.5px solid var(--accent); border-radius:12px; padding:12px 14px;
+    background:rgba(229,184,92,.08); font-size:13px; }
+  .pw-banner b { display:block; color:var(--accent); font-size:11px; letter-spacing:.13em; text-transform:uppercase; margin-bottom:4px; }
+  .pw-head { font-size:22px; font-weight:700; letter-spacing:-.02em; margin:18px 0 8px; font-family:var(--font-display); }
+  .pw-lede { color:var(--muted); font-size:14px; line-height:1.55; margin:0 0 6px; }
+  .pw-saved { color:var(--text); font-size:13px; line-height:1.5; margin:12px 0 18px; border-left:2px solid var(--accent); padding-left:10px; }
+  .pw-cta { display:block; text-align:center; text-decoration:none; font-weight:800; font-size:15px;
+    border-radius:12px; padding:14px 18px; margin-bottom:10px; }
+  .pw-cta-primary { background:var(--accent); color:var(--accent-ink); }
+  .pw-cta-secondary { background:var(--surface-2); color:var(--text); border:1px solid var(--border); }
+  .pw-cta .pw-sub { display:block; font-weight:600; font-size:12px; opacity:.8; margin-top:2px; }
+  .pw-best { display:inline-block; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    background:var(--accent); color:var(--accent-ink); border-radius:6px; padding:2px 6px; margin-left:6px; vertical-align:middle; }
+  .pw-reassure { font-size:12px; color:var(--muted); line-height:1.5; margin:14px 0 0; }
+  .pw-logout { background:none; border:none; color:var(--accent); font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:0; margin-top:16px; }
+  /* Questionnaire */
+  .q-section { border-top:1px solid var(--border); padding-top:18px; margin-top:2px; }
+  .q-section:first-of-type { border-top:none; padding-top:0; }
+  .q-section-title { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:14px; }
+  .check-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  @media (max-width:480px){ .check-grid{ grid-template-columns:1fr; } }
+  .check-item { display:flex; gap:8px; align-items:center; font-size:13px; color:var(--text);
+    text-transform:none; letter-spacing:0; font-weight:400; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:8px; padding:9px 10px; cursor:pointer; }
+  .check-item input { width:auto; margin:0; flex:none; }
+  /* Companion */
+  .spot-hi { font-size:15px; color:var(--text); margin:0 0 4px; }
+  .spot-hi b { color:var(--accent); }
+  .glance-line { display:flex; gap:8px; align-items:baseline; font-size:14px; padding:7px 0; border-bottom:1px solid var(--border); }
+  .glance-line:last-child { border-bottom:none; }
+  .glance-line .gl-k { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700; min-width:88px; flex:none; }
+  .glance-line .gl-v { color:var(--text); }
+  .glance-line .gl-v b { color:var(--accent); }
+  .spot-badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--accent); background:var(--good-bg); border:1px solid var(--border); border-radius:999px; padding:2px 8px; margin-left:6px; vertical-align:middle; }
+  .spot-badge.wait { color:var(--flag); background:var(--flag-bg); }
+  .spot-ask { display:flex; gap:8px; align-items:stretch; }
+  .spot-ask input { flex:1; }
+  .spot-ask button { white-space:nowrap; }
+  .spot-answer { margin-top:14px; border-left:3px solid var(--accent); background:var(--surface-2);
+    border:1px solid var(--border); border-left-width:3px; border-radius:8px; padding:14px 16px; font-size:14px; }
+  .spot-answer .sa-you { color:var(--muted); font-size:13px; margin-bottom:8px; }
+  .spot-answer .sa-you b { color:var(--text); }
+  .spot-answer .sa-spot { color:var(--text); line-height:1.6; }
+  .spot-answer .sa-spot .sig { color:var(--muted); font-weight:700; }
+  .spot-answer.flagged { border-left-color:var(--flag); }
+  .spot-answer.crisis { border-left-color:var(--danger); background:rgba(224,106,90,.08); }
+  .spot-suggest { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+  .spot-chip { font:inherit; font-size:12px; font-weight:600; background:var(--surface-2); color:var(--muted);
+    border:1px solid var(--border); padding:6px 11px; border-radius:999px; cursor:pointer; }
+  .spot-chip:hover { border-color:var(--accent); color:var(--text); }
+  .install-help { position:fixed; inset:0; background:rgba(0,0,0,.72); display:flex; align-items:center; justify-content:center;
+    z-index:70; padding:20px; }
+  .install-help .ih-card { width:100%; max-width:420px; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:24px 22px; box-shadow:var(--shadow); }
+  .install-help h3 { font-size:14px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); margin:0 0 12px; }
+  .install-help ol { margin:0 0 16px; padding-left:20px; font-size:14px; color:var(--text); }
+  .install-help li { margin-bottom:8px; }
+  #toasts { position:fixed; left:0; right:0; top:calc(14px + var(--safe-t)); z-index:9999;
+    display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none; padding:0 12px; }
+  .toast { pointer-events:auto; max-width:min(92vw,26rem); padding:12px 16px; border-radius:12px;
+    background:var(--glass-bg); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
+    border:1px solid var(--glass-brd); color:var(--text); font-size:14px; font-weight:500;
+    box-shadow:0 12px 34px rgba(0,0,0,.5); transform:translateY(-14px); opacity:0;
+    transition:transform var(--fast) var(--spring), opacity var(--fast); }
+  .toast.show { transform:none; opacity:1; }
+  .toast.ok { border-left:3px solid var(--accent); }
+  .toast.err { border-left:3px solid var(--danger); }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN / ACCOUNT GATE ============ -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="wordmark">Anchored<span>.</span></div>
+    <div class="tagline">Never walk alone.</div>
+    <p class="gate-lede" id="gate-lede">Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet. Your walk saves here; your reminders come to you.</p>
+    <form id="gate-form" autocomplete="off">
+      <div class="field signup-only"><label for="g-first">First name</label><input type="text" id="g-first" required></div>
+      <div class="field"><label for="g-email">Email</label><input type="email" id="g-email" required></div>
+      <div class="field signup-only"><label for="g-phone">Phone (mobile) — for reminders (optional)</label><input type="tel" id="g-phone" placeholder="+1 555 123 4567"></div>
+      <div class="field-row signup-only">
+        <div class="field"><label for="g-goal">What are you here for?</label><select id="g-goal"><option value="closeness">Grow closer to God</option><option value="prayer">Build a prayer habit</option><option value="scripture">Read Scripture daily</option><option value="freedom">Find freedom from a habit</option></select></div>
+        <div class="field"><label for="g-channel">Preferred nudge</label><select id="g-channel"><option value="email">Email</option><option value="text">Text</option><option value="both">Both</option></select></div>
+      </div>
+      <div class="field"><label for="g-pass">Password</label><input type="password" id="g-pass" required></div>
+      <div class="signup-only">
+        <label class="consent-row"><input type="checkbox" id="g-consent-email"> Email me my daily verse and gentle check-in nudges. I can unsubscribe anytime.</label>
+        <label class="consent-row" style="margin-top:8px;"><input type="checkbox" id="g-consent-sms"> Text me my daily verse &amp; reminders (about 1 msg/day). Msg &amp; data rates may apply. Reply STOP to cancel, HELP for help. Consent isn't required to use Anchored.</label>
+        <p class="gate-note" style="margin-top:8px;">By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. We never sell your information, and your phone number is used only for the reminders you ask for.</p>
+      </div>
+      <div class="gate-err" id="gate-err"></div>
+      <button type="submit" class="primary" id="gate-submit" style="width:100%;margin-top:6px;">Create my account</button>
+    </form>
+    <div style="margin-top:14px;font-size:13px;color:var(--muted);">
+      <span id="gate-switch-label">Already have an account?</span>
+      <button type="button" class="gate-switch" id="gate-switch">Log in</button>
+    </div>
+    <div class="gate-note" id="gate-note">Heads up — this is a simple on-device account: it remembers you on this device and captures your info so your Companion can reach you. It is <strong>not</strong> secure login yet (no server is verifying your password, and it only lives on this device). Real accounts that follow you across devices arrive with the backend.</div>
+  </div>
+</div>
+
+<!-- ============ TRIAL-ENDED PAYWALL (STAGED — placeholder checkout links) ============ -->
+<div class="paywall" id="paywall">
+  <div class="paywall-card">
+    <div class="wordmark">Anchored<span>.</span></div>
+    <div class="pw-banner"><b>Founding member price · first 100 only</b>Lock in $8.99/mo for life. As long as you stay, your price never goes up.</div>
+    <h1 class="pw-head">Your free week has ended.</h1>
+    <p class="pw-lede">The plan tells you what to read and pray. Anchored is the part that helps you actually keep it: it carries your streak, sends the day's verse to you, and your Companion reaches out in the exact window you normally drift.</p>
+    <p class="pw-saved">Your walk is saved. Subscribe and you pick up right where you left off, nothing lost.</p>
+    <!-- STAGED: replace href="#staged-monthly" with the real Stripe payment link before launch (see BUILD-CHECKLIST.md). -->
+    <a class="pw-cta pw-cta-primary" id="pw-monthly" href="#staged-monthly" data-staged="1">
+      Continue for $8.99/mo<span class="pw-sub">Founding price, locked for life</span>
+    </a>
+    <a class="pw-cta pw-cta-secondary" id="pw-annual" href="#staged-annual" data-staged="1">
+      Go annual for $79/yr<span class="pw-best">Best value</span><span class="pw-sub">About $6.58/mo, roughly three months free</span>
+    </a>
+    <p class="pw-reassure">Cancel anytime, right from the app, no calls and no hoops. Change your mind in the first two weeks and we refund you, no questions.</p>
+    <button type="button" class="pw-logout" id="pw-logout">Log out</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="wordmark">Anchored<span>.</span></div>
+      <div class="tagline">Never walk alone.</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button type="button" class="theme-btn" id="install-btn" hidden>⬇ Install app</button>
+      <div class="acct-chip" id="acct-chip"></div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn" role="tab" data-view="today" aria-selected="true">Today</button>
+    <button class="tab-btn" role="tab" data-view="plan" aria-selected="false">Plan</button>
+    <button class="tab-btn" role="tab" data-view="checkin" aria-selected="false">Check-In</button>
+    <button class="tab-btn" role="tab" data-view="companion" aria-selected="false">Companion</button>
+    <button class="tab-btn" role="tab" data-view="walk" aria-selected="false">My Walk</button>
+  </nav>
+
+  <!-- ============ TODAY ============ -->
+  <section class="panel-view active" id="view-today">
+    <div id="today-body"></div>
+  </section>
+
+  <!-- ============ PLAN ============ -->
+  <section class="panel-view" id="view-plan">
+    <div id="plan-body"></div>
+  </section>
+
+  <!-- ============ CHECK-IN ============ -->
+  <section class="panel-view" id="view-checkin">
+    <h1 class="page-title">Check-in</h1>
+    <p class="lede">A minute of honesty a day. It's the single biggest predictor of whether the habit sticks.</p>
+    <div id="streak-wrap"></div>
+    <form id="checkin-form">
+      <div class="field">
+        <label for="ci-minutes">Minutes with God today</label>
+        <input type="number" id="ci-minutes" min="0" max="300" step="1" inputmode="numeric" placeholder="10">
+      </div>
+      <div class="field">
+        <label for="ci-state">How is your heart today? (1 dry — 5 full)</label>
+        <select id="ci-state">
+          <option value="3" selected>3 — steady</option>
+          <option value="1">1 — dry / distant</option>
+          <option value="2">2 — struggling</option>
+          <option value="4">4 — encouraged</option>
+          <option value="5">5 — full</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ci-gratitude">One thing you're grateful for</label>
+        <input type="text" id="ci-gratitude" placeholder="e.g. my kids, a quiet morning">
+      </div>
+      <div class="field">
+        <label for="ci-notes">Anything on your mind (private journal)</label>
+        <textarea id="ci-notes" placeholder="God, today I..."></textarea>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <button type="submit" class="primary">Save today's check-in</button>
+        <span class="ci-meta" id="ci-note"></span>
+      </div>
+    </form>
+    <div class="panel" style="margin-top:16px;">
+      <h3>Recent check-ins</h3>
+      <div id="ci-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ COMPANION ============ -->
+  <section class="panel-view" id="view-companion">
+    <div id="spot-body"></div>
+  </section>
+
+  <!-- ============ MY WALK (intake) ============ -->
+  <section class="panel-view" id="view-walk">
+    <div class="step-label">Step 1 — About your walk</div>
+    <h1 class="page-title">Build your plan</h1>
+    <p class="lede">Answer these once. Your daily verse, prayer prompts, a small practice, and a reading plan built around where you are and what you're carrying all come from it.</p>
+    <form id="intake-form" autocomplete="off">
+
+      <div class="q-section">
+        <div class="q-section-title">What you're here for</div>
+        <div class="field">
+          <label for="goal">What do you most want to build right now?</label>
+          <select id="goal" required>
+            <option value="" disabled selected>Choose</option>
+            <option value="closeness">Grow closer to God every day</option>
+            <option value="prayer">Build a consistent prayer life</option>
+            <option value="scripture">Read through Scripture</option>
+            <option value="freedom">Find freedom from a habit</option>
+            <option value="family">Lead my family spiritually</option>
+            <option value="rebuild">Rebuild after drifting away</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="q-section">
+        <div class="q-section-title">Where you're starting</div>
+        <div class="field-row">
+          <div class="field">
+            <label for="bible_familiarity">How familiar are you with the Bible?</label>
+            <select id="bible_familiarity" required>
+              <option value="" disabled selected>Choose</option>
+              <option value="new">Brand new to it</option>
+              <option value="some">I know some</option>
+              <option value="grew_up">Grew up around it</option>
+              <option value="deep">I know it well</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="prayer_habit">How often do you pray now?</label>
+            <select id="prayer_habit" required>
+              <option value="" disabled selected>Choose</option>
+              <option value="rarely">Rarely</option>
+              <option value="sometimes">Sometimes</option>
+              <option value="most_days">Most days</option>
+              <option value="daily">Daily</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="season">Your season of life</label>
+          <select id="season">
+            <option value="" disabled selected>Choose</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="young_parent">Parent of young kids</option>
+            <option value="parent">Parent</option>
+            <option value="empty_nester">Empty nester</option>
+            <option value="student">Student</option>
+            <option value="caregiver">Caregiver</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="q-section">
+        <div class="q-section-title">Your rhythm</div>
+        <div class="field-row">
+          <div class="field">
+            <label for="minutes">Minutes you can give daily</label>
+            <select id="minutes" required>
+              <option value="5">5 minutes</option>
+              <option value="10" selected>10 minutes</option>
+              <option value="15">15 minutes</option>
+              <option value="20">20+ minutes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="preferred_time">Best time of day</label>
+            <select id="preferred_time">
+              <option value="morning" selected>Morning</option>
+              <option value="midday">Midday</option>
+              <option value="evening">Evening</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="plan_pref">Which reading plan fits you?</label>
+          <select id="plan_pref">
+            <option value="gospels" selected>Start with the Gospels (the life of Jesus)</option>
+            <option value="psalms_proverbs">A Psalm &amp; a Proverb each day</option>
+            <option value="topical">Topical — scripture for what I'm carrying</option>
+            <option value="whole">Work toward the whole Bible</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="q-section">
+        <div class="q-section-title">What you're carrying</div>
+        <div class="field">
+          <label>Pick anything on your heart (we'll bring Scripture to it — gently, never a diagnosis)</label>
+          <div class="check-grid">
+            <label class="check-item"><input type="checkbox" class="burden-check" value="anxiety"> Anxiety / worry</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="discouragement"> Discouragement</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="temptation"> Temptation</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="anger"> Anger</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="loneliness"> Loneliness</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="grief"> Grief / loss</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="doubt"> Doubt</label>
+            <label class="check-item"><input type="checkbox" class="burden-check" value="purpose"> Purpose / direction</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="q-section">
+        <div class="q-section-title">Your preferences</div>
+        <div class="field">
+          <label for="translation">Bible translation you read (label only — we quote public-domain WEB in-app)</label>
+          <select id="translation">
+            <option value="WEB" selected>World English Bible (WEB)</option>
+            <option value="KJV">King James (KJV)</option>
+            <option value="ESV">ESV</option>
+            <option value="NIV">NIV</option>
+            <option value="NLT">NLT</option>
+            <option value="CSB">CSB</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="tradition">Church background (optional — we stay welcoming to all)</label>
+          <input type="text" id="tradition" placeholder="e.g. non-denominational, Catholic, Baptist — or just exploring">
+        </div>
+      </div>
+    </form>
+
+    <div id="walk-results" hidden></div>
+  </section>
+
+  <footer class="foot">
+    Anchored is a daily-discipline companion, not a substitute for your church, a pastor, or professional care.
+    If you're in crisis or thinking about harming yourself, call or text <strong>988</strong> (US Suicide &amp; Crisis Lifeline) right now, or your local emergency number.
+    Scripture quoted in-app is the World English Bible (public domain).
+  </footer>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     ANCHORED app engine — client-side only (demand-test stage).
+     Mirrors spotted-app.html architecture: localStorage contract,
+     login gate, trial→paywall, questionnaire→plan engine, AI
+     companion (fixed KB + safety redirect), check-ins/streak, PWA.
+     ============================================================ */
+
+  /* ---------- storage keys (contract — see BUILD-CHECKLIST.md) ---------- */
+  var LS_PROFILE   = "anchored_profile";   // intake superset that drives the plan
+  var LS_INTAKE    = "anchored_intake";    // raw questionnaire answers
+  var LS_CHECKINS  = "anchored_checkins";  // [{date, minutes, state, gratitude, notes}]
+  var LS_COMPLETES = "anchored_completes"; // [dateISO] days the rhythm was marked done
+  var LS_START     = "anchored_start";     // ISO date the walk began (day counter)
+  var LS_THEME     = "anchored_theme_ui";  // light/dark (reserved)
+  var LS_MEMBER    = "anchored_member";    // single CRM record
+  var LS_AUTH      = "_auth";              // {hash} placeholder gate secret (shared contract name)
+  var LS_AUTHED    = "anchored_authed";    // session flag
+  var LS_SUB_STATUS= "anchored_sub_status";   // 'none'|'trial'|'active'|'expired'
+  var LS_TRIAL_EXP = "anchored_trial_expires";// ISO8601
+
+  var REDUCE_MOTION = false;
+  try { if (location.search.indexOf("selftest") !== -1) REDUCE_MOTION = true; } catch (e) {}
+
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch (e) { return fallback; }
+  }
+  function save(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; }
+  }
+  function trim(s) { return String(s == null ? "" : s).trim(); }
+  function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function todayISO() { var d = new Date(); return d.toISOString().slice(0, 10); }
+  function daysBetween(aISO, bISO) {
+    var a = Date.parse(aISO + "T00:00:00"), b = Date.parse(bISO + "T00:00:00");
+    if (isNaN(a) || isNaN(b)) return 0;
+    return Math.round((b - a) / 86400000);
+  }
+
+  /* ---------- toast ---------- */
+  function toast(msg, type) {
+    var root = document.getElementById("toasts"); if (!root) return;
+    var el = document.createElement("div");
+    el.className = "toast " + (type || "ok");
+    el.textContent = msg;
+    root.appendChild(el);
+    requestAnimationFrame(function () { el.classList.add("show"); });
+    setTimeout(function () { el.classList.remove("show"); setTimeout(function () { el.remove(); }, 260); }, 2600);
+  }
+
+  /* ---------- account / gate (client-side, mirrors Spotted honesty) ---------- */
+  function hashPass(pass, email) {
+    var s = String(email || "").toLowerCase() + ":" + String(pass || "");
+    var h = 0x811c9dc5;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; }
+    return h.toString(16);
+  }
+  function isAuthed() { try { return localStorage.getItem(LS_AUTHED) === "1"; } catch (e) { return false; } }
+  function setAuthed(on) { try { if (on) localStorage.setItem(LS_AUTHED, "1"); else localStorage.removeItem(LS_AUTHED); } catch (e) {} }
+  function getMember() { return load(LS_MEMBER, null); }
+  function hasAccount() { try { return !!localStorage.getItem(LS_AUTH); } catch (e) { return false; } }
+
+  var gateMode = "signup";
+  function applyGateMode() {
+    var isSignup = gateMode === "signup";
+    document.querySelectorAll(".signup-only").forEach(function (n) { n.style.display = isSignup ? "" : "none"; });
+    var sub = document.getElementById("gate-submit");
+    var lbl = document.getElementById("gate-switch-label");
+    var sw = document.getElementById("gate-switch");
+    var lede = document.getElementById("gate-lede");
+    if (sub) sub.textContent = isSignup ? "Create my account" : "Log in";
+    if (lbl) lbl.textContent = isSignup ? "Already have an account?" : "New here?";
+    if (sw) sw.textContent = isSignup ? "Log in" : "Create account";
+    if (lede) lede.textContent = isSignup
+      ? "Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet."
+      : "Welcome back. Log in and pick up your walk right where you left off.";
+  }
+
+  function doSignup() {
+    var first = trim((document.getElementById("g-first") || {}).value);
+    var email = trim((document.getElementById("g-email") || {}).value);
+    var phone = trim((document.getElementById("g-phone") || {}).value);
+    var goal = (document.getElementById("g-goal") || {}).value;
+    var channel = (document.getElementById("g-channel") || {}).value;
+    var pass = (document.getElementById("g-pass") || {}).value;
+    var err = document.getElementById("gate-err");
+    if (!first || !email || email.indexOf("@") < 1 || !pass) { if (err) err.textContent = "Please fill your name, a valid email, and a password."; return; }
+    save(LS_AUTH, { hash: hashPass(pass, email) });
+    var m = getMember() || {};
+    m.identity = { first_name: first, created_at: new Date().toISOString() };
+    m.contact = {
+      email: email, phone: phone, preferred_channel: channel,
+      consent_email: !!(document.getElementById("g-consent-email") || {}).checked,
+      consent_sms: !!(document.getElementById("g-consent-sms") || {}).checked
+    };
+    m.status = m.status || { goal: goal };
+    m.engagement = m.engagement || { last_reply: null, quiet_days: 0, status_flags: [] };
+    m.open_questions = m.open_questions || [];
+    save(LS_MEMBER, m);
+    setAuthed(true);
+    startTrialIfNeeded();
+    unlockApp();
+    toast("Welcome, " + first + ". Your walk starts today.");
+  }
+
+  function doLogin() {
+    var email = trim((document.getElementById("g-email") || {}).value);
+    var pass = (document.getElementById("g-pass") || {}).value;
+    var err = document.getElementById("gate-err");
+    var auth = load(LS_AUTH, null);
+    if (!auth || auth.hash !== hashPass(pass, email)) { if (err) err.textContent = "That email or password doesn't match this device."; return; }
+    setAuthed(true);
+    unlockApp();
+  }
+
+  function unlockApp() {
+    document.body.classList.remove("gated");
+    applyGate();
+    renderAll();
+    renderAcct();
+  }
+
+  function logout() {
+    setAuthed(false);
+    document.body.classList.remove("paywalled");
+    document.body.classList.add("gated");
+    gateMode = "login";
+    applyGateMode();
+  }
+
+  function renderAcct() {
+    var chip = document.getElementById("acct-chip"); if (!chip) return;
+    var m = getMember();
+    if (!m || !isAuthed()) { chip.innerHTML = ""; return; }
+    chip.innerHTML = '<span class="acct-name">' + escapeHtml((m.identity && m.identity.first_name) || "Friend") + '</span>' +
+      '<button type="button" class="theme-btn" id="logout-btn">Log out</button>';
+    var lb = document.getElementById("logout-btn");
+    if (lb) lb.addEventListener("click", logout);
+  }
+
+  /* ---------- trial / paywall (mirrors Spotted gate; 7-day free) ---------- */
+  var TRIAL_DAYS = 7;
+  function startTrialIfNeeded() {
+    try {
+      if (!localStorage.getItem(LS_TRIAL_EXP) && localStorage.getItem(LS_SUB_STATUS) == null) {
+        localStorage.setItem(LS_SUB_STATUS, "trial");
+        localStorage.setItem(LS_TRIAL_EXP, new Date(Date.now() + TRIAL_DAYS * 86400e3).toISOString());
+      }
+    } catch (e) {}
+  }
+  function subStatus() { try { return localStorage.getItem(LS_SUB_STATUS) || "none"; } catch (e) { return "none"; } }
+  function trialExpiresMs() { try { var v = localStorage.getItem(LS_TRIAL_EXP); return v ? Date.parse(v) : NaN; } catch (e) { return NaN; } }
+  function isPaywalled() {
+    if (subStatus() === "active") return false;      // paying member
+    var exp = trialExpiresMs();
+    if (isNaN(exp)) return false;                     // grandfathered / no trial fields → never blocked
+    return Date.now() > exp;                           // trial clock passed
+  }
+  function applyGate() {
+    if (!isAuthed()) return;
+    if (isPaywalled()) { document.body.classList.add("paywalled"); }
+    else { document.body.classList.remove("paywalled"); }
+  }
+  // test hook — mirrors window.__spottedGate
+  window.__anchoredGate = { isPaywalled: isPaywalled, apply: applyGate };
+
+  /* ============================================================
+     PLAN ENGINE — the domain content. Public-domain WEB Scripture.
+     Themes carry: anchor verses, prayer prompts, reflections.
+     Reading plans produce a dated passage per day.
+     ============================================================ */
+
+  // Theme banks keyed to what the member is carrying / their goal.
+  var THEMES = {
+    peace: {
+      label: "Peace over anxiety",
+      verses: [
+        ["Do not be anxious about anything, but in everything by prayer and petition with thanksgiving, let your requests be made known to God.", "Philippians 4:6"],
+        ["Come to me, all you who labor and are heavily burdened, and I will give you rest.", "Matthew 11:28"],
+        ["Casting all your worries on him, because he cares for you.", "1 Peter 5:7"],
+        ["Yahweh is my shepherd; I shall lack nothing.", "Psalm 23:1"],
+        ["Peace I leave with you. My peace I give to you... Don't let your heart be troubled, neither let it be fearful.", "John 14:27"]
+      ],
+      prayers: [
+        "Name the one worry sitting heaviest on you right now, and hand it to God out loud.",
+        "Thank God for one thing He carried you through before — and ask Him to do it again.",
+        "Ask for peace not by escaping the hard thing, but in the middle of it."
+      ],
+      reflections: [
+        "What are you trying to control today that was never yours to carry?",
+        "Where have you seen God provide before, even when you were afraid?"
+      ]
+    },
+    hope: {
+      label: "Hope over discouragement",
+      verses: [
+        ["Yahweh is near to those who have a broken heart, and saves those who have a crushed spirit.", "Psalm 34:18"],
+        ["Weeping may stay for the night, but joy comes in the morning.", "Psalm 30:5"],
+        ["Those who wait for Yahweh will renew their strength. They will mount up with wings like eagles.", "Isaiah 40:31"],
+        ["We know that all things work together for good for those who love God.", "Romans 8:28"],
+        ["Let's not be weary in doing good, for we will reap in due season if we don't give up.", "Galatians 6:9"]
+      ],
+      prayers: [
+        "Tell God honestly where you feel discouraged — He can handle the truth.",
+        "Ask Him for the strength to take just the next small step today.",
+        "Thank Him that this season is not the end of your story."
+      ],
+      reflections: [
+        "What's one small faithful step you can take today, even discouraged?",
+        "Who could you reach out to instead of carrying this alone?"
+      ]
+    },
+    strength: {
+      label: "Strength over temptation",
+      verses: [
+        ["No temptation has taken you except what is common to man. God is faithful... he will also make the way of escape.", "1 Corinthians 10:13"],
+        ["Submit therefore to God. Resist the devil, and he will flee from you.", "James 4:7"],
+        ["I can do all things through Christ, who strengthens me.", "Philippians 4:13"],
+        ["Watch and pray, that you don't enter into temptation. The spirit indeed is willing, but the flesh is weak.", "Matthew 26:41"],
+        ["Create in me a clean heart, God. Renew a right spirit within me.", "Psalm 51:10"]
+      ],
+      prayers: [
+        "Name the temptation plainly to God — bringing it into the light is half the battle.",
+        "Ask for a specific way of escape today, and the courage to take it.",
+        "Thank God that His mercy is new every morning, no matter yesterday."
+      ],
+      reflections: [
+        "What situation tends to set you up to fall — and how could you avoid it today?",
+        "Who is one trusted person who could walk with you in this?"
+      ]
+    },
+    comfort: {
+      label: "Comfort in grief",
+      verses: [
+        ["Blessed are those who mourn, for they shall be comforted.", "Matthew 5:4"],
+        ["He will wipe away every tear from their eyes. Death will be no more.", "Revelation 21:4"],
+        ["Yahweh is near to those who have a broken heart.", "Psalm 34:18"],
+        ["Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me.", "Psalm 23:4"],
+        ["Blessed be the God... of all comfort, who comforts us in all our affliction.", "2 Corinthians 1:3-4"]
+      ],
+      prayers: [
+        "Tell God what you miss and what hurts. He is close to the brokenhearted.",
+        "Ask Him to sit with you today — you don't have to have words.",
+        "Thank Him for one good memory, and let yourself feel it."
+      ],
+      reflections: [
+        "What do you need to give yourself permission to feel today?",
+        "Where might God be near, even in the ache?"
+      ]
+    },
+    purpose: {
+      label: "Direction and purpose",
+      verses: [
+        ["Trust in Yahweh with all your heart, and don't lean on your own understanding. In all your ways acknowledge him, and he will make your paths straight.", "Proverbs 3:5-6"],
+        ["Your word is a lamp to my feet, and a light for my path.", "Psalm 119:105"],
+        ["'For I know the thoughts that I think toward you,' says Yahweh, 'thoughts of peace, and not of evil, to give you hope and a future.'", "Jeremiah 29:11"],
+        ["Commit your works to Yahweh, and your plans will be established.", "Proverbs 16:3"],
+        ["He has shown you, O man, what is good... to act justly, to love mercy, and to walk humbly with your God.", "Micah 6:8"]
+      ],
+      prayers: [
+        "Ask God for wisdom for one decision in front of you — He gives it freely.",
+        "Surrender your own timeline and ask Him to make the next step clear.",
+        "Thank Him that you don't have to see the whole path to take the next step."
+      ],
+      reflections: [
+        "What next step do you already sense you should take?",
+        "Where are you leaning on your own understanding instead of asking God?"
+      ]
+    },
+    closeness: {
+      label: "Closer to God",
+      verses: [
+        ["Draw near to God, and he will draw near to you.", "James 4:8"],
+        ["As the deer pants for the water brooks, so my soul pants after you, God.", "Psalm 42:1"],
+        ["You will seek me and find me, when you search for me with all your heart.", "Jeremiah 29:13"],
+        ["Remain in me, and I in you... apart from me you can do nothing.", "John 15:4-5"],
+        ["One thing I have asked of Yahweh, that I will seek after: that I may dwell in the house of Yahweh all the days of my life.", "Psalm 27:4"]
+      ],
+      prayers: [
+        "Just sit quietly for one minute and tell God you want to know Him more.",
+        "Thank Him for one way you've already seen Him at work in your life.",
+        "Ask Him to make His presence real to you today, in something small."
+      ],
+      reflections: [
+        "What crowds out your time with God — and what could you trade for it?",
+        "When did you last feel close to God? What were you doing?"
+      ]
+    }
+  };
+
+  // Which theme to lead with, from the burdens/goal.
+  function pickTheme(profile) {
+    var b = (profile.burdens || []);
+    if (b.indexOf("anxiety") >= 0) return "peace";
+    if (b.indexOf("grief") >= 0) return "comfort";
+    if (b.indexOf("temptation") >= 0 || b.indexOf("anger") >= 0) return "strength";
+    if (b.indexOf("discouragement") >= 0 || b.indexOf("loneliness") >= 0) return "hope";
+    if (b.indexOf("doubt") >= 0 || b.indexOf("purpose") >= 0) return "purpose";
+    if (profile.goal === "freedom") return "strength";
+    if (profile.goal === "prayer" || profile.goal === "closeness" || profile.goal === "rebuild") return "closeness";
+    if (profile.goal === "family") return "purpose";
+    return "closeness";
+  }
+
+  // Reading plans → an ordered list of passage references. Kept modest but real.
+  var PLANS = {
+    gospels: {
+      name: "The Gospels — the life of Jesus",
+      days: ["John 1", "Mark 1", "Luke 1", "Matthew 1", "John 3", "Mark 2", "Luke 2",
+             "Matthew 5", "John 4", "Mark 4", "Luke 6", "Matthew 6", "John 6", "Mark 6",
+             "Luke 10", "Matthew 11", "John 8", "Mark 8", "Luke 15", "Matthew 14",
+             "John 11"]
+    },
+    psalms_proverbs: {
+      name: "A Psalm & a Proverb a day",
+      days: ["Psalm 1 · Proverbs 1", "Psalm 8 · Proverbs 2", "Psalm 19 · Proverbs 3",
+             "Psalm 23 · Proverbs 4", "Psalm 27 · Proverbs 5", "Psalm 34 · Proverbs 6",
+             "Psalm 37 · Proverbs 7", "Psalm 42 · Proverbs 8", "Psalm 46 · Proverbs 9",
+             "Psalm 51 · Proverbs 10", "Psalm 63 · Proverbs 11", "Psalm 84 · Proverbs 12",
+             "Psalm 90 · Proverbs 13", "Psalm 91 · Proverbs 14", "Psalm 100 · Proverbs 15",
+             "Psalm 103 · Proverbs 16", "Psalm 119:1-32 · Proverbs 17", "Psalm 121 · Proverbs 18",
+             "Psalm 130 · Proverbs 19", "Psalm 139 · Proverbs 20", "Psalm 145 · Proverbs 21"]
+    },
+    topical: {
+      name: "Scripture for what you're carrying",
+      days: null   // built from the chosen theme's verse list, see buildPlan()
+    },
+    whole: {
+      name: "Toward the whole Bible",
+      days: ["Genesis 1", "Genesis 12", "Exodus 3", "Exodus 20", "Psalm 1", "Isaiah 40",
+             "Isaiah 53", "Matthew 5", "John 1", "Luke 15", "John 19", "John 20",
+             "Acts 2", "Romans 8", "1 Corinthians 13", "Galatians 5", "Ephesians 2",
+             "Philippians 4", "Hebrews 11", "James 1", "Revelation 21"]
+    }
+  };
+
+  // A small rotating set of daily practices, gentle and scaled by time.
+  var PRACTICES = [
+    "Write down one thing you're thankful for before you do anything else.",
+    "Pray for someone by name who is on your heart today.",
+    "Put your phone away for the first 10 minutes of your day.",
+    "Read today's verse slowly, twice, and sit with the one line that stands out.",
+    "Text one person a word of encouragement.",
+    "Take a two-minute walk and thank God for three things you can see.",
+    "Confess one thing honestly and receive that His mercy is new this morning.",
+    "Memorize today's verse — say it three times before you close the app.",
+    "Do one small act of service for someone in your home today.",
+    "Sit in silence for one minute and simply say, 'Here I am.'"
+  ];
+
+  function getProfile() { return load(LS_PROFILE, null); }
+
+  function planStart() {
+    var s = load(LS_START, null);
+    if (!s) { s = todayISO(); save(LS_START, s); }
+    return s;
+  }
+  function dayIndex() {
+    var start = planStart();
+    return Math.max(0, daysBetween(start, todayISO()));
+  }
+
+  // Build the concrete plan (day list) for a profile.
+  function buildPlan(profile) {
+    var theme = pickTheme(profile);
+    var planKey = profile.plan_pref || "gospels";
+    var plan = PLANS[planKey] || PLANS.gospels;
+    var days;
+    if (planKey === "topical") {
+      days = THEMES[theme].verses.map(function (v) { return v[1]; });
+    } else {
+      days = plan.days.slice();
+    }
+    return { theme: theme, planName: plan.name, days: days };
+  }
+
+  // Today's rhythm: verse + reading + prayer + practice + reflection.
+  function todayRhythm(profile) {
+    var p = buildPlan(profile);
+    var t = THEMES[p.theme];
+    var i = dayIndex();
+    var verse = t.verses[i % t.verses.length];
+    var reading = p.days[i % p.days.length];
+    var prayer = t.prayers[i % t.prayers.length];
+    var practice = PRACTICES[i % PRACTICES.length];
+    var reflection = t.reflections[i % t.reflections.length];
+    return {
+      dayNum: i + 1, theme: p.theme, themeLabel: t.label, planName: p.planName,
+      verse: verse, reading: reading, prayer: prayer, practice: practice, reflection: reflection,
+      minutes: profile.minutes || 10
+    };
+  }
+
+  /* ---------- streak ---------- */
+  function completes() { return load(LS_COMPLETES, []); }
+  function isTodayComplete() { return completes().indexOf(todayISO()) >= 0; }
+  function markTodayComplete() {
+    var c = completes();
+    if (c.indexOf(todayISO()) < 0) { c.push(todayISO()); save(LS_COMPLETES, c); }
+  }
+  function currentStreak() {
+    var set = {}; completes().forEach(function (d) { set[d] = 1; });
+    var streak = 0;
+    var d = new Date();
+    // count back from today (or yesterday if today not yet done)
+    if (!set[todayISO()]) d.setDate(d.getDate() - 1);
+    for (var i = 0; i < 3650; i++) {
+      var iso = d.toISOString().slice(0, 10);
+      if (set[iso]) { streak++; d.setDate(d.getDate() - 1); } else break;
+    }
+    return streak;
+  }
+
+  /* ============================================================
+     RENDER — Today, Plan, Check-in, Companion, My Walk
+     ============================================================ */
+  function needProfileCallout(where) {
+    return '<div class="callout"><strong>Set up your plan first.</strong> Head to <strong>My Walk</strong> and answer a few questions — then ' + where + ' fills in for you. It takes about a minute.</div>';
+  }
+
+  function renderToday() {
+    var host = document.getElementById("today-body"); if (!host) return;
+    var profile = getProfile();
+    if (!profile) {
+      host.innerHTML = '<h1 class="page-title">Today</h1><p class="lede">Your daily rhythm shows up here.</p>' + needProfileCallout("your daily verse, prayer, and practice");
+      return;
+    }
+    var r = todayRhythm(profile);
+    var done = isTodayComplete();
+    var html = '';
+    html += '<h1 class="page-title">Today</h1>';
+    html += '<p class="lede">Day ' + r.dayNum + ' of your walk · ' + escapeHtml(r.themeLabel) + ' · about ' + r.minutes + ' min.</p>';
+    html += '<div class="streak">🔥 ' + currentStreak() + '-day streak</div>';
+    // Anchor verse
+    html += '<div class="panel"><h3>Today\'s anchor verse</h3>';
+    html += '<div class="verse">&ldquo;' + escapeHtml(r.verse[0]) + '&rdquo;<span class="verse-ref">' + escapeHtml(r.verse[1]) + ' · WEB</span></div></div>';
+    // Rhythm
+    html += '<div class="panel"><h3>Your rhythm today</h3>';
+    html += '<div class="rhythm-item"><div class="rhythm-k">📖 Read</div><div class="rhythm-v"><span class="ref">' + escapeHtml(r.reading) + '</span> — from ' + escapeHtml(r.planName) + '.</div></div>';
+    html += '<div class="rhythm-item"><div class="rhythm-k">🙏 Pray</div><div class="rhythm-v">' + escapeHtml(r.prayer) + '</div></div>';
+    html += '<div class="rhythm-item"><div class="rhythm-k">🌱 Practice</div><div class="rhythm-v">' + escapeHtml(r.practice) + '</div></div>';
+    html += '<div class="rhythm-item"><div class="rhythm-k">💭 Reflect</div><div class="rhythm-v">' + escapeHtml(r.reflection) + '</div></div>';
+    html += '</div>';
+    // Complete button
+    html += '<button type="button" class="primary done-btn' + (done ? ' is-done' : '') + '" id="today-done" style="width:100%;">' +
+      (done ? '✓ Done for today — see you tomorrow' : 'Mark today complete') + '</button>';
+    host.innerHTML = html;
+    var db = document.getElementById("today-done");
+    if (db) db.addEventListener("click", function () {
+      if (isTodayComplete()) return;
+      markTodayComplete();
+      touchEngagement();
+      toast("Well done. Streak: " + currentStreak() + " days.");
+      renderToday();
+    });
+  }
+
+  function renderPlan() {
+    var host = document.getElementById("plan-body"); if (!host) return;
+    var profile = getProfile();
+    if (!profile) {
+      host.innerHTML = '<h1 class="page-title">Your plan</h1>' + needProfileCallout("your reading plan");
+      return;
+    }
+    var p = buildPlan(profile);
+    var t = THEMES[p.theme];
+    var idx = dayIndex();
+    var doneSet = {}; completes().forEach(function (d) { doneSet[d] = 1; });
+    var start = planStart();
+    var html = '';
+    html += '<h1 class="page-title">Your plan</h1>';
+    html += '<p class="lede">' + escapeHtml(p.planName) + ' · focus: ' + escapeHtml(t.label) + '.</p>';
+    html += '<div class="panel"><h3>Memory verse for this stretch</h3>';
+    html += '<div class="verse">&ldquo;' + escapeHtml(t.verses[0][0]) + '&rdquo;<span class="verse-ref">' + escapeHtml(t.verses[0][1]) + ' · WEB</span></div></div>';
+    html += '<div class="panel"><h3>The reading arc</h3>';
+    for (var i = 0; i < p.days.length; i++) {
+      var dayISO = new Date(Date.parse(start + "T00:00:00") + i * 86400e3).toISOString().slice(0, 10);
+      var isDone = !!doneSet[dayISO];
+      var isToday = i === (idx % p.days.length);
+      html += '<div class="plan-day"' + (isToday ? ' style="background:rgba(229,184,92,.06);border-radius:8px;"' : '') + '>' +
+        '<div class="pd-n">Day ' + (i + 1) + '</div>' +
+        '<div>' + escapeHtml(p.days[i]) + (isToday ? ' <span class="spot-badge">today</span>' : '') + '</div>' +
+        '<div class="pd-check">' + (isDone ? '✓' : '') + '</div></div>';
+    }
+    html += '</div>';
+    host.innerHTML = html;
+  }
+
+  function renderStreakWrap() {
+    var w = document.getElementById("streak-wrap"); if (!w) return;
+    w.innerHTML = '<div class="streak">🔥 ' + currentStreak() + '-day streak</div>';
+  }
+  function renderCheckins() {
+    var list = document.getElementById("ci-list"); if (!list) return;
+    var arr = load(LS_CHECKINS, []);
+    if (!arr.length) { list.innerHTML = '<div class="empty-state">No check-ins yet. Your first one is today.</div>'; return; }
+    list.innerHTML = arr.slice(-10).reverse().map(function (c) {
+      var stateTxt = ["", "dry", "struggling", "steady", "encouraged", "full"][c.state] || "steady";
+      return '<div class="ci-entry"><div class="ci-date">' + escapeHtml(c.date) + '</div>' +
+        '<div class="ci-meta">' + (c.minutes ? c.minutes + ' min · ' : '') + stateTxt +
+        (c.gratitude ? ' · grateful for ' + escapeHtml(c.gratitude) : '') + '</div>' +
+        '<div class="ci-wt">' + (c.state || 3) + '/5</div></div>';
+    }).join("");
+  }
+  function saveCheckin(e) {
+    if (e) e.preventDefault();
+    var c = {
+      date: todayISO(),
+      minutes: parseInt((document.getElementById("ci-minutes") || {}).value || "0", 10) || 0,
+      state: parseInt((document.getElementById("ci-state") || {}).value || "3", 10),
+      gratitude: trim((document.getElementById("ci-gratitude") || {}).value),
+      notes: trim((document.getElementById("ci-notes") || {}).value)
+    };
+    var arr = load(LS_CHECKINS, []);
+    // overwrite today's if it exists
+    arr = arr.filter(function (x) { return x.date !== c.date; });
+    arr.push(c);
+    save(LS_CHECKINS, arr);
+    // a check-in also counts as showing up today
+    markTodayComplete();
+    touchEngagement();
+    var note = document.getElementById("ci-note");
+    if (note) note.textContent = "Saved. Streak: " + currentStreak() + " days.";
+    toast("Check-in saved.");
+    // Safety net: the private journal is a real place distress surfaces. If a
+    // check-in mentions self-harm/abuse/ED, gently surface real help. Defined
+    // once the Companion's safety patterns exist (hoisted below).
+    try { scanCheckinForCrisis(c); } catch (e) {}
+    renderStreakWrap();
+    renderCheckins();
+  }
+
+  // Show a non-blocking crisis/abuse resource callout at the top of the Check-In
+  // view when a journal entry signals it. Uses the same always-wins patterns as
+  // the Companion so there is no gap between the two channels.
+  function scanCheckinForCrisis(c) {
+    if (typeof CRISIS_RE === "undefined") return;
+    var blob = String((c && c.notes) || "") + " " + String((c && c.gratitude) || "");
+    var msg = null;
+    if (CRISIS_RE.test(blob)) msg = CRISIS_ANSWER;
+    else if (ABUSE_RE.test(blob)) msg = ABUSE_ANSWER;
+    else if (ED_RE.test(blob)) msg = ED_ANSWER;
+    if (!msg) return;
+    var view = document.getElementById("view-checkin"); if (!view) return;
+    var host = document.getElementById("ci-crisis-note");
+    if (!host) {
+      host = document.createElement("div");
+      host.id = "ci-crisis-note";
+      host.className = "spot-answer crisis";
+      host.setAttribute("role", "alert");
+      host.style.marginBottom = "16px";
+      view.insertBefore(host, view.firstChild);
+    }
+    host.innerHTML = '<div class="sa-spot">' + escapeHtml(msg) + '</div>';
+    host.hidden = false;
+    try { host.scrollIntoView({ block: "center" }); } catch (e) {}
+    if (c) { if (!c.__flagged) { var m = getMember(); if (m && m.engagement && m.engagement.status_flags && m.engagement.status_flags.indexOf("crisis_flag") < 0) { m.engagement.status_flags.push("crisis_flag"); save(LS_MEMBER, m); } } }
+  }
+
+  function touchEngagement() {
+    var m = getMember(); if (!m) return;
+    m.engagement = m.engagement || { last_reply: null, quiet_days: 0, status_flags: [] };
+    m.engagement.last_reply = new Date().toISOString();
+    m.engagement.quiet_days = 0;
+    save(LS_MEMBER, m);
+  }
+
+  /* ============================================================
+     COMPANION — fixed faith Q&A KB + hard SAFETY redirects.
+     Safety redirect (crisis) ALWAYS wins, mirroring Spotted's PED block.
+     Non-condemning, welcoming across Christian traditions. Not a
+     counselor, pastor, or doctor — points to real people for real help.
+     ============================================================ */
+
+  var QA_BASE = [
+    { id:1, intent:"start_bible", keywords:["how do i start","where do i start","start reading","begin the bible","new to the bible","never read the bible","where to begin","how to read the bible"],
+      answer:"Start small and start with Jesus. Your plan opens in the Gospel of John or Mark — just one chapter a day on the Today tab. Read slowly, and when a line stands out, stop and sit with it. You don't need to understand everything at once. Showing up daily beats reading a lot once." },
+    { id:2, intent:"missed_day", keywords:["missed a day","fell behind","missed yesterday","broke my streak","skipped a day","didnt read","behind on my plan","missed my time"],
+      answer:"There's no shame here, and no catching up to do. His mercies are new every morning (Lamentations 3:22-23). Don't try to make up the days you missed — just open Today and take today. One faithful day is a win. The streak is a nudge, not a judge." },
+    { id:3, intent:"how_to_pray", keywords:["how do i pray","dont know how to pray","how to pray","what do i say to god","teach me to pray","prayer feels awkward","i cant pray"],
+      answer:"Prayer is just honest talking with God — no special words needed. A simple pattern: thank Him for one thing, tell Him one thing that's hard, ask Him for one thing, and sit quiet for a moment. Jesus gave us the Lord's Prayer (Matthew 6:9-13) as a model. Start with one sentence today." },
+    { id:4, intent:"dont_feel_god", keywords:["dont feel god","cant feel god","god feels distant","feel nothing","god is silent","dont feel anything","where is god","god feels far"],
+      answer:"Feelings come and go, and even people deep in faith walk through dry seasons — you're not doing it wrong. Faith isn't measured by a feeling; it's measured by showing up. Keep drawing near, and He promises to draw near to you (James 4:8). If the distance feels heavy for a long stretch, it's worth telling a trusted pastor or friend." },
+    { id:5, intent:"doubt", keywords:["i have doubts","struggling to believe","doubt","is god real","questioning my faith","hard to believe","doubting"],
+      answer:"Doubt isn't the opposite of faith — honest questions have a long, welcome history among believers. A father once prayed, 'I believe; help my unbelief' (Mark 9:24), and Jesus met him. Bring the questions instead of burying them, and consider talking them through with a pastor or a mature believer who won't flinch at hard ones." },
+    { id:6, intent:"anxiety", flag:"support", keywords:["anxious","anxiety","worried","cant stop worrying","overwhelmed","panic","stressed","fear"],
+      answer:"Scripture speaks to this often: 'Do not be anxious about anything, but in everything by prayer... let your requests be made known to God' (Philippians 4:6-7). Try naming the worry out loud to God today and handing it over. And please hear this gently — if anxiety is overwhelming your daily life, that's not a faith failure, and talking to a counselor or doctor is a wise, faithful step." },
+    { id:7, intent:"temptation", keywords:["temptation","tempted","keep sinning","cant stop","struggling with sin","habit i cant break","addiction","keep falling"],
+      answer:"You're not alone in this, and one fall doesn't undo you. 'God is faithful... he will also make the way of escape' (1 Corinthians 10:13). Two things that help: bring it into the light with one trusted person (secrecy is where these things grow), and notice what sets you up to fall so you can avoid that trigger today. If it's an addiction, please also reach out to a pastor or a recovery program — that's strength, not weakness." },
+    { id:8, intent:"forgiveness", keywords:["forgive","forgiveness","cant forgive","hurt me","holding a grudge","bitter","someone hurt me","let go"],
+      answer:"Forgiveness is hard and it's rarely a one-time event — it's a road you walk. It doesn't mean what happened was okay, and it doesn't always mean reconciliation. It means handing the debt to God instead of carrying it. 'Be kind... forgiving each other, just as God also in Christ forgave you' (Ephesians 4:32). Start by telling God honestly how much it hurt." },
+    { id:9, intent:"which_translation", keywords:["which translation","what version","esv or niv","best bible version","which bible","translation should i","what bible to read"],
+      answer:"The best translation is the one you'll actually read. The NLT and NIV are easy to read; the ESV and CSB balance readability and precision; the KJV is beautiful but older English. In this app we quote the World English Bible (WEB), which is public domain. Pick one that reads clearly to you and stick with it for a while." },
+    { id:10, intent:"build_habit", keywords:["build a habit","stay consistent","make it stick","keep it up","consistency","cant stay consistent","daily habit","routine"],
+      answer:"Anchor it to something you already do — coffee, your commute, bedtime. Keep it small enough that you can't fail: even five honest minutes counts. Use the Check-In tab daily; watching the streak grow is quietly powerful. And your Companion will nudge you in the window you tend to drift. Small and daily beats big and rare." },
+    { id:11, intent:"gospel", keywords:["what is the gospel","who is jesus","what do christians believe","good news","how to be saved","become a christian","what is christianity"],
+      answer:"In one breath: God made us, we all fall short, and out of love He sent Jesus — who lived, died, and rose again — so that anyone who trusts Him is forgiven and made new (John 3:16, Ephesians 2:8-9). It's a gift you receive, not a grade you earn. If you want to explore what it means to follow Jesus, a local church or a pastor is the best next conversation." },
+    { id:12, intent:"church_community", keywords:["find a church","should i go to church","community","alone in my faith","need people","church","fellowship","other believers"],
+      answer:"Faith was never meant to be solo — 'let's consider how to provoke one another to love and good works, not forsaking our own assembling together' (Hebrews 10:24-25). Look for a church that teaches the Bible and where you can actually know people, not just attend. Start by visiting one this week, or ask a believing friend where they go." },
+    { id:13, intent:"sabbath_rest", keywords:["rest","sabbath","burned out","tired","need a break","exhausted","overwhelmed with life","cant slow down"],
+      answer:"Rest is a command, not a reward — God built a Sabbath into the very first week (Genesis 2:2-3), and Jesus invites the weary to come to Him for rest (Matthew 11:28). Guard one slower day, put the phone down, and let God be God while you stop working. If you're running on empty constantly, that's worth an honest look with someone you trust." },
+    { id:14, intent:"giving", keywords:["giving","tithe","tithing","should i give","money and faith","generosity","give to church"],
+      answer:"Generosity is about the heart, not a formula — 'each man should give according as he has determined in his heart, not grudgingly... for God loves a cheerful giver' (2 Corinthians 9:7). Many start with a set percentage of income to their church and grow from there. Give in a way that stretches trust without wrecking your family's stability." },
+    { id:15, intent:"sharing_faith", keywords:["share my faith","tell others","evangelism","talk about jesus","witness","how to share","my family isnt christian"],
+      answer:"The most powerful witness is usually a changed, steady life plus a willingness to share your own story. You don't have to win a debate — 'always be ready to give an answer... with humility and fear' (1 Peter 3:15). Pray for the people you love, live it out, and share what God has done for you when the door opens. No pressure, no manipulation." },
+    { id:16, intent:"memory_verse", keywords:["memorize","memory verse","remember verses","learn scripture by heart","hide it in my heart","memorize the bible"],
+      answer:"'I have hidden your word in my heart, that I might not sin against you' (Psalm 119:11). Take today's anchor verse, read it aloud three times, then try to say it with your eyes closed. Review it once tomorrow and once at the end of the week. One verse a week adds up fast." },
+    { id:17, intent:"journaling", keywords:["journal","journaling","write it down","how to journal","prayer journal","reflection"],
+      answer:"Journaling turns a vague quiet time into something you can look back on. Simple prompt: write the one line from today's reading that stood out, one thing you're grateful for, and one thing you're asking God for. The Check-In tab has space for exactly this, and it's private." },
+    { id:18, intent:"fasting", keywords:["fasting","fast","should i fast","spiritual fasting","give something up"],
+      answer:"Spiritual fasting means setting something aside for a time to focus on God — food for a meal, or something like social media. Jesus assumed His followers would fast (Matthew 6:16-18). Start small: skip one thing for one day and turn that time and hunger into prayer. (Note: if you have any medical condition, talk to your doctor before fasting from food.)" },
+    { id:19, intent:"purpose", keywords:["my purpose","gods plan for me","what should i do with my life","calling","direction","gods will","find my purpose"],
+      answer:"You don't have to see the whole map to take the next step. 'Trust in Yahweh with all your heart... and he will make your paths straight' (Proverbs 3:5-6). Your foundational purpose is to know God and love the people around you; the specifics usually clarify as you walk faithfully. Ask God for wisdom on the one decision in front of you — He gives it freely (James 1:5)." },
+    { id:20, intent:"loneliness", flag:"support", keywords:["lonely","loneliness","no one","isolated","alone","by myself","nobody cares"],
+      answer:"Loneliness is real and it's heavy — and you are genuinely not alone: God promises 'I will never leave you nor forsake you' (Hebrews 13:5). But He also made us for each other, so this week take one small step toward people — a text, a church visit, a call. If loneliness is sliding into hopelessness, please reach out to a pastor, a counselor, or someone you trust today." },
+    { id:21, intent:"app_help", keywords:["how does this work","how do i use","how the app works","what do the tabs do","how to use anchored","whats today tab"],
+      answer:"Simple: Today gives you the day's verse, a prayer, a small practice, and a reflection — tap Mark today complete when you're done. Plan shows your whole reading arc. Check-In is your daily minute of honesty and your streak. And I'm your Companion — ask me anything about faith, the Bible, or the app, anytime." },
+    { id:22, intent:"data_privacy", keywords:["is my data private","data private","who sees my journal","privacy","is my info safe","do you sell my data","private journal"],
+      answer:"Your journal, check-ins, and plan are saved privately on your device. Your contact info lives only where we can reach you for the reminders you asked for, and we never sell or share it. Reply STOP to texts or unsubscribe from email any time." },
+    { id:23, intent:"fallback_escalate", keywords:[],
+      answer:"That's a good and honest question, and I want to point you well rather than guess. For something this personal, a trusted pastor, a mature believer, or a Christian counselor is the best next conversation. In the meantime, your reading and prayer for today are on the Today tab, and I'm always here for questions about faith, the Bible, or the app. — your Companion" }
+  ];
+  var QA_INDEX = {}; QA_BASE.forEach(function (e) { QA_INDEX[e.id] = e; });
+
+  // CRISIS terms — self-harm / suicide. This ALWAYS wins, exactly like Spotted's
+  // PED hard-block. Compassionate redirect to real help. Deliberately broad:
+  // for a crisis block a false positive (a caring message + hotline) is far
+  // cheaper than a false negative. Whitespace-tolerant, tested against evasions.
+  var CRISIS_RE = /\b(kill(ing)?\s+myself|end(ing)?\s+my\s+life|suicid\w*|want\s+to\s+die|wanna\s+die|don'?t\s+want\s+to\s+(be\s+here|live|be\s+alive|exist|wake\s+up|go\s+on)|take\s+my\s+(own\s+)?life|(hurt|harm|hurting|harming|cut|cutting)\s+myself|self[-\s]?harm\w*|overdos\w*|no\s+reason\s+to\s+live|nothing\s+to\s+live\s+for|no\s+point\s+(in\s+)?(living|being\s+here|life)|not\s+worth\s+living|better\s+off\s+(dead|without\s+me)|wish\s+i\s+(was|were|wasn'?t|weren'?t)\s+(dead|here|alive|born)|hang(ing)?\s+myself|off\s+myself|slit\s+my|can'?t\s+go\s+on|end\s+it\s+all|(just|want\s+to|wanna|gonna)\s+end\s+it|give\s+up\s+on\s+life)\b/i;
+  var CRISIS_ANSWER = "I'm really glad you told me, and I want you to be safe. I'm not able to help with this the way you deserve right now — but people who can are ready this second. Please call or text 988 (the US Suicide & Crisis Lifeline), or text HOME to 741741 (Crisis Text Line), or dial 911, right now. If you're outside the US, please call your local emergency number. You are not alone, you are loved, and this pain is not the end of your story. Please also reach out to a pastor or someone you trust today, and stay with someone if you can.";
+
+  // EATING-DISORDER terms — routed to professional/medical help (not the same as
+  // acute suicide crisis, and deliberately narrow so faith topics like fasting or
+  // Psalm 51 "purge me" never trigger it). Wins over normal Q&A matching.
+  var ED_RE = /\b(anorexi\w*|bulimi\w*|eating disorder|starv(e|ing)\s+myself|make\s+myself\s+(throw\s+up|vomit)|throwing\s+up\s+my\s+food|binge\s+and\s+purge)\b/i;
+  var ED_ANSWER = "Thank you for trusting me with something this hard. What you're describing deserves real, caring help — it is not a willpower failure or a faith failure, and God loves you exactly as you are right now. This is beyond what I can safely help with. Please reach out to a doctor or a licensed counselor who works with eating and body-image struggles — that's a strong, faithful step. If you ever feel unsafe or in crisis, call or text 988 (US Suicide & Crisis Lifeline) any time. Telling a pastor or someone close to you today can help you not carry this alone.";
+
+  // Abuse/violence — point to safety + professionals, don't counsel it.
+  var ABUSE_RE = /\b(being abused|he hits me|she hits me|domestic (violence|abuse)|my (husband|wife|partner|dad|mom|father|mother|boyfriend|girlfriend) (hits|beats|hurts)|someone is hurting me|i'?m being hurt|assault|raped|molest)\b/i;
+  var ABUSE_ANSWER = "I'm so sorry — no one deserves to be hurt, and your safety matters to God and to me. This is beyond what I can help with, and you deserve real help. If you're in immediate danger, call 911. In the US you can reach the National Domestic Violence Hotline at 1-800-799-7233 (or text START to 88788). Please also tell a pastor or someone you trust who can help you get to safety. You are not to blame for this.";
+
+  function normalizeQ(q) { return " " + String(q).toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim() + " "; }
+  function scoreEntry(norm, entry) {
+    var score = 0;
+    (entry.keywords || []).forEach(function (kw) {
+      var k = " " + kw.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim() + " ";
+      if (norm.indexOf(k) >= 0) { var words = k.trim().split(" ").length; score += words * words; }
+    });
+    return score;
+  }
+  // Returns { entry, flag, resolved, crisis }
+  function matchQuestion(raw) {
+    if (CRISIS_RE.test(raw)) return { entry: { intent: "crisis", answer: CRISIS_ANSWER }, flag: "crisis", resolved: false, crisis: true };
+    if (ABUSE_RE.test(raw)) return { entry: { intent: "abuse", answer: ABUSE_ANSWER }, flag: "crisis", resolved: false, crisis: true };
+    if (ED_RE.test(raw)) return { entry: { intent: "eating_disorder", answer: ED_ANSWER }, flag: "crisis", resolved: false, crisis: true };
+    var norm = normalizeQ(raw), best = null, bestScore = 0;
+    QA_BASE.forEach(function (e) {
+      if (e.intent === "fallback_escalate") return;
+      var sc = scoreEntry(norm, e);
+      if (sc > bestScore) { bestScore = sc; best = e; }
+    });
+    if (!best || bestScore < 1) return { entry: QA_INDEX[23], flag: null, resolved: false, crisis: false };
+    return { entry: best, flag: best.flag || null, resolved: !best.flag, crisis: false };
+  }
+
+  function logOpenQuestion(raw, res) {
+    var m = getMember(); if (!m) return;
+    if (!m.open_questions) m.open_questions = [];
+    var rec = { date: todayISO(), text: String(raw).trim(), intent: res.entry.intent, resolved: !!res.resolved };
+    if (res.flag) rec.flag = res.flag;
+    m.open_questions.push(rec);
+    if (m.engagement) {
+      m.engagement.last_reply = new Date().toISOString();
+      m.engagement.quiet_days = 0;
+      if (res.crisis && m.engagement.status_flags && m.engagement.status_flags.indexOf("crisis_flag") < 0) m.engagement.status_flags.push("crisis_flag");
+    }
+    save(LS_MEMBER, m);
+  }
+
+  var SPOT_SUGGESTIONS = ["How do I start reading the Bible?", "I missed a day", "How do I pray?", "I don't feel God right now", "I'm anxious", "How does this app work?"];
+
+  function askCompanion(raw) {
+    raw = trim(raw); if (!raw) return;
+    var res = matchQuestion(raw);
+    logOpenQuestion(raw, res);
+    var host = document.getElementById("spot-answer");
+    if (host) {
+      var ans = res.entry.answer;
+      host.innerHTML =
+        '<div class="sa-you">You asked: <b>' + escapeHtml(raw) + '</b></div>' +
+        '<div class="sa-spot">' + escapeHtml(ans) + (/—\s*your Companion\s*$/.test(ans) ? "" : ' <span class="sig">— your Companion</span>') + '</div>';
+      host.className = "spot-answer" + (res.crisis ? " crisis" : (res.flag ? " flagged" : ""));
+      host.hidden = false;
+    }
+    renderCompanionQuestions();
+  }
+
+  function renderCompanionQuestions() {
+    var host = document.getElementById("spot-oq"); if (!host) return;
+    var m = getMember();
+    var qs = (m && m.open_questions) ? m.open_questions.slice(-5).reverse() : [];
+    if (!qs.length) { host.innerHTML = '<div class="ci-meta">Nothing asked yet. Try a question above — I answer faith, the Bible, and how the app works.</div>'; return; }
+    host.innerHTML = qs.map(function (q) {
+      var tag = q.flag === "crisis" ? '<span class="spot-badge wait">please get real help</span>'
+              : q.flag === "support" ? '<span class="spot-badge wait">talk to someone you trust</span>'
+              : q.intent === "fallback_escalate" ? '<span class="spot-badge wait">ask a pastor</span>'
+              : '<span class="spot-badge">answered</span>';
+      return '<div class="glance-line"><span class="gl-v">' + escapeHtml(q.text) + tag + '</span></div>';
+    }).join("");
+  }
+
+  function renderCompanion() {
+    var body = document.getElementById("spot-body"); if (!body) return;
+    var m = getMember();
+    var first = (m && m.identity && m.identity.first_name) || "friend";
+    var profile = getProfile();
+    var html = "";
+    html += '<div class="panel"><div class="spot-hi">Hey <b>' + escapeHtml(first) + '</b> — I\'m your Companion. ' +
+      (profile ? 'Day ' + (dayIndex() + 1) + ' of your walk. Let\'s keep going.' : 'Set up My Walk and I\'ll tailor your days — but you can ask me anything right now.') + '</div>';
+    html += '<div class="ci-meta">I answer questions about faith, the Bible, and the app. I\'m not a pastor, counselor, or doctor — for those, I\'ll point you to real people who can help.</div></div>';
+    html += '<div class="panel"><h3>Ask me anything</h3>';
+    html += '<div class="spot-ask"><input type="text" id="spot-q" placeholder="Type your question..." autocomplete="off"><button type="button" class="primary" id="spot-send">Ask</button></div>';
+    html += '<div class="spot-suggest">' + SPOT_SUGGESTIONS.map(function (s) { return '<button type="button" class="spot-chip">' + escapeHtml(s) + '</button>'; }).join("") + '</div>';
+    html += '<div class="spot-answer" id="spot-answer" hidden></div>';
+    html += '</div>';
+    html += '<div class="panel"><h3>Recent questions</h3><div id="spot-oq"></div></div>';
+    body.innerHTML = html;
+
+    var send = document.getElementById("spot-send");
+    var q = document.getElementById("spot-q");
+    if (send && q) {
+      send.addEventListener("click", function () { askCompanion(q.value); });
+      q.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); askCompanion(q.value); } });
+    }
+    body.querySelectorAll(".spot-chip").forEach(function (c) {
+      c.addEventListener("click", function () { if (q) q.value = c.textContent; askCompanion(c.textContent); });
+    });
+    renderCompanionQuestions();
+  }
+
+  /* ---------- My Walk (intake) ---------- */
+  function readIntake() {
+    var burdens = Array.prototype.map.call(document.querySelectorAll(".burden-check:checked"), function (n) { return n.value; });
+    return {
+      goal: (document.getElementById("goal") || {}).value || "",
+      bible_familiarity: (document.getElementById("bible_familiarity") || {}).value || "",
+      prayer_habit: (document.getElementById("prayer_habit") || {}).value || "",
+      season: (document.getElementById("season") || {}).value || "",
+      minutes: parseInt((document.getElementById("minutes") || {}).value || "10", 10),
+      preferred_time: (document.getElementById("preferred_time") || {}).value || "morning",
+      plan_pref: (document.getElementById("plan_pref") || {}).value || "gospels",
+      burdens: burdens,
+      translation: (document.getElementById("translation") || {}).value || "WEB",
+      tradition: trim((document.getElementById("tradition") || {}).value)
+    };
+  }
+  function requiredFilled(intake) {
+    return intake.goal && intake.bible_familiarity && intake.prayer_habit;
+  }
+  function onIntakeChange() {
+    var intake = readIntake();
+    save(LS_INTAKE, intake);
+    if (!requiredFilled(intake)) { var r = document.getElementById("walk-results"); if (r) r.hidden = true; return; }
+    save(LS_PROFILE, intake);
+    // stamp plan snapshot onto the member for the CRM/companion
+    var m = getMember();
+    if (m) { m.plan_snapshot = { goal: intake.goal, theme: pickTheme(intake), plan: (PLANS[intake.plan_pref] || PLANS.gospels).name, minutes: intake.minutes }; save(LS_MEMBER, m); }
+    renderWalkResults(intake);
+    // keep the rest of the app in sync
+    renderToday(); renderPlan();
+  }
+  function renderWalkResults(intake) {
+    var host = document.getElementById("walk-results"); if (!host) return;
+    var theme = THEMES[pickTheme(intake)];
+    var plan = intake.plan_pref === "topical" ? PLANS.topical : (PLANS[intake.plan_pref] || PLANS.gospels);
+    host.hidden = false;
+    var html = '';
+    html += '<div class="stat-grid">';
+    html += '<div class="stat-tile"><div class="value" id="out-minutes">' + (intake.minutes || 10) + '<span class="unit">min</span></div><div class="label">Daily commitment</div></div>';
+    html += '<div class="stat-tile"><div class="value">' + currentStreak() + '<span class="unit">days</span></div><div class="label">Current streak</div></div>';
+    html += '<div class="stat-tile"><div class="value" style="font-size:16px;line-height:1.2;" id="out-focus">' + escapeHtml(theme.label) + '</div><div class="label">Your focus</div></div>';
+    html += '<div class="stat-tile"><div class="value" style="font-size:15px;line-height:1.2;">' + escapeHtml(intake.preferred_time.charAt(0).toUpperCase() + intake.preferred_time.slice(1)) + '</div><div class="label">Best time</div></div>';
+    html += '</div>';
+    html += '<div class="panel"><h3>Your plan is ready</h3>' +
+      '<div class="split-name">' + escapeHtml((PLANS[intake.plan_pref] || PLANS.gospels).name) + '</div>' +
+      '<div class="ci-meta">We built your days around growing in <b style="color:var(--accent)">' + escapeHtml(theme.label.toLowerCase()) + '</b>' +
+      (intake.tradition ? ', and we\'ll keep it welcoming to your background' : '') + '. Head to <b>Today</b> to begin.</div>' +
+      '<div class="rule-note">Scripture in-app is quoted from the public-domain World English Bible; your chosen translation (' + escapeHtml(intake.translation) + ') is noted for your own reading.</div>' +
+      '</div>';
+    html += '<button type="button" class="primary" id="go-today" style="width:100%;">Go to today &rarr;</button>';
+    host.innerHTML = html;
+    var g = document.getElementById("go-today");
+    if (g) g.addEventListener("click", function () { switchView("today"); });
+  }
+  function hydrateIntake() {
+    var intake = load(LS_INTAKE, null); if (!intake) return;
+    function set(id, v) { var n = document.getElementById(id); if (n && v != null) n.value = v; }
+    set("goal", intake.goal); set("bible_familiarity", intake.bible_familiarity);
+    set("prayer_habit", intake.prayer_habit); set("season", intake.season);
+    set("minutes", intake.minutes); set("preferred_time", intake.preferred_time);
+    set("plan_pref", intake.plan_pref); set("translation", intake.translation);
+    set("tradition", intake.tradition);
+    (intake.burdens || []).forEach(function (b) { var n = document.querySelector('.burden-check[value="' + b + '"]'); if (n) n.checked = true; });
+    if (requiredFilled(intake)) renderWalkResults(intake);
+  }
+
+  /* ---------- view switching ---------- */
+  function switchView(view) {
+    document.querySelectorAll(".tab-btn").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-view") === view ? "true" : "false"); });
+    document.querySelectorAll(".panel-view").forEach(function (v) { v.classList.toggle("active", v.id === "view-" + view); });
+    if (view === "today") renderToday();
+    if (view === "plan") renderPlan();
+    if (view === "checkin") { renderStreakWrap(); renderCheckins(); }
+    if (view === "companion") renderCompanion();
+    try { window.scrollTo({ top: 0, behavior: REDUCE_MOTION ? "auto" : "smooth" }); } catch (e) {}
+  }
+
+  function renderAll() {
+    renderToday(); renderPlan(); renderStreakWrap(); renderCheckins(); renderCompanion(); hydrateIntake();
+  }
+
+  /* ---------- PWA ---------- */
+  var deferredPrompt = null;
+  function initPWA() {
+    if ("serviceWorker" in navigator) {
+      try { navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(function () {}); } catch (e) {}
+    }
+    window.addEventListener("beforeinstallprompt", function (e) {
+      e.preventDefault(); deferredPrompt = e;
+      var b = document.getElementById("install-btn"); if (b) b.hidden = false;
+    });
+    var btn = document.getElementById("install-btn");
+    if (btn) btn.addEventListener("click", function () {
+      if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; btn.hidden = true; }
+      else { toast("To install: use your browser menu → Add to Home Screen."); }
+    });
+  }
+
+  /* ============================================================
+     BOOT
+     ============================================================ */
+  document.querySelectorAll(".tab-btn").forEach(function (b) {
+    b.addEventListener("click", function () { switchView(b.getAttribute("data-view")); });
+  });
+  var gf = document.getElementById("gate-form");
+  if (gf) gf.addEventListener("submit", function (e) { e.preventDefault(); if (gateMode === "signup") doSignup(); else doLogin(); });
+  var gs = document.getElementById("gate-switch");
+  if (gs) gs.addEventListener("click", function () { gateMode = gateMode === "signup" ? "login" : "signup"; applyGateMode(); var err = document.getElementById("gate-err"); if (err) err.textContent = ""; });
+  var cf = document.getElementById("checkin-form");
+  if (cf) cf.addEventListener("submit", saveCheckin);
+  var intakeForm = document.getElementById("intake-form");
+  if (intakeForm) { intakeForm.addEventListener("input", onIntakeChange); intakeForm.addEventListener("change", onIntakeChange); }
+  var pwLogout = document.getElementById("pw-logout");
+  if (pwLogout) pwLogout.addEventListener("click", logout);
+  // staged paywall CTAs: no live checkout yet — tell the truth in the demo.
+  document.querySelectorAll('[data-staged]').forEach(function (a) {
+    a.addEventListener("click", function (e) { e.preventDefault(); toast("Checkout isn't wired yet — this is a staged build."); });
+  });
+
+  // Decide gate vs app
+  if (isAuthed() && hasAccount()) {
+    document.body.classList.remove("gated");
+    applyGate();
+    renderAll();
+    renderAcct();
+  } else {
+    document.body.classList.add("gated");
+    gateMode = hasAccount() ? "login" : "signup";
+    applyGateMode();
+  }
+  initPWA();
+})();
+</script>
+<script>
+/* DEV-ONLY self-test loader. Inert for real users — only fires when the URL
+   contains ?selftest (e.g. anchored-app.html?selftest=1). Mirrors Spotted. */
+(function () {
+  if (location.search.indexOf("selftest") === -1) return;
+  var s = document.createElement("script");
+  s.src = "faith-selftest.js";
+  s.onerror = function () { console.error("[selftest] could not load faith-selftest.js"); };
+  document.body.appendChild(s);
+})();
+</script>
+</body>
+</html>

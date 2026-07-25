@@ -1,0 +1,16 @@
+{
+  "name": "Anchored — Never walk alone",
+  "short_name": "Anchored",
+  "description": "Your daily verse, prayer, and a Companion that keeps you walking with God every day.",
+  "start_url": "./anchored-app.html",
+  "scope": "./",
+  "id": "/anchored-app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12100C",
+  "theme_color": "#12100C",
+  "categories": ["lifestyle", "education", "health"],
+  "icons": [
+    { "src": "anchored-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
