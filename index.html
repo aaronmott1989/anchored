@@ -12,16 +12,12 @@
   spotted-tripwire-lp.html. ONE file, two offers.
   Usage: point the Meta ad at  anchored-tripwire-lp.html?offer=anchor  (default)
                           or    anchored-tripwire-lp.html?offer=peace
-  Buyers go to the checkout link; the checkout captures their email at purchase.
-  Non-buyers are caught by the inline opt-in + one exit-intent prompt.
-
-  === STAGED — WIRING TODO (see faith-app/BUILD-CHECKLIST.md) ===
-  1) CHECKOUT is a PLACEHOLDER (checkout: "#staged-..."). Replace with a real
-     Gumroad/Stripe checkout link before launch. Buy button is inert until then.
-  2) LEAD_ENDPOINT is empty (capture stubbed). Set it to a real capture endpoint
-     before launch. Contract: POST JSON { email, offer, source:"tripwire_lp", ts };
-     any 2xx = success. Capture is NON-BLOCKING. No secret is committed here.
-  3) /privacy.html must exist at deploy root before this is public.
+  Buyers go to the LIVE Gumroad $7 checkout; the checkout captures their email at
+  purchase. There is intentionally NO free email opt-in on this page: we do not
+  operate an email-capture backend for this demand test, so instead of promising
+  a "free card" we can't deliver, both the inline and exit-intent prompts push the
+  honest $7 offer. (A lead Worker exists at aarons-loop/anchored-lead-worker/ and
+  can be wired via a LEAD_ENDPOINT once a Workers-scoped Cloudflare token is set.)
 -->
 <style>
   :root{
@@ -206,14 +202,10 @@
 <section style="padding-top:6px;">
   <div class="wrap">
     <div class="optin">
-      <h3 id="k-opt-h">Not ready to buy? Take the free "5-Minute Morning" card.</h3>
-      <p id="k-opt-p">The one page that makes starting easy: a simple 5-minute morning rhythm you can begin tomorrow. We'll email it to you, plus a couple of genuinely encouraging reflections. No spam, unsubscribe anytime.</p>
-      <form class="cap" data-cap>
-        <input type="email" required placeholder="you@email.com" aria-label="Your email">
-        <button type="submit">Send it</button>
-      </form>
-      <p class="consent">By entering your email you agree to receive emails from Anchored. No spam — unsubscribe anytime. See our <a href="privacy.html">Privacy Policy</a>.</p>
-      <div class="capdone" data-capdone>✓ On its way. Check your inbox in a minute.</div>
+      <h3 id="k-opt-h">Still deciding? The whole plan is just $7.</h3>
+      <p id="k-opt-p">No subscription and no risk — one payment of $7 gets you all 21 days, yours to keep, backed by a 30-day, no-questions money-back guarantee. You can start tomorrow morning.</p>
+      <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
+      <p class="consent" style="margin-top:12px;">30-day money-back guarantee · instant access · <a href="privacy.html">Privacy Policy</a></p>
     </div>
   </div>
 </section>
@@ -261,24 +253,16 @@
 <!-- exit-intent / non-buyer capture modal -->
 <div class="modal" id="modal">
   <div class="sheet">
-    <h3 id="k-m-h">Before you go — grab the free "5-Minute Morning" card.</h3>
-    <p id="k-m-p">The simplest way to start: a 5-minute morning rhythm you can begin tomorrow. We'll email it to you free. No spam.</p>
-    <form class="cap" data-cap style="margin-top:16px;">
-      <input type="email" required placeholder="you@email.com" aria-label="Your email">
-      <button type="submit">Email me the card</button>
-    </form>
-    <p class="consent">By entering your email you agree to receive emails from Anchored. Unsubscribe anytime. See our <a href="privacy.html">Privacy Policy</a>.</p>
-    <div class="capdone" data-capdone>✓ On its way. Check your inbox in a minute.</div>
-    <span class="skip" id="modalskip">No thanks, take me to the $7 plan</span>
+    <h3 id="k-m-h">Before you go — the whole plan is just $7.</h3>
+    <p id="k-m-p">One payment of $7, yours to keep, with a 30-day money-back guarantee. Don't let another week of meaning-to slip by.</p>
+    <a class="cta" data-buy href="#" style="margin-top:16px;"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
+    <span class="skip" id="modalskip">No thanks</span>
   </div>
 </div>
 
 <script>
 (function(){
   "use strict";
-
-  // ---- WIRING: set to a real capture endpoint before launch (see head comment) ----
-  var LEAD_ENDPOINT = ""; // STAGED: empty = capture stubbed, buy flow still works. Set to Supabase Edge Function / Worker before launch.
 
   // ---- Offer config: one page, two ad sets ----
   var OFFERS = {
@@ -301,10 +285,10 @@
       why: 'A single counseling session runs $100+, and a devotional book leaves you deciding when and how. This is <b>$7, once,</b> for 14 dated days built specifically for an anxious mind — Scripture, prayer, and a small daily practice. Not a replacement for a counselor if you need one, but a daily anchor anyone can start tomorrow.',
       appH: "When the 14 days end, the Anchored app takes over.",
       appB: "It keeps sending you a daily verse and a steadying practice, holds your streak, and your Companion checks in on the anxious days. This plan is your start.",
-      optH: "Not ready to buy? Take the free \"When Worry Hits\" card.",
-      optP: "Three verses and a 60-second prayer for the moment anxiety spikes. We'll email it to you, plus a couple of steadying reflections. No spam, unsubscribe anytime.",
-      mH: "Before you go — grab the free \"When Worry Hits\" card.",
-      mP: "Three verses and a 60-second prayer for the moment anxiety spikes. We'll email it to you free. No spam.",
+      optH: "Still deciding? The whole plan is just $7.",
+      optP: "No subscription and no risk — one payment of $7 gets you all 14 days, yours to keep, backed by a 30-day money-back guarantee. You can start calming the noise tomorrow.",
+      mH: "Before you go — the whole plan is just $7.",
+      mP: "One payment of $7, yours to keep, with a 30-day money-back guarantee. A quieter mind starts with a single day.",
       final: "Ten minutes a day. Fourteen days. A quieter mind.",
       stack: [
         ["14 dated days for an anxious mind","Open to today and know exactly what to read, pray, and do. No deciding when your mind is already racing."],
@@ -352,27 +336,6 @@
     a.addEventListener('click', function(e){ e.preventDefault(); goCheckout(); });
   });
 
-  // ---- email capture (non-blocking) ----
-  function capture(email, ctx){
-    var payload = { email: email, offer: key, source: "tripwire_lp", context: ctx, ts: Date.now() };
-    try{ localStorage.setItem('anchored_lead', email); }catch(e){}
-    try{ if(window.fbq) fbq('track','Lead'); }catch(e){}
-    if(!LEAD_ENDPOINT) return Promise.resolve(); // stubbed until wired
-    return fetch(LEAD_ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)}).catch(function(){});
-  }
-  document.querySelectorAll('form[data-cap]').forEach(function(f){
-    f.addEventListener('submit', function(e){
-      e.preventDefault();
-      var input = f.querySelector('input[type=email]');
-      var email = (input.value||'').trim();
-      if(!email || email.indexOf('@')<1) { input.focus(); return; }
-      capture(email, f.closest('#modal') ? 'exit_modal' : 'inline');
-      f.style.display='none';
-      var done = f.parentElement.querySelector('[data-capdone]');
-      if(done) done.style.display='block';
-      try{ localStorage.setItem('anchored_captured','1'); }catch(e){}
-    });
-  });
 
   // ---- sticky mobile buy bar ----
   var sticky = document.getElementById('stickybuy');
@@ -394,7 +357,7 @@
     modal.classList.add('show');
   }
   function hideModal(){ modal.classList.remove('show'); }
-  document.getElementById('modalskip').addEventListener('click', function(){ hideModal(); goCheckout(); });
+  document.getElementById('modalskip').addEventListener('click', function(){ hideModal(); });
   modal.addEventListener('click', function(e){ if(e.target===modal) hideModal(); });
   document.addEventListener('mouseout', function(e){ if(e.clientY<=0 && !e.relatedTarget) showModal(); });
   var maxY=0, dwell=false;
