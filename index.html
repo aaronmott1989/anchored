@@ -176,7 +176,7 @@
   <div class="wrap">
     <div class="guarantee">
       <div class="g-h"><span class="seal">✓</span> Your $7 is protected.</div>
-      <p><b style="color:var(--text)">30-day, 100% money-back, no-questions-asked.</b> Use it, and if it doesn't help you build a daily time with God that finally sticks, email <a style="color:var(--gold)" href="mailto:support@anchored.app">support@anchored.app</a> and get every cent back. You keep the plan. The only risk here is another month of meaning to and not doing it.</p>
+      <p><b style="color:var(--text)">30-day, 100% money-back, no-questions-asked.</b> Use it, and if it doesn't help you build a daily time with God that finally sticks, email <a style="color:var(--gold)" href="mailto:amott1989@gmail.com">amott1989@gmail.com</a> and get every cent back. You keep the plan. The only risk here is another month of meaning to and not doing it.</p>
     </div>
   </div>
 </section>
@@ -243,7 +243,7 @@
 <footer>
   <div class="wrap">
     <div class="logo" style="font-size:16px;justify-content:center;">Anchored<span class="dot">.</span></div>
-    <p style="margin-top:8px;">A daily walk with God, made simple. Questions? <a href="mailto:support@anchored.app">support@anchored.app</a></p>
+    <p style="margin-top:8px;">A daily walk with God, made simple. Questions? <a href="mailto:amott1989@gmail.com">amott1989@gmail.com</a></p>
     <p style="margin-top:10px;">Anchored is a spiritual-growth tool for daily discipline. It is not medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. If you are in crisis or thinking about harming yourself, call or text <b>988</b> (US Suicide &amp; Crisis Lifeline) or dial 911.</p>
     <p style="margin-top:8px;">Results depend on your own effort and consistency. Scripture quoted is the World English Bible (public domain). Bible translation names are trademarks of their respective publishers and are referenced for identification only.</p>
     <p style="margin-top:8px;">&copy; <span id="yr"></span> Anchored. · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
@@ -284,12 +284,12 @@
   var OFFERS = {
     anchor: {
       title: "Anchored — The 21-Day Anchor ($7)",
-      // STAGED: replace with a real Gumroad/Stripe checkout link before launch.
-      checkout: "#staged-anchor-checkout"
+      // LIVE Gumroad checkout ($7 one-time). Same product serves both offers for this test.
+      checkout: "https://amottster.gumroad.com/l/tynak?wanted=true"
     },
     peace: {
       title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
-      checkout: "#staged-peace-checkout",
+      checkout: "https://amottster.gumroad.com/l/tynak?wanted=true",
       kicker: "Anchored · Peace in 14 Days",
       h1: 'Your mind won\'t stop. <span class="hl">Scripture speaks straight to it.</span>',
       sub: "14 days of Scripture, prayer, and a simple practice for an anxious, racing mind — 10 minutes a day.",
@@ -342,13 +342,10 @@
     document.querySelectorAll('[data-buy] span:first-child').forEach(function(s){ s.textContent = o.buy; });
   }
 
-  // ---- buy: to checkout (STAGED placeholder until a real link is set) ----
+  // ---- buy: to the live Gumroad checkout ----
   function goCheckout(){
     try{ if(window.fbq) fbq('track','InitiateCheckout'); }catch(e){}
-    if(!o.checkout || o.checkout.charAt(0) === "#"){
-      alert("This is a staged demo — checkout isn't wired yet. (See BUILD-CHECKLIST.md.)");
-      return;
-    }
+    if(!o.checkout){ return; }
     location.href = o.checkout;
   }
   document.querySelectorAll('[data-buy]').forEach(function(a){
