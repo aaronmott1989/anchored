@@ -113,6 +113,37 @@
   .sheet .skip{display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;}
   @media(min-width:560px){.modal{align-items:center;}.sheet{border-radius:22px;border-bottom:1px solid var(--line);}}
 </style>
+<!-- ============================================================
+     META PIXEL — Anchored (its OWN dedicated pixel; NOT the Spotted pixel).
+     Fires PageView + ViewContent on load. InitiateCheckout fires on the buy
+     click (see goCheckout below). Engaged10s / ScrolledHalf custom events fire
+     from the engagement block. Purchase is sent server-side by the Gumroad
+     Conversions-API worker (functions/api/gumroad-ping.js).
+     Pixel ID 1407254754557742 = the dedicated Anchored pixel (ad account
+     37985900). It appears in the const below AND the <noscript> img. <<<
+     ============================================================ -->
+<script>
+  // Anchored Meta Pixel ID (dedicated; NOT the Spotted pixel).
+  const ANCHORED_PIXEL_ID = "1407254754557742";
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window,document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', ANCHORED_PIXEL_ID);
+  fbq('track','PageView');
+  (function(){
+    var offer = (new URLSearchParams(location.search).get('offer') || 'anchor').toLowerCase();
+    if(offer !== 'anchor' && offer !== 'peace') offer = 'anchor';
+    fbq('track','ViewContent',{content_name:'anchored-lp', content_category:offer, offer:offer});
+  })();
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
 </head>
 <body>
 
@@ -326,11 +357,33 @@
     document.querySelectorAll('[data-buy] span:first-child').forEach(function(s){ s.textContent = o.buy; });
   }
 
-  // ---- buy: to the live Gumroad checkout ----
+  // ---- UTM capture + passthrough (creative attribution) ----
+  // Read utm_* on load, persist in sessionStorage, then append them (plus the
+  // offer variant) onto the Gumroad checkout URL so the buyer record carries
+  // which creative (utm_content=static vs video) drove the sale. Without this
+  // the hardcoded checkout URL drops every param.
+  var UTM_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+  var UTMS = (function(){
+    var params = new URLSearchParams(location.search), stored = {};
+    try{ stored = JSON.parse(sessionStorage.getItem('anchored_utms') || '{}'); }catch(e){ stored = {}; }
+    UTM_KEYS.forEach(function(k){ var v = params.get(k); if(v) stored[k] = v; });
+    try{ sessionStorage.setItem('anchored_utms', JSON.stringify(stored)); }catch(e){}
+    return stored;
+  })();
+  function checkoutURL(){
+    if(!o.checkout) return o.checkout;
+    var u; try{ u = new URL(o.checkout); }catch(e){ return o.checkout; }
+    UTM_KEYS.forEach(function(k){ if(UTMS[k]) u.searchParams.set(k, UTMS[k]); });
+    u.searchParams.set('offer', key);
+    return u.toString();
+  }
+
+  // ---- buy: to the live Gumroad checkout (UTMs + offer appended) ----
   function goCheckout(){
-    try{ if(window.fbq) fbq('track','InitiateCheckout'); }catch(e){}
-    if(!o.checkout){ return; }
-    location.href = o.checkout;
+    try{ if(window.fbq) fbq('track','InitiateCheckout',{value:7,currency:'USD'}); }catch(e){}
+    var dest = checkoutURL();
+    if(!dest){ return; }
+    location.href = dest;
   }
   document.querySelectorAll('[data-buy]').forEach(function(a){
     a.addEventListener('click', function(e){ e.preventDefault(); goCheckout(); });
@@ -345,6 +398,15 @@
       ents.forEach(function(en){ sticky.classList.toggle('show', !en.isIntersecting); });
     },{rootMargin:'-60px 0px 0px 0px'}).observe(hero);
   }
+
+  // ---- engagement signals: tell an instant bounce from an engaged non-buyer ----
+  setTimeout(function(){ try{ if(window.fbq) fbq('trackCustom','Engaged10s'); }catch(e){} }, 10000);
+  var scrolledHalf = false;
+  window.addEventListener('scroll', function(){
+    if(scrolledHalf) return;
+    var pct = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
+    if(pct > 0.5){ scrolledHalf = true; try{ if(window.fbq) fbq('trackCustom','ScrolledHalf'); }catch(e){} }
+  }, {passive:true});
 
   // ---- exit-intent / non-buyer prompt: once per visitor ----
   var modal = document.getElementById('modal');
