@@ -140,8 +140,9 @@
   fbq('init', ANCHORED_PIXEL_ID);
   fbq('track','PageView');
   (function(){
-    var offer = (new URLSearchParams(location.search).get('offer') || 'anchor').toLowerCase();
-    if(offer !== 'anchor' && offer !== 'peace') offer = 'anchor';
+    // ANCHOR-ONLY (2026-07-28): the `peace` offer variant is disabled (it sold the
+    // Anchor product under Peace copy). Always report the Anchor offer here.
+    var offer = 'anchor';
     fbq('track','ViewContent',{content_name:'anchored-lp', content_category:offer, offer:offer});
   })();
 </script>
@@ -303,9 +304,17 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   var OFFERS = {
     anchor: {
       title: "Anchored — The 21-Day Anchor ($7)",
-      // LIVE Gumroad checkout ($7 one-time). Same product serves both offers for this test.
+      // LIVE Gumroad checkout ($7 one-time) for The 21-Day Anchor.
       checkout: "https://amottster.gumroad.com/l/tynak?wanted=true"
-    },
+    }
+    /* ANCHOR-ONLY (2026-07-28): the `peace` offer variant is DISABLED. It showed
+       "Peace: 14 Days for Anxious Hearts" copy but its checkout pointed at `tynak`
+       (The 21-Day Anchor), so a Peace ad would charge for and deliver the wrong
+       product (bait-and-switch). Preserved here — NOT deleted — so it can be
+       restored if/when a real Peace product is built. To re-enable: give it its
+       OWN Gumroad checkout, then remove this comment wrapper AND the `key = "anchor"`
+       force below. Do NOT re-enable while `checkout` still points at tynak.
+    ,
     peace: {
       title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
       checkout: "https://amottster.gumroad.com/l/tynak?wanted=true",
@@ -338,10 +347,15 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
         ["How do I get it?","Instant access after a $7 checkout. Backed by a 30-day, no-questions money-back guarantee."]
       ]
     }
+    */
   };
 
   function qp(n){ return new URLSearchParams(location.search).get(n); }
-  var key = (qp("offer") || "anchor").toLowerCase();
+  // ANCHOR-ONLY (2026-07-28): force the Anchor offer regardless of ?offer=.
+  // The peace variant is disabled (see OFFERS above) because it would charge for
+  // `tynak` (The 21-Day Anchor) while showing Peace copy. Even ?offer=peace now
+  // serves Anchor copy AND routes checkout to tynak, so copy == product == delivery.
+  var key = "anchor";
   var o = OFFERS[key] || OFFERS.anchor;
 
   function set(id, html){ var el=document.getElementById(id); if(el && html!=null) el.innerHTML=html; }
