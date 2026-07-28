@@ -304,16 +304,11 @@
     <form id="gate-form" autocomplete="off">
       <div class="field signup-only"><label for="g-first">First name</label><input type="text" id="g-first" required></div>
       <div class="field"><label for="g-email">Email</label><input type="email" id="g-email" required></div>
-      <div class="field signup-only"><label for="g-phone">Phone (mobile) — for reminders (optional)</label><input type="tel" id="g-phone" placeholder="+1 555 123 4567"></div>
-      <div class="field-row signup-only">
-        <div class="field"><label for="g-goal">What are you here for?</label><select id="g-goal"><option value="closeness">Grow closer to God</option><option value="prayer">Build a prayer habit</option><option value="scripture">Read Scripture daily</option><option value="freedom">Find freedom from a habit</option></select></div>
-        <div class="field"><label for="g-channel">Preferred nudge</label><select id="g-channel"><option value="email">Email</option><option value="text">Text</option><option value="both">Both</option></select></div>
-      </div>
+      <div class="field signup-only"><label for="g-goal">What are you here for?</label><select id="g-goal"><option value="closeness">Grow closer to God</option><option value="prayer">Build a prayer habit</option><option value="scripture">Read Scripture daily</option><option value="freedom">Find freedom from a habit</option></select></div>
       <div class="field"><label for="g-pass">Password</label><input type="password" id="g-pass" required></div>
       <div class="signup-only">
         <label class="consent-row"><input type="checkbox" id="g-consent-email"> Email me my daily verse and gentle check-in nudges. I can unsubscribe anytime.</label>
-        <label class="consent-row" style="margin-top:8px;"><input type="checkbox" id="g-consent-sms"> Text me my daily verse &amp; reminders (about 1 msg/day). Msg &amp; data rates may apply. Reply STOP to cancel, HELP for help. Consent isn't required to use Anchored.</label>
-        <p class="gate-note" style="margin-top:8px;">By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. We never sell your information, and your phone number is used only for the reminders you ask for.</p>
+        <p class="gate-note" style="margin-top:8px;">By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. We never sell your information, and we only email you the reminders you ask for.</p>
       </div>
       <div class="gate-err" id="gate-err"></div>
       <button type="submit" class="primary" id="gate-submit" style="width:100%;margin-top:6px;">Create my account</button>
@@ -653,9 +648,7 @@
   function doSignup() {
     var first = trim((document.getElementById("g-first") || {}).value);
     var email = trim((document.getElementById("g-email") || {}).value);
-    var phone = trim((document.getElementById("g-phone") || {}).value);
     var goal = (document.getElementById("g-goal") || {}).value;
-    var channel = (document.getElementById("g-channel") || {}).value;
     var pass = (document.getElementById("g-pass") || {}).value;
     var err = document.getElementById("gate-err");
     if (!first || !email || email.indexOf("@") < 1 || !pass) { if (err) err.textContent = "Please fill your name, a valid email, and a password."; return; }
@@ -663,9 +656,8 @@
     var m = getMember() || {};
     m.identity = { first_name: first, created_at: new Date().toISOString() };
     m.contact = {
-      email: email, phone: phone, preferred_channel: channel,
-      consent_email: !!(document.getElementById("g-consent-email") || {}).checked,
-      consent_sms: !!(document.getElementById("g-consent-sms") || {}).checked
+      email: email, preferred_channel: "email",
+      consent_email: !!(document.getElementById("g-consent-email") || {}).checked
     };
     m.status = m.status || { goal: goal };
     m.engagement = m.engagement || { last_reply: null, quiet_days: 0, status_flags: [] };
@@ -1190,7 +1182,7 @@
     { id:21, intent:"app_help", keywords:["how does this work","how do i use","how the app works","what do the tabs do","how to use anchored","whats today tab"],
       answer:"Simple: Today gives you the day's verse, a prayer, a small practice, and a reflection — tap Mark today complete when you're done. Plan shows your whole reading arc. Check-In is your daily minute of honesty and your streak. And I'm your Companion — ask me anything about faith, the Bible, or the app, anytime." },
     { id:22, intent:"data_privacy", keywords:["is my data private","data private","who sees my journal","privacy","is my info safe","do you sell my data","private journal"],
-      answer:"Your journal, check-ins, and plan are saved privately on your device. Your contact info lives only where we can reach you for the reminders you asked for, and we never sell or share it. Reply STOP to texts or unsubscribe from email any time." },
+      answer:"Your journal, check-ins, and plan are saved privately on your device. Your contact info lives only where we can reach you for the reminders you asked for, and we never sell or share it. You can unsubscribe from email any time." },
     { id:23, intent:"fallback_escalate", keywords:[],
       answer:"That's a good and honest question, and I want to point you well rather than guess. For something this personal, a trusted pastor, a mature believer, or a Christian counselor is the best next conversation. In the meantime, your reading and prayer for today are on the Today tab, and I'm always here for questions about faith, the Bible, or the app. — your Companion" }
   ];

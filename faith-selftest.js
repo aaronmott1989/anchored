@@ -78,12 +78,9 @@
       // 1) SIGN UP through the gate
       setInput("g-first", "TestUser");
       setInput("g-email", "test@selftest.local");
-      setInput("g-phone", "+15551230000");
       setSelectByText("g-goal", "prayer");
-      setSelectByText("g-channel", "both");
       setInput("g-pass", "testpass1");
       checkBox("#g-consent-email");
-      checkBox("#g-consent-sms");
       var submit = document.getElementById("gate-submit");
       if (submit) submit.click();
       var inApp = await waitFor(function () {
