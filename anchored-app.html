@@ -835,15 +835,8 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   var STRIPE_LINKS = {
     monthly: "https://buy.stripe.com/14A9AV6OD33RaCD5Pdbo405",   // Founding Monthly $8.99/mo (plink_1TyOaRPTFZ0RNnnRfELL0l08)
     annual:  "https://buy.stripe.com/14AaEZ6ODeMz267cdBbo404",   // Founding Annual $59/yr (plink_1TyOXsPTFZ0RNnnRI7wtHCDW)
-    // AARON SEAM: not real links yet — only needed once the founding cap (100,
-    // enforced server-side via founding_counter, schema.sql §6) is close to
-    // full. Create two more Stripe Payment Links ($11.99/mo, $79/yr standing
-    // price) and paste them here before the 100th founding member signs up;
-    // until then checkFoundingAvailability()/stripeLinkFor() stay honestly
-    // staged for a standard-price customer (same "opens at launch" pattern as
-    // the founding links used before they were wired).
-    standardMonthly: "#staged-standard-monthly",
-    standardAnnual:  "#staged-standard-annual"
+    standardMonthly: "https://buy.stripe.com/cNi14pa0PgUH267b9xbo406",  // Standard Monthly $11.99/mo (plink_1TzUVsPTFZ0RNnnRd8yDjYGw)
+    standardAnnual:  "https://buy.stripe.com/4gMbJ30qfgUH9yzb9xbo407"   // Standard Annual $79/yr (plink_1TzUaIPTFZ0RNnnRuJkuTNhn)
   };
   // Server-authoritative: true once founding_counter.count has reached its cap.
   // Defaults false (show founding pricing) until checkFoundingAvailability()
