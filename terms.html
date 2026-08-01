@@ -5,14 +5,31 @@
 <link rel="icon" href="anchored-icon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Terms of Service | Anchored</title>
-<meta name="description" content="Anchored terms of service — the agreement for using the Anchored site, plans, and app, including the money-back guarantee, subscription terms, and important disclaimers.">
+<meta name="description" content="Anchored terms of service — the agreement for using the Anchored site, plans, subscriptions, and app, including auto-renewal, the money-back guarantee, and important disclaimers.">
 <meta name="robots" content="index,follow">
 <meta name="theme-color" content="#12100C">
 <!--
-  STAGED terms of service for Anchored. Deploy at SITE ROOT as /terms.html.
-  Before public launch: confirm legal entity name + address, confirm the live
-  refund window matches what the LP and app promise, and have a real attorney
-  review. Operational template, not legal advice.
+  Terms of Service for Anchored (LeadLock LLC). Deploy at SITE ROOT as /terms.html.
+
+  2026-07-31 revision (security-compliance BLOCK-WITH-FIX remediation): merged
+  in the attorney-drafted subscription-era content from
+  AnchoredTermsOfService-DRAFT.md (repo root) — auto-renewal disclosure,
+  renewal-reminder timing, founding-price mechanism, and money-back scope
+  across the one-time plan and first subscription charge (matches the in-app
+  paywall's existing "30 days, no questions" copy in anchored-app.html).
+
+  STILL OPEN before this can go live (do not remove these notes until closed):
+  - TWO items here still need a real attorney per AnchoredGoLiveGateChecklist.md:
+    (1) the founding "locked for life" price-lock clause below — now backed by
+    a real mechanism (schema.sql founding_counter, enforced in stripe-webhook),
+    but the LEGAL WORDING of a perpetual price promise still needs counsel;
+    (2) exact money-back-guarantee scope across monthly/annual/one-time — the
+    text below matches what's already live in the app's paywall copy, but is
+    not yet attorney-confirmed.
+  - Governing law/venue below (Arizona, Maricopa County) is an operational
+    default matching LeadLock LLC's home state, not attorney-confirmed.
+  - "Anchored" trademark clearance + the anchoredfaith.app domain are open
+    items — see BUILD-CHECKLIST.md / AnchoredGoLiveGateChecklist.md.
 -->
 <style>
   :root{--bg:#12100C;--card:#1C1913;--line:#38311F;--gold:#E5B85C;--text:#F5F0E6;--muted:#A79B84;}
@@ -23,6 +40,7 @@
   .brand .dot{color:var(--gold);}
   h1{font-size:32px;font-weight:800;letter-spacing:-.02em;margin:28px 0 6px;font-family:Georgia,serif;}
   h2{font-size:19px;font-weight:800;margin:30px 0 8px;}
+  h3{font-size:16px;font-weight:800;margin:18px 0 6px;}
   p,li{color:var(--text);font-size:15.5px;}
   .muted,.updated{color:var(--muted);}
   .updated{font-size:13.5px;margin-bottom:8px;}
@@ -36,45 +54,70 @@
 <div class="wrap">
   <div class="brand">Anchored<span class="dot">.</span></div>
   <h1>Terms of Service</h1>
-  <p class="updated">Effective date: July 25, 2026</p>
+  <p class="updated">Effective date: July 31, 2026</p>
 
-  <p>These Terms govern your use of the Anchored website, plans, and app ("Anchored"). By using Anchored, you agree to these Terms. If you do not agree, please do not use Anchored.</p>
+  <p>These Terms of Service ("Terms") govern your use of the Anchored website, plans, subscriptions, and app (together, "Anchored"), operated by <strong>LeadLock LLC</strong> ("we," "us," "our"). By using Anchored you agree to these Terms. If you do not agree, please do not use Anchored.</p>
 
   <h2>What Anchored is (and isn't)</h2>
-  <p>Anchored is a spiritual-growth tool for building a daily Christian discipline of Scripture, prayer, and reflection. It is <strong>not</strong> medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. The in-app "Companion" is an automated tool that shares general encouragement and Scripture; it is not a pastor, counselor, or medical professional and does not provide professional advice. If you are in crisis or thinking about harming yourself, call or text <strong>988</strong> (US Suicide &amp; Crisis Lifeline) or dial 911.</p>
+  <p>Anchored is a spiritual-growth and devotional tool for building a daily Christian discipline of Scripture, prayer, and reflection. It is <strong>not</strong> medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. The in-app "Companion" is an automated tool that answers common questions about faith, the Bible, and the app from a fixed set of responses and sends check-ins during the windows you tend to slip; it is not an open-ended AI, and it is not a pastor, counselor, or medical professional. <strong>If you are in crisis or thinking about harming yourself, call or text 988 (US Suicide &amp; Crisis Lifeline), text HOME to 741741, or dial 911.</strong> See our <a href="crisis.html">Crisis &amp; Care Disclaimer</a>.</p>
 
-  <h2>Your account</h2>
-  <p>You are responsible for keeping your login and device secure and for the accuracy of the information you provide. You must be at least 16 years old to use Anchored.</p>
+  <h2>Eligibility and your account</h2>
+  <p>You must be at least 16 years old to use Anchored. You are responsible for keeping your login secure, for activity under your account, and for the accuracy of the information you provide.</p>
 
   <h2>Purchases, plans, and subscriptions</h2>
   <ul>
-    <li><strong>One-time plans</strong> (such as the $7 plan) are billed once and delivered digitally for your personal use.</li>
-    <li><strong>Subscriptions</strong> renew automatically at the stated price and interval until you cancel. You can cancel anytime from the app; cancellation stops future charges and takes effect at the end of the current billing period.</li>
-    <li>Prices and promotional/"founding member" pricing are described at checkout and may change for new customers.</li>
+    <li><strong>One-time plans</strong> (such as the $7 21-Day Anchor, and the optional $9 Starter Library add-on) are billed once and delivered digitally for your personal use. Any add-on is opt-in only — never pre-checked.</li>
+    <li><strong>Subscriptions.</strong> Anchored offers recurring memberships:
+      <ul>
+        <li>Founding Monthly: $8.99/month</li>
+        <li>Founding Annual: $59/year</li>
+        <li>Standing rates (for members who join after founding fills): $11.99/month or $79/year</li>
+      </ul>
+    </li>
   </ul>
+
+  <h3>Auto-renewal</h3>
+  <div class="callout">
+    <p><strong>Your subscription automatically renews.</strong> When you subscribe, you authorize us to charge your payment method the stated price on a recurring basis — every month (monthly plan) or every year (annual plan) — and it continues to renew automatically until you cancel. We show the price, billing interval, and renewal terms before you pay, adjacent to the subscribe button, both in the app and at Stripe checkout. You can cancel at any time (see "Cancellation" below).</p>
+  </div>
+  <p><strong>Free trial.</strong> New accounts get a 7-day free trial. You are not charged during the trial, and you can cancel before it ends at no cost. If you don't cancel, your subscription begins automatically at the trial's end at the price you selected.</p>
+  <p><strong>Renewal reminders.</strong> For annual subscriptions we send a reminder before each renewal (approximately 15–45 days in advance) stating the renewal date, the amount, and how to cancel. For a free trial that's about to convert to paid, we tell you the charge date and amount before the first charge.</p>
+  <p><strong>Confirmation.</strong> After you subscribe, we send a confirmation email restating what you bought, the price, the renewal cadence, how to cancel, and the money-back window.</p>
+
+  <h3>Cancellation</h3>
+  <p>You can cancel anytime from your account, through the Stripe customer portal — no phone call and no hoops. Cancellation stops future charges and takes effect at the end of the current billing period; you keep access until then.</p>
+
+  <h3>Founding price</h3>
+  <p>Founding members are among the first 100 subscribers at the founding price. As long as your subscription remains continuously active, your founding price stays the same — we will not raise your rate to the standing price while you stay subscribed without a lapse. If your subscription lapses or is cancelled, re-subscribing is at the then-current rate. The founding tier is limited to the first 100 members and closes automatically once that cap is reached, tracked server-side — once it's full, new subscribers are shown the standing price instead.</p>
 
   <h2>Money-back guarantee &amp; refunds</h2>
   <div class="callout">
-    <p>We back the $7 plan with a <strong>30-day, no-questions-asked money-back guarantee</strong>: email <a href="mailto:amott1989@gmail.com">amott1989@gmail.com</a> within 30 days of purchase and we will refund your money in full; you may keep the plan. For subscriptions, you can cancel anytime, and we honor the refund window described at checkout and in the app. We honor every refund we promise.</p>
+    <p>We back the <strong>$7 21-Day Anchor</strong> with a <strong>30-day, no-questions-asked money-back guarantee</strong>: email <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a> within 30 days of purchase and we will refund your money in full; you may keep the plan. For a <strong>subscription (monthly or annual)</strong>, you're never charged during your free trial, and if you cancel before it ends you pay nothing. If you are charged and want a refund, contact <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a> within 30 days of that charge and we'll refund it in full; after that window, cancellation stops future renewals but past charges are non-refundable except as required by law. We honor every refund we promise.</p>
   </div>
 
   <h2>Acceptable use</h2>
-  <p>Please don't misuse Anchored, attempt to break its security, or use it to harm others. Content you enter (such as journal entries) is yours; you grant us only the limited permission needed to store and display it back to you and operate the service.</p>
+  <p>Please don't misuse Anchored, attempt to break its security, resell it, or use it to harm others.</p>
+
+  <h2>Your content</h2>
+  <p>Content you enter (such as journal and prayer entries) is yours. You grant us only the limited permission needed to store it, display it back to you, and operate the service. We do not sell it or use it to target advertising. See the <a href="privacy.html">Privacy Policy</a> for how we handle it, including deletion.</p>
 
   <h2>Intellectual property</h2>
   <p>Scripture quoted in Anchored is from the World English Bible (public domain). Names of other Bible translations are trademarks of their respective publishers and are referenced only to identify what you like to read. Anchored's name, content, and software are protected and may not be copied or resold without permission.</p>
 
   <h2>Disclaimers &amp; limitation of liability</h2>
-  <p>Anchored is provided "as is," without warranties of any kind. Spiritual growth depends on your own effort and consistency, and we do not promise any specific outcome. To the fullest extent permitted by law, Anchored is not liable for indirect, incidental, or consequential damages, and our total liability will not exceed the amount you paid us in the 12 months before the claim.</p>
+  <p>Anchored is provided "as is," without warranties of any kind. Spiritual growth depends on your own effort and consistency, and we do not promise any specific spiritual or personal outcome. To the fullest extent permitted by law, Anchored (and LeadLock LLC) is not liable for indirect, incidental, or consequential damages, and our total liability will not exceed the amount you paid us in the 12 months before the claim. Some jurisdictions do not allow certain limitations, so parts of this may not apply to you.</p>
+
+  <h2>Governing law &amp; disputes</h2>
+  <p>These Terms are governed by the laws of the State of Arizona, without regard to conflict-of-law principles, and any dispute will be resolved in the state or federal courts located in Maricopa County, Arizona.</p>
 
   <h2>Changes</h2>
-  <p>We may update these Terms from time to time. When we do, we will revise the effective date above. Continued use after changes means you accept the updated Terms.</p>
+  <p>We may update these Terms from time to time. When we do, we will revise the effective date above. Continued use after changes means you accept the updated Terms. For material changes affecting your subscription, we will notify you.</p>
 
   <h2>Contact</h2>
-  <p>Questions? Contact <a href="mailto:amott1989@gmail.com">amott1989@gmail.com</a>. See also our <a href="privacy.html">Privacy Policy</a>.</p>
+  <p>Questions? Contact <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a>. See also our <a href="privacy.html">Privacy Policy</a> and <a href="crisis.html">Crisis &amp; Care Disclaimer</a>.</p>
 
   <footer>
-    Anchored &middot; <a href="mailto:amott1989@gmail.com">amott1989@gmail.com</a> &middot; <a href="privacy.html">Privacy</a><br>
+    Anchored &middot; <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="crisis.html">Crisis &amp; Care</a><br>
     &copy; <span id="yr"></span> Anchored. All rights reserved.
   </footer>
 </div>

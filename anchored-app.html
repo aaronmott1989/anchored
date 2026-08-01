@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<title>Anchored — Your Daily Walk</title>
+<title>Anchored Faith — Your Daily Walk</title>
 <!--
   ANCHORED — daily-Christian-discipline accountability app.
   THIRD MACHINE demand-test clone of spotted-app.html. Same shell (login gate,
@@ -27,9 +27,34 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Anchored">
+<meta name="apple-mobile-web-app-title" content="Anchored Faith">
 <link rel="apple-touch-icon" href="anchored-icon.svg">
 <link rel="icon" href="anchored-icon.svg" type="image/svg+xml">
+<!-- ============================================================
+     PostHog analytics (EU region · project 235841). Public project token is
+     write-only and safe in front-end. COMPLIANCE GATE P-4: autocapture and
+     session recording are DISABLED here so PostHog can never ingest the private
+     journal ("Anything on your mind") or heart-state ratings — only the explicit,
+     named behavioral events wired in the app engine below (app_opened,
+     signup_started/completed, login_completed, plan_built, checkin_saved,
+     paywall_shown, paywall_cta_clicked) map the activation + monetization funnel.
+     Those events carry NO journal text or heart value as properties. This is what
+     makes the "we don't sell your journal" claim true — do not re-enable autocapture
+     or session replay inside the app. posthog.identify ties events to the member email
+     (person_profiles: 'identified_only' only creates a profile once identified).
+     ============================================================ -->
+<script>
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
+  api_host: 'https://eu.i.posthog.com',
+  person_profiles: 'identified_only',
+  autocapture: false,               // GATE P-4: never auto-capture journal/heart-state text
+  disable_session_recording: true,  // GATE P-4: never replay a journaling session
+  capture_pageview: true,           // funnel pageviews only — no private field content
+  defaults: '2026-05-30'
+});
+</script>
+<!-- End PostHog -->
 <style>
   :root {
     color-scheme: dark;
@@ -236,7 +261,8 @@
   .pw-cta .pw-sub { display:block; font-weight:600; font-size:12px; opacity:.8; margin-top:2px; }
   .pw-best { display:inline-block; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
     background:var(--accent); color:var(--accent-ink); border-radius:6px; padding:2px 6px; margin-left:6px; vertical-align:middle; }
-  .pw-reassure { font-size:12px; color:var(--muted); line-height:1.5; margin:14px 0 0; }
+  .pw-renew { font-size:13px; color:var(--text); font-weight:600; line-height:1.5; margin:14px 0 0; }
+  .pw-reassure { font-size:12px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
   .pw-logout { background:none; border:none; color:var(--accent); font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:0; margin-top:16px; }
   /* Questionnaire */
   .q-section { border-top:1px solid var(--border); padding-top:18px; margin-top:2px; }
@@ -298,7 +324,7 @@
 <!-- ============ LOGIN / ACCOUNT GATE ============ -->
 <div class="gate" id="gate">
   <div class="gate-card">
-    <div class="wordmark">Anchored<span>.</span></div>
+    <div class="wordmark">Anchored<span> Faith</span></div>
     <div class="tagline">Never walk alone.</div>
     <p class="gate-lede" id="gate-lede">Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet. Your walk saves here; your reminders come to you.</p>
     <form id="gate-form" autocomplete="off">
@@ -317,26 +343,27 @@
       <span id="gate-switch-label">Already have an account?</span>
       <button type="button" class="gate-switch" id="gate-switch">Log in</button>
     </div>
-    <div class="gate-note" id="gate-note">Heads up — this is a simple on-device account: it remembers you on this device and captures your info so your Companion can reach you. It is <strong>not</strong> secure login yet (no server is verifying your password, and it only lives on this device). Real accounts that follow you across devices arrive with the backend.</div>
+    <div class="gate-note" id="gate-note">Your account is secured by our backend — your password is verified on the server, and your walk safely syncs across every device you sign in on. Your private journal and check-ins stay yours; we never sell your information.</div>
   </div>
 </div>
 
 <!-- ============ TRIAL-ENDED PAYWALL (STAGED — placeholder checkout links) ============ -->
 <div class="paywall" id="paywall">
   <div class="paywall-card">
-    <div class="wordmark">Anchored<span>.</span></div>
-    <div class="pw-banner"><b>Founding member price · first 100 only</b>Lock in $8.99/mo for life. As long as you stay, your price never goes up.</div>
+    <div class="wordmark">Anchored<span> Faith</span></div>
+    <div class="pw-banner" id="pw-banner"><b>Founding member price &middot; first 100 only</b>Lock in $8.99/mo for life. As long as you stay, your price never goes up.</div>
     <h1 class="pw-head">Your free week has ended.</h1>
     <p class="pw-lede">The plan tells you what to read and pray. Anchored is the part that helps you actually keep it: it carries your streak, sends the day's verse to you, and your Companion reaches out in the exact window you normally drift.</p>
     <p class="pw-saved">Your walk is saved. Subscribe and you pick up right where you left off, nothing lost.</p>
-    <!-- STAGED: replace href="#staged-monthly" with the real Stripe payment link before launch (see BUILD-CHECKLIST.md). -->
+    <!-- STAGED: replace href="#staged-monthly" with the real Stripe payment link before launch (see BUILD-CHECKLIST.md). checkFoundingAvailability() swaps these to standard pricing/links automatically once founding_counter hits its cap (schema.sql §6). -->
     <a class="pw-cta pw-cta-primary" id="pw-monthly" href="#staged-monthly" data-staged="1">
-      Continue for $8.99/mo<span class="pw-sub">Founding price, locked for life</span>
+      <span id="pw-monthly-label">Continue for $8.99/mo</span><span class="pw-sub" id="pw-monthly-sub">Founding price, locked for life</span>
     </a>
     <a class="pw-cta pw-cta-secondary" id="pw-annual" href="#staged-annual" data-staged="1">
-      Go annual for $79/yr<span class="pw-best">Best value</span><span class="pw-sub">About $6.58/mo, roughly three months free</span>
+      <span id="pw-annual-label">Go annual for $59/yr</span><span class="pw-best">Best value</span><span class="pw-sub" id="pw-annual-sub">About $4.92/mo, roughly five months free</span>
     </a>
-    <p class="pw-reassure">Cancel anytime, right from the app, no calls and no hoops. Change your mind in the first two weeks and we refund you, no questions.</p>
+    <p class="pw-renew" id="pw-renew-text">Your plan renews automatically &mdash; $8.99/mo (or $59/yr) &mdash; until you cancel.</p>
+    <p class="pw-reassure">Cancel anytime, right from the app, no calls and no hoops. Change your mind within 30 days and we refund you, no questions.</p>
     <button type="button" class="pw-logout" id="pw-logout">Log out</button>
   </div>
 </div>
@@ -344,7 +371,7 @@
 <div class="wrap">
   <header class="masthead">
     <div>
-      <div class="wordmark">Anchored<span>.</span></div>
+      <div class="wordmark">Anchored<span> Faith</span></div>
       <div class="tagline">Never walk alone.</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
@@ -558,12 +585,17 @@
 
 <div id="toasts"></div>
 
+<!-- Supabase client (pinned + SRI). If it fails to load or we're offline, the app
+     falls back to its local-only store — nothing here is required to run. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.8/dist/umd/supabase.js"
+        integrity="sha384-M65KxMm/JqBppck6onbmAgPVMBHrmPCf1L17Q+71EcvI9/VVI8j5cqoxQf6lj6h2"
+        crossorigin="anonymous"></script>
 <script>
 (function () {
   "use strict";
 
   /* ============================================================
-     ANCHORED app engine — client-side only (demand-test stage).
+     ANCHORED app engine — local-first + Supabase cloud backend.
      Mirrors spotted-app.html architecture: localStorage contract,
      login gate, trial→paywall, questionnaire→plan engine, AI
      companion (fixed KB + safety redirect), check-ins/streak, PWA.
@@ -590,7 +622,7 @@
     catch (e) { return fallback; }
   }
   function save(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; }
+    try { localStorage.setItem(key, JSON.stringify(val)); cloudPush(); return true; } catch (e) { return false; }
   }
   function trim(s) { return String(s == null ? "" : s).trim(); }
   function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
@@ -604,6 +636,299 @@
     var a = Date.parse(aISO + "T00:00:00"), b = Date.parse(bISO + "T00:00:00");
     if (isNaN(a) || isNaN(b)) return 0;
     return Math.round((b - a) / 86400000);
+  }
+
+  /* ============================================================
+     CLOUD BACKEND (Supabase) — real accounts + server-side, RLS-protected
+     storage layered ON TOP of the local-first store. localStorage stays the
+     instant offline cache; the UI never blocks on the network. If the library or
+     network is unavailable, CLOUD is false and the app behaves exactly as before.
+     The publishable (anon) key is safe to ship — Row-Level Security (see
+     faith-app/anchored-backend/schema.sql) is what actually protects each member's
+     data. Trial/subscription columns are SERVER-authoritative (client-unwritable),
+     so a member can't reset their trial by clearing localStorage.
+     ============================================================ */
+  var SB_URL = "https://pzuckcmjfysnaoogszde.supabase.co";
+  var SB_KEY = "sb_publishable_4CGAeUhsDLUPe-iCheveaQ_03DB2aCV";
+  var sb = null;
+  try {
+    if (SB_URL && window.supabase && window.supabase.createClient) {
+      sb = window.supabase.createClient(SB_URL, SB_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, storageKey: "anchored_sb_auth" }
+      });
+    }
+  } catch (e) { sb = null; }
+  var CLOUD = !!sb;
+  var cloudUser = null;        // signed-in Supabase user, or null
+  var suspendPush = false;     // guard so a pull doesn't immediately echo back
+  var authGen = 0;             // bumped on logout to cancel in-flight auth calls
+  var LS_DIRTY = "anchored_dirty";
+  function markDirty() { try { localStorage.setItem(LS_DIRTY, "1"); } catch (e) {} }
+  function clearDirty() { try { localStorage.removeItem(LS_DIRTY); } catch (e) {} }
+  function isDirty() { try { return localStorage.getItem(LS_DIRTY) === "1"; } catch (e) { return false; } }
+
+  // The app-state LS keys that ride inside the members.app_state JSONB column.
+  function appStateKeys() { return [LS_PROFILE, LS_INTAKE, LS_CHECKINS, LS_COMPLETES, LS_START, LS_THEME]; }
+
+  // Build the full server row from local state. app_state stores each key's raw
+  // serialized string so it round-trips back byte-for-byte on pull.
+  function cloudRowFromLocal() {
+    var m = getMember() || {};
+    var app = {};
+    appStateKeys().forEach(function (k) {
+      try { var v = localStorage.getItem(k); if (v != null) app[k] = v; } catch (e) {}
+    });
+    return {
+      user_id: cloudUser ? cloudUser.id : null,
+      email: (m.contact && m.contact.email) || (cloudUser && cloudUser.email) || null,
+      member_id: m.member_id || null,
+      identity: m.identity || {}, contact: m.contact || {}, status: m.status || {},
+      plan_snapshot: m.plan_snapshot || {}, activity: m.activity || {},
+      engagement: m.engagement || {}, open_questions: m.open_questions || [],
+      app_state: app
+    };
+  }
+
+  var cloudPushTimer = null;
+  function cloudPushNow() {
+    if (!CLOUD || !cloudUser) return Promise.resolve(false);
+    var row = cloudRowFromLocal();
+    if (!row.user_id) return Promise.resolve(false);
+    return sb.from("members").upsert(row, { onConflict: "user_id" })
+      .then(function (r) {
+        if (r && r.error) { console.warn("[cloud] push:", r.error.message); return false; }
+        clearDirty();
+        return true;
+      })
+      .catch(function (e) { console.warn("[cloud] push failed:", e); return false; });
+  }
+  function cloudPush() {                     // debounced, non-blocking
+    if (!CLOUD || !cloudUser || suspendPush) return;
+    markDirty();
+    if (cloudPushTimer) clearTimeout(cloudPushTimer);
+    cloudPushTimer = setTimeout(function () { cloudPushTimer = null; cloudPushNow(); }, 900);
+  }
+
+  // Pull the authoritative server row into local. "hit" | "empty" | "error".
+  function cloudPull() {
+    if (!CLOUD || !cloudUser) return Promise.resolve("error");
+    return sb.from("members").select("*").eq("user_id", cloudUser.id).maybeSingle()
+      .then(function (r) {
+        if (r.error) return "error";
+        if (!r.data) return "empty";
+        var d = r.data, app = d.app_state || {};
+        cacheSubState(d.subscription_status, d.trial_expires_at);
+        suspendPush = true;
+        try {
+          appStateKeys().forEach(function (k) {
+            try { if (app[k] != null) localStorage.setItem(k, app[k]); } catch (e) {}
+          });
+          save(LS_MEMBER, {
+            member_id: d.member_id, created_at: d.created_at,
+            identity: d.identity || {}, contact: d.contact || {}, status: d.status || {},
+            plan_snapshot: d.plan_snapshot || {}, activity: d.activity || {},
+            engagement: d.engagement || {}, open_questions: d.open_questions || []
+          });
+        } finally { suspendPush = false; }
+        clearDirty();
+        return "hit";
+      })
+      .catch(function (e) { console.warn("[cloud] pull failed:", e); return "error"; });
+  }
+
+  function refreshFromCloud() { try { applyGate(); renderAll(); renderAcct(); } catch (e) {} }
+  function syncOnEntry() {
+    if (!CLOUD || !cloudUser) return;
+    if (isDirty()) { cloudPushNow(); return; }     // preserve unsynced local edits
+    cloudPull().then(function (res) {
+      if (res === "hit") refreshFromCloud();       // took newer server copy
+      else if (res === "empty") cloudPushNow();    // no server row yet — seed it from local
+      // "error": leave local untouched
+    });
+  }
+
+  function cloudSignUp(email, pass) {
+    if (!CLOUD) return Promise.resolve({ ok: false, skip: true });
+    var gen = ++authGen;
+    return sb.auth.signUp({ email: email, password: pass })
+      .then(function (r) {
+        if (gen !== authGen) return { ok: false, superseded: true };
+        if (r.error) return { ok: false, error: r.error.message };
+        var hasSession = !!(r.data && r.data.session);
+        if (hasSession) cloudUser = (r.data && r.data.user) || null;
+        return { ok: true, session: hasSession };
+      })
+      .catch(function (e) { return { ok: false, error: String(e && e.message || e) }; });
+  }
+  function cloudSignIn(email, pass) {
+    if (!CLOUD) return Promise.resolve({ ok: false, skip: true });
+    var gen = ++authGen;
+    return sb.auth.signInWithPassword({ email: email, password: pass })
+      .then(function (r) {
+        if (gen !== authGen) return { ok: false, superseded: true };
+        if (r.error) return { ok: false, error: r.error.message };
+        cloudUser = (r.data && r.data.user) || null;
+        return { ok: true };
+      })
+      .catch(function (e) { return { ok: false, error: String(e && e.message || e) }; });
+  }
+  function cloudSignOut() {
+    authGen++;                               // cancel any in-flight sign-in/up
+    cloudUser = null;
+    if (cloudPushTimer) { clearTimeout(cloudPushTimer); cloudPushTimer = null; }
+    clearSubCache();                         // don't leak one account's trial state to the next
+    if (!CLOUD) return Promise.resolve();
+    return sb.auth.signOut().catch(function () {});
+  }
+
+  /* ---- server-authoritative trial cache + gate helpers ---------------------
+     The clock lives in members.trial_expires_at / subscription_status (client-
+     unwritable). We cache it locally only to render the gate + honor a started
+     trial offline. Expiry is computed from the timestamp — no cron needed. */
+  function cacheSubState(status, exp) {
+    try {
+      if (status != null) localStorage.setItem(LS_SUB_STATUS, String(status));
+      if (exp) localStorage.setItem(LS_TRIAL_EXP, String(exp));
+      else if (exp === null) localStorage.removeItem(LS_TRIAL_EXP);
+    } catch (e) {}
+  }
+  function clearSubCache() {
+    try { localStorage.removeItem(LS_SUB_STATUS); localStorage.removeItem(LS_TRIAL_EXP); } catch (e) {}
+  }
+  // Ask the backend to open this account's ONE 7-day trial (idempotent server-side).
+  function startTrial() {
+    if (!CLOUD || !cloudUser) return Promise.resolve(false);
+    return sb.auth.getSession().then(function (r) {
+      var tok = r && r.data && r.data.session && r.data.session.access_token;
+      if (!tok) return false;
+      return fetch(SB_URL + "/functions/v1/start-trial", {
+        method: "POST",
+        headers: { apikey: SB_KEY, Authorization: "Bearer " + tok }
+      }).then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (j) {
+          if (j && j.ok) { cacheSubState(j.subscription_status, j.trial_expires_at); return true; }
+          return false;
+        });
+    }).catch(function (e) { console.warn("[trial] start failed:", e); return false; });
+  }
+  // Bounded retry for the ONE start-trial call (fresh-signup path only). start-trial is
+  // idempotent server-side, so retrying a network blip is harmless; never runs on boot.
+  function startTrialWithRetry(tries) {
+    return startTrial().then(function (ok) {
+      if (ok || tries <= 1) return ok;
+      return new Promise(function (res) { setTimeout(res, 1500); })
+        .then(function () { return startTrialWithRetry(tries - 1); });
+    });
+  }
+
+  /* ---- Stripe paywall wiring -----------------------------------------------
+     AARON SEAM: paste the real Stripe Payment Link URLs below (his sole-prop Stripe
+     account, same one as Spotted). Until these are real https://buy.stripe.com/...
+     links the paywall CTAs stay in honest "opens at launch" staged mode. Once filled,
+     tagPaywallLinks() upgrades each CTA to the live link with client_reference_id
+     (= Supabase user id) so the stripe-webhook can match the payer back to THIS member.
+     Set each link's after-payment redirect to  <app-url>/?paid=1  so the app lifts the
+     paywall on return. Brand: "Anchored Faith"; canonical domain: anchoredfaith.app
+     (NOT registered yet — Aaron's ~$15 purchase; until then use the deploy host URL for
+     the redirect). The $7-credit annual link is handled by the EMAIL engine (Path A),
+     not this in-app paywall (Path B / cold trial). */
+  var STRIPE_LINKS = {
+    monthly: "https://buy.stripe.com/14A9AV6OD33RaCD5Pdbo405",   // Founding Monthly $8.99/mo (plink_1TyOaRPTFZ0RNnnRfELL0l08)
+    annual:  "https://buy.stripe.com/14AaEZ6ODeMz267cdBbo404",   // Founding Annual $59/yr (plink_1TyOXsPTFZ0RNnnRI7wtHCDW)
+    // AARON SEAM: not real links yet — only needed once the founding cap (100,
+    // enforced server-side via founding_counter, schema.sql §6) is close to
+    // full. Create two more Stripe Payment Links ($11.99/mo, $79/yr standing
+    // price) and paste them here before the 100th founding member signs up;
+    // until then checkFoundingAvailability()/stripeLinkFor() stay honestly
+    // staged for a standard-price customer (same "opens at launch" pattern as
+    // the founding links used before they were wired).
+    standardMonthly: "#staged-standard-monthly",
+    standardAnnual:  "#staged-standard-annual"
+  };
+  // Server-authoritative: true once founding_counter.count has reached its cap.
+  // Defaults false (show founding pricing) until checkFoundingAvailability()
+  // resolves, so offline/selftest/CLOUD-unavailable runs behave exactly as
+  // before this fix (no regression to Test Faith App.bat).
+  var FOUNDING_CAP_REACHED = false;
+  function stripeLinkFor(id) {
+    var links = FOUNDING_CAP_REACHED
+      ? { "pw-monthly": STRIPE_LINKS.standardMonthly, "pw-annual": STRIPE_LINKS.standardAnnual }
+      : { "pw-monthly": STRIPE_LINKS.monthly, "pw-annual": STRIPE_LINKS.annual };
+    return links[id] || "";
+  }
+  // Swap the paywall's price copy between founding and standard, so the "first
+  // 100 only" claim in privacy.html/terms.html is actually true: once the cap
+  // is hit, nobody sees or can buy the founding price anymore.
+  function applyFoundingUI(foundingAvailable) {
+    try {
+      var banner = document.getElementById("pw-banner");
+      var mLabel = document.getElementById("pw-monthly-label");
+      var mSub = document.getElementById("pw-monthly-sub");
+      var aLabel = document.getElementById("pw-annual-label");
+      var aSub = document.getElementById("pw-annual-sub");
+      var renew = document.getElementById("pw-renew-text");
+      if (foundingAvailable) {
+        if (banner) banner.innerHTML = "<b>Founding member price &middot; first 100 only</b>Lock in $8.99/mo for life. As long as you stay, your price never goes up.";
+        if (mLabel) mLabel.textContent = "Continue for $8.99/mo";
+        if (mSub) mSub.textContent = "Founding price, locked for life";
+        if (aLabel) aLabel.textContent = "Go annual for $59/yr";
+        if (aSub) aSub.textContent = "About $4.92/mo, roughly five months free";
+        if (renew) renew.textContent = "Your plan renews automatically — $8.99/mo (or $59/yr) — until you cancel.";
+      } else {
+        if (banner) banner.innerHTML = "<b>Standard pricing</b>Our founding-member spots are full — you're still getting the full plan and Companion.";
+        if (mLabel) mLabel.textContent = "Continue for $11.99/mo";
+        if (mSub) mSub.textContent = "Standard price";
+        if (aLabel) aLabel.textContent = "Go annual for $79/yr";
+        if (aSub) aSub.textContent = "About $6.58/mo";
+        if (renew) renew.textContent = "Your plan renews automatically — $11.99/mo (or $79/yr) — until you cancel.";
+      }
+    } catch (e) {}
+  }
+  // Reads the public founding_counter row (anon-readable, client-unwritable —
+  // schema.sql §6) to decide whether to still offer the founding price. Safe
+  // to call whenever the paywall is about to render.
+  function checkFoundingAvailability() {
+    if (!CLOUD) return Promise.resolve();
+    return sb.from("founding_counter").select("count,cap").eq("id", 1).maybeSingle()
+      .then(function (r) {
+        FOUNDING_CAP_REACHED = !!(r && r.data && r.data.count >= r.data.cap);
+        applyFoundingUI(!FOUNDING_CAP_REACHED);
+      })
+      .catch(function (e) { console.warn("[founding] availability check failed:", e); });
+  }
+  function tagPaywallLinks() {
+    try {
+      ["pw-monthly", "pw-annual"].forEach(function (id) {
+        var a = document.getElementById(id); if (!a) return;
+        var link = stripeLinkFor(id);
+        if (!/^https:\/\//.test(link)) return;         // not wired yet → stays staged
+        if (a.dataset.wired === "1") return;
+        var qs = [];
+        if (cloudUser && cloudUser.id) qs.push("client_reference_id=" + encodeURIComponent(cloudUser.id));
+        if (cloudUser && cloudUser.email) qs.push("prefilled_email=" + encodeURIComponent(cloudUser.email));
+        a.setAttribute("href", link + (qs.length ? ("?" + qs.join("&")) : ""));
+        a.dataset.wired = "1"; a.removeAttribute("data-staged");
+      });
+    } catch (e) {}
+  }
+  // Returning from a successful Stripe checkout (success URL = <app>/?paid=1): the
+  // stripe-webhook flips subscription_status to 'active' server-side. Poll a few times
+  // to beat that webhook race, then lift the paywall. Harmless no-op when ?paid absent.
+  function maybePollPaidReturn() {
+    try { if (location.search.indexOf("paid=1") === -1) return; } catch (e) { return; }
+    if (!CLOUD || !cloudUser) return;
+    var tries = 0;
+    (function poll() {
+      cloudPull().then(function () {
+        if (subStatus() === "active") {
+          document.body.classList.remove("paywalled");
+          try { unlockApp(); } catch (e) {}
+          try { toast("You're in. Subscription active — welcome back."); } catch (e) {}
+          return;
+        }
+        if (++tries < 10) setTimeout(poll, 3000);
+      });
+    })();
   }
 
   /* ---------- toast ---------- */
@@ -654,19 +979,35 @@
     if (!first || !email || email.indexOf("@") < 1 || !pass) { if (err) err.textContent = "Please fill your name, a valid email, and a password."; return; }
     save(LS_AUTH, { hash: hashPass(pass, email) });
     var m = getMember() || {};
+    m.member_id = m.member_id || ("m_" + Math.random().toString(16).slice(2, 8));
     m.identity = { first_name: first, created_at: new Date().toISOString() };
     m.contact = {
       email: email, preferred_channel: "email",
       consent_email: !!(document.getElementById("g-consent-email") || {}).checked
     };
-    m.status = m.status || { goal: goal };
+    m.status = m.status || { goal: goal, buyer: false, source: "app_signup" };
     m.engagement = m.engagement || { last_reply: null, quiet_days: 0, status_flags: [] };
     m.open_questions = m.open_questions || [];
     save(LS_MEMBER, m);
     setAuthed(true);
-    startTrialIfNeeded();
     unlockApp();
     toast("Welcome, " + first + ". Your walk starts today.");
+    // Real server account + SERVER-authoritative 7-day trial. Non-blocking, so signup
+    // works offline and the local self-test stays green even with no network.
+    if (CLOUD) {
+      cloudSignUp(email, pass).then(function (r) {
+        if (r.ok && r.session) {
+          // Push the row FIRST (start-trial PATCHes an existing members row), then open
+          // the account's one 7-day trial. Idempotent server-side, so a retry is harmless.
+          cloudPushNow().then(function () { return startTrialWithRetry(3); }).then(function () { applyGate(); });
+        } else if (r.error && /already|registered|exists/i.test(r.error)) {
+          try { toast("Looks like you already have an account — log out, then log in to sync your walk.", "err"); } catch (e) {}
+        }
+      });
+    } else {
+      startTrialIfNeeded();   // offline fallback: local 7-day clock
+      applyGate();
+    }
   }
 
   function doLogin() {
@@ -674,9 +1015,27 @@
     var pass = (document.getElementById("g-pass") || {}).value;
     var err = document.getElementById("gate-err");
     var auth = load(LS_AUTH, null);
-    if (!auth || auth.hash !== hashPass(pass, email)) { if (err) err.textContent = "That email or password doesn't match this device."; return; }
-    setAuthed(true);
-    unlockApp();
+    if (auth && auth.hash === hashPass(pass, email)) {
+      // Known device: unlock instantly, then verify + sync in the background.
+      setAuthed(true); unlockApp();
+      if (CLOUD) cloudSignIn(email, pass).then(function (r) {
+        if (r.ok) syncOnEntry();
+        else if (!r.superseded) { try { toast("Unlocked offline — cloud backup is paused until you reconnect.", "err"); } catch (e) {} }
+      });
+      return;
+    }
+    // New device (no local record): authenticate against the server and pull the walk
+    // down. This is what makes accounts follow the member across devices.
+    if (!CLOUD) { if (err) err.textContent = "That email or password doesn't match this device."; return; }
+    if (err) err.textContent = "Checking your account…";
+    cloudSignIn(email, pass).then(function (r) {
+      if (!r.ok) { if (!r.superseded && err) err.textContent = "That email or password didn't match. Try again."; return; }
+      cloudPull().then(function (res) {
+        if (res === "error") { if (err) err.textContent = "Logged in, but couldn't load your walk yet. Check your connection and try again."; return; }
+        save(LS_AUTH, { hash: hashPass(pass, email) });
+        setAuthed(true); unlockApp();
+      });
+    });
   }
 
   function unlockApp() {
@@ -687,6 +1046,7 @@
   }
 
   function logout() {
+    if (CLOUD) cloudSignOut();     // clears cloudUser + server session + trial cache
     setAuthed(false);
     document.body.classList.remove("paywalled");
     document.body.classList.add("gated");
@@ -724,7 +1084,12 @@
   }
   function applyGate() {
     if (!isAuthed()) return;
-    if (isPaywalled()) { document.body.classList.add("paywalled"); }
+    if (isPaywalled()) {
+      document.body.classList.add("paywalled");
+      // Resolve founding-cap availability BEFORE wiring the Stripe links, so a
+      // just-reached cap never leaves a founding-price link tagged in.
+      checkFoundingAvailability().then(function () { tagPaywallLinks(); });
+    }
     else { document.body.classList.remove("paywalled"); }
   }
   // test hook — mirrors window.__spottedGate
@@ -1180,9 +1545,9 @@
     { id:20, intent:"loneliness", flag:"support", keywords:["lonely","loneliness","no one","isolated","alone","by myself","nobody cares"],
       answer:"Loneliness is real and it's heavy — and you are genuinely not alone: God promises 'I will never leave you nor forsake you' (Hebrews 13:5). But He also made us for each other, so this week take one small step toward people — a text, a church visit, a call. If loneliness is sliding into hopelessness, please reach out to a pastor, a counselor, or someone you trust today." },
     { id:21, intent:"app_help", keywords:["how does this work","how do i use","how the app works","what do the tabs do","how to use anchored","whats today tab"],
-      answer:"Simple: Today gives you the day's verse, a prayer, a small practice, and a reflection — tap Mark today complete when you're done. Plan shows your whole reading arc. Check-In is your daily minute of honesty and your streak. And I'm your Companion — ask me anything about faith, the Bible, or the app, anytime." },
+      answer:"Simple: Today gives you the day's verse, a prayer, a small practice, and a reflection — tap Mark today complete when you're done. Plan shows your whole reading arc. Check-In is your daily minute of honesty and your streak. And I'm your Companion — ask me about faith, the Bible, or the app, anytime." },
     { id:22, intent:"data_privacy", keywords:["is my data private","data private","who sees my journal","privacy","is my info safe","do you sell my data","private journal"],
-      answer:"Your journal, check-ins, and plan are saved privately on your device. Your contact info lives only where we can reach you for the reminders you asked for, and we never sell or share it. You can unsubscribe from email any time." },
+      answer:"Once you have an account, your check-ins, plan progress, and private journal notes are stored on our secure backend, locked to your login only — nobody else can read them. Your contact info lives only where we can reach you for the reminders you asked for. We never sell or share your journal, check-ins, or contact info, and none of it is ever used to target ads. You can unsubscribe from email any time." },
     { id:23, intent:"fallback_escalate", keywords:[],
       answer:"That's a good and honest question, and I want to point you well rather than guess. For something this personal, a trusted pastor, a mature believer, or a Christian counselor is the best next conversation. In the meantime, your reading and prayer for today are on the Today tab, and I'm always here for questions about faith, the Bible, or the app. — your Companion" }
   ];
@@ -1282,9 +1647,9 @@
     var profile = getProfile();
     var html = "";
     html += '<div class="panel"><div class="spot-hi">Hey <b>' + escapeHtml(first) + '</b> — I\'m your Companion. ' +
-      (profile ? 'Day ' + (dayIndex() + 1) + ' of your walk. Let\'s keep going.' : 'Set up My Walk and I\'ll tailor your days — but you can ask me anything right now.') + '</div>';
+      (profile ? 'Day ' + (dayIndex() + 1) + ' of your walk. Let\'s keep going.' : 'Set up My Walk and I\'ll tailor your days — but you can ask me about faith, the Bible, or the app right now.') + '</div>';
     html += '<div class="ci-meta">I answer questions about faith, the Bible, and the app. I\'m not a pastor, counselor, or doctor — for those, I\'ll point you to real people who can help.</div></div>';
-    html += '<div class="panel"><h3>Ask me anything</h3>';
+    html += '<div class="panel"><h3>Ask me about faith, the Bible, or the app</h3>';
     html += '<div class="spot-ask"><input type="text" id="spot-q" placeholder="Type your question..." autocomplete="off"><button type="button" class="primary" id="spot-send">Ask</button></div>';
     html += '<div class="spot-suggest">' + SPOT_SUGGESTIONS.map(function (s) { return '<button type="button" class="spot-chip">' + escapeHtml(s) + '</button>'; }).join("") + '</div>';
     html += '<div class="spot-answer" id="spot-answer" hidden></div>';
@@ -1418,21 +1783,45 @@
   if (intakeForm) { intakeForm.addEventListener("input", onIntakeChange); intakeForm.addEventListener("change", onIntakeChange); }
   var pwLogout = document.getElementById("pw-logout");
   if (pwLogout) pwLogout.addEventListener("click", logout);
-  // staged paywall CTAs: no live checkout yet — tell the truth in the demo.
-  document.querySelectorAll('[data-staged]').forEach(function (a) {
-    a.addEventListener("click", function (e) { e.preventDefault(); toast("Checkout isn't wired yet — this is a staged build."); });
+  // Paywall CTAs. tagPaywallLinks() upgrades these to real Stripe Payment Links once
+  // STRIPE_LINKS are filled in; until then they stay honestly staged.
+  ["pw-monthly", "pw-annual"].forEach(function (id) {
+    var a = document.getElementById(id); if (!a) return;
+    a.addEventListener("click", function (e) {
+      if (a.dataset.wired === "1") return;     // real Stripe link → let it navigate
+      e.preventDefault();
+      toast("Founding checkout opens at launch — almost there.");
+    });
   });
 
-  // Decide gate vs app
-  if (isAuthed() && hasAccount()) {
-    document.body.classList.remove("gated");
-    applyGate();
-    renderAll();
-    renderAcct();
+  // Decide gate vs app. Prefer a live Supabase session (so a real account follows the
+  // member across devices even with no local record); fall back to the local flags.
+  function localBootDecision() {
+    if (isAuthed() && hasAccount()) {
+      document.body.classList.remove("gated");
+      applyGate(); renderAll(); renderAcct();
+    } else {
+      document.body.classList.add("gated");
+      gateMode = hasAccount() ? "login" : "signup";
+      applyGateMode();
+    }
+  }
+  if (CLOUD) {
+    sb.auth.getSession().then(function (r) {
+      var session = r && r.data && r.data.session;
+      if (session && session.user) {
+        cloudUser = session.user;
+        setAuthed(true);
+        document.body.classList.remove("gated");
+        renderAll(); renderAcct();
+        syncOnEntry();           // pull server row → refreshFromCloud re-gates + repaints
+        maybePollPaidReturn();   // returning from a Stripe checkout (?paid=1)
+      } else {
+        localBootDecision();
+      }
+    }).catch(localBootDecision);
   } else {
-    document.body.classList.add("gated");
-    gateMode = hasAccount() ? "login" : "signup";
-    applyGateMode();
+    localBootDecision();
   }
   initPWA();
 })();

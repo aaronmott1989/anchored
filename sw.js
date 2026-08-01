@@ -3,7 +3,7 @@
    gets the latest build when online, and falls back to cache only when offline.
    Static assets (icons/manifest) stay cache-first with a background refresh.
    Bump CACHE to invalidate on any ship. Mirrors spotted/sw.js. */
-var CACHE = "anchored-v3";
+var CACHE = "anchored-v7";
 var ASSETS = [
   "./anchored-app.html",
   "./manifest.webmanifest",
