@@ -261,8 +261,18 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   .pw-cta .pw-sub { display:block; font-weight:600; font-size:12px; opacity:.8; margin-top:2px; }
   .pw-best { display:inline-block; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
     background:var(--accent); color:var(--accent-ink); border-radius:6px; padding:2px 6px; margin-left:6px; vertical-align:middle; }
+  /* On the filled/primary CTA the badge needs inverted colors or it blends into the button. */
+  .pw-cta-primary .pw-best { background:var(--accent-ink); color:var(--accent); }
   .pw-renew { font-size:13px; color:var(--text); font-weight:600; line-height:1.5; margin:14px 0 0; }
   .pw-reassure { font-size:12px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
+  /* Guarantee elevated to a headline trust element (not just fine print) — sits right
+     above the CTAs, per AnchoredOfferRework.md item 4: none of Hallow/Glorify/Abide/
+     Pray.com publish a real refund guarantee, so Anchored's honored 30-day guarantee is
+     a genuine differentiator and should be seen before the decision, not just after. */
+  .pw-guarantee { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--text);
+    background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin:0 0 14px; }
+  .pw-guarantee .pw-guarantee-icon { flex:none; width:18px; height:18px; border-radius:50%; background:var(--accent);
+    color:var(--accent-ink); font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; }
   .pw-logout { background:none; border:none; color:var(--accent); font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:0; margin-top:16px; }
   /* Questionnaire */
   .q-section { border-top:1px solid var(--border); padding-top:18px; margin-top:2px; }
@@ -351,18 +361,19 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
 <div class="paywall" id="paywall">
   <div class="paywall-card">
     <div class="wordmark">Anchored<span> Faith</span></div>
-    <div class="pw-banner" id="pw-banner"><b>Founding member price &middot; first 100 only</b>Lock in $8.99/mo for life. As long as you stay, your price never goes up.</div>
+    <div class="pw-banner" id="pw-banner"><b>Founding member price &middot; first 100 only</b>Go annual for $59/yr &mdash; that's 5 months free &mdash; and lock the founding rate for life.</div>
     <h1 class="pw-head">Your free week has ended.</h1>
     <p class="pw-lede">The plan tells you what to read and pray. Anchored is the part that helps you actually keep it: it carries your streak, sends the day's verse to you, and your Companion reaches out in the exact window you normally drift.</p>
     <p class="pw-saved">Your walk is saved. Subscribe and you pick up right where you left off, nothing lost.</p>
-    <!-- STAGED: replace href="#staged-monthly" with the real Stripe payment link before launch (see BUILD-CHECKLIST.md). checkFoundingAvailability() swaps these to standard pricing/links automatically once founding_counter hits its cap (schema.sql §6). -->
-    <a class="pw-cta pw-cta-primary" id="pw-monthly" href="#staged-monthly" data-staged="1">
-      <span id="pw-monthly-label">Continue for $8.99/mo</span><span class="pw-sub" id="pw-monthly-sub">Founding price, locked for life</span>
-    </a>
-    <a class="pw-cta pw-cta-secondary" id="pw-annual" href="#staged-annual" data-staged="1">
+    <div class="pw-guarantee"><span class="pw-guarantee-icon" aria-hidden="true">&#10003;</span>30-day money-back guarantee &mdash; every cent, no questions.</div>
+    <!-- STAGED: replace href="#staged-annual"/"#staged-monthly" with the real Stripe payment links before launch (see BUILD-CHECKLIST.md). checkFoundingAvailability() swaps these to standard pricing/links automatically once founding_counter hits its cap (schema.sql §6). Annual leads (AnchoredOfferRework.md item 3 — every proven long-runner in this category anchors on annual, monthly exists to make annual look like the deal). -->
+    <a class="pw-cta pw-cta-primary" id="pw-annual" href="#staged-annual" data-staged="1">
       <span id="pw-annual-label">Go annual for $59/yr</span><span class="pw-best">Best value</span><span class="pw-sub" id="pw-annual-sub">About $4.92/mo, roughly five months free</span>
     </a>
-    <p class="pw-renew" id="pw-renew-text">Your plan renews automatically &mdash; $8.99/mo (or $59/yr) &mdash; until you cancel.</p>
+    <a class="pw-cta pw-cta-secondary" id="pw-monthly" href="#staged-monthly" data-staged="1">
+      <span id="pw-monthly-label">Continue for $8.99/mo</span><span class="pw-sub" id="pw-monthly-sub">Founding price, locked for life</span>
+    </a>
+    <p class="pw-renew" id="pw-renew-text">Your plan renews automatically &mdash; $59/yr (or $8.99/mo) &mdash; until you cancel.</p>
     <p class="pw-reassure">Cancel anytime, right from the app, no calls and no hoops. Change your mind within 30 days and we refund you, no questions.</p>
     <button type="button" class="pw-logout" id="pw-logout">Log out</button>
   </div>
@@ -861,19 +872,19 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       var aSub = document.getElementById("pw-annual-sub");
       var renew = document.getElementById("pw-renew-text");
       if (foundingAvailable) {
-        if (banner) banner.innerHTML = "<b>Founding member price &middot; first 100 only</b>Lock in $8.99/mo for life. As long as you stay, your price never goes up.";
+        if (banner) banner.innerHTML = "<b>Founding member price &middot; first 100 only</b>Go annual for $59/yr — that's 5 months free — and lock the founding rate for life.";
         if (mLabel) mLabel.textContent = "Continue for $8.99/mo";
         if (mSub) mSub.textContent = "Founding price, locked for life";
         if (aLabel) aLabel.textContent = "Go annual for $59/yr";
         if (aSub) aSub.textContent = "About $4.92/mo, roughly five months free";
-        if (renew) renew.textContent = "Your plan renews automatically — $8.99/mo (or $59/yr) — until you cancel.";
+        if (renew) renew.textContent = "Your plan renews automatically — $59/yr (or $8.99/mo) — until you cancel.";
       } else {
         if (banner) banner.innerHTML = "<b>Standard pricing</b>Our founding-member spots are full — you're still getting the full plan and Companion.";
         if (mLabel) mLabel.textContent = "Continue for $11.99/mo";
         if (mSub) mSub.textContent = "Standard price";
         if (aLabel) aLabel.textContent = "Go annual for $79/yr";
         if (aSub) aSub.textContent = "About $6.58/mo";
-        if (renew) renew.textContent = "Your plan renews automatically — $11.99/mo (or $79/yr) — until you cancel.";
+        if (renew) renew.textContent = "Your plan renews automatically — $79/yr (or $11.99/mo) — until you cancel.";
       }
     } catch (e) {}
   }
