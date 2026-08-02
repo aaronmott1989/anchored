@@ -16,7 +16,7 @@
   spotted-tripwire-lp.html. ONE file, two offers.
   Usage: point the Meta ad at  anchored-tripwire-lp.html?offer=anchor  (default)
                           or    anchored-tripwire-lp.html?offer=peace
-  Buyers go to the LIVE Gumroad $7 checkout; the checkout captures their email at
+  Buyers go to the LIVE Stripe $7 checkout; the checkout captures their email at
   purchase. There is intentionally NO free email opt-in on this page: we do not
   operate an email-capture backend for this demand test, so instead of promising
   a "free card" we can't deliver, both the inline and exit-intent prompts push the
@@ -121,8 +121,12 @@
      META PIXEL — Anchored (its OWN dedicated pixel; NOT the Spotted pixel).
      Fires PageView + ViewContent on load. InitiateCheckout fires on the buy
      click (see goCheckout below). Engaged10s / ScrolledHalf custom events fire
-     from the engagement block. Purchase is sent server-side by the Gumroad
-     Conversions-API worker (functions/api/gumroad-ping.js).
+     from the engagement block. NOTE (2026-08-02): checkout moved from Gumroad to
+     a Stripe Payment Link; the Gumroad Conversions-API Purchase ping
+     (functions/api/gumroad-ping.js) no longer fires for this product, so
+     server-side Purchase attribution to this pixel is currently NOT wired for
+     Stripe — InitiateCheckout still fires client-side below. Flagged as a
+     follow-up (needs a Stripe webhook -> CAPI ping, same pattern as gumroad-ping.js).
      Pixel ID 1407254754557742 = the dedicated Anchored pixel (ad account
      37985900). It appears in the const below AND the <noscript> img. <<<
      ============================================================ -->
@@ -304,20 +308,26 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   var OFFERS = {
     anchor: {
       title: "Anchored — The 21-Day Anchor ($7)",
-      // LIVE Gumroad checkout ($7 one-time) for The 21-Day Anchor.
-      checkout: "https://amottster.gumroad.com/l/tynak?wanted=true"
+      // LIVE Stripe checkout ($7 one-time) for The 21-Day Anchor.
+      // (Cut over from Gumroad `tynak` 2026-08-02 — Gumroad product unpublished
+      // same day. Delivery after payment: Stripe redirects straight to
+      // anchoredfaith.app/anchored-app.html, same "create your login" flow
+      // Gumroad's receipt used to hand off to.)
+      checkout: "https://buy.stripe.com/00weVfb4T0VJ3ab5Pdbo40d"
     }
     /* ANCHOR-ONLY (2026-07-28): the `peace` offer variant is DISABLED. It showed
        "Peace: 14 Days for Anxious Hearts" copy but its checkout pointed at `tynak`
        (The 21-Day Anchor), so a Peace ad would charge for and deliver the wrong
        product (bait-and-switch). Preserved here — NOT deleted — so it can be
        restored if/when a real Peace product is built. To re-enable: give it its
-       OWN Gumroad checkout, then remove this comment wrapper AND the `key = "anchor"`
-       force below. Do NOT re-enable while `checkout` still points at tynak.
+       OWN Stripe checkout, then remove this comment wrapper AND the `key = "anchor"`
+       force below. Do NOT re-enable while `checkout` still points at the Anchor
+       product's link (Gumroad `tynak` is gone as of 2026-08-02 — this is now the
+       Stripe link above).
     ,
     peace: {
       title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
-      checkout: "https://amottster.gumroad.com/l/tynak?wanted=true",
+      checkout: "https://buy.stripe.com/00weVfb4T0VJ3ab5Pdbo40d",
       kicker: "Anchored · Peace in 14 Days",
       h1: 'Your mind won\'t stop. <span class="hl">Scripture speaks straight to it.</span>',
       sub: "14 days of Scripture, prayer, and a simple practice for an anxious, racing mind — 10 minutes a day.",
@@ -353,8 +363,9 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   function qp(n){ return new URLSearchParams(location.search).get(n); }
   // ANCHOR-ONLY (2026-07-28): force the Anchor offer regardless of ?offer=.
   // The peace variant is disabled (see OFFERS above) because it would charge for
-  // `tynak` (The 21-Day Anchor) while showing Peace copy. Even ?offer=peace now
-  // serves Anchor copy AND routes checkout to tynak, so copy == product == delivery.
+  // the Anchor product while showing Peace copy. Even ?offer=peace now serves
+  // Anchor copy AND routes checkout to the Anchor Stripe link, so
+  // copy == product == delivery.
   var key = "anchor";
   var o = OFFERS[key] || OFFERS.anchor;
 
@@ -377,9 +388,12 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
 
   // ---- UTM capture + passthrough (creative attribution) ----
   // Read utm_* on load, persist in sessionStorage, then append them (plus the
-  // offer variant) onto the Gumroad checkout URL so the buyer record carries
-  // which creative (utm_content=static vs video) drove the sale. Without this
-  // the hardcoded checkout URL drops every param.
+  // offer variant) onto the checkout URL so the buyer record carries which
+  // creative (utm_content=static vs video) drove the sale. NOTE: Stripe Payment
+  // Links ignore unrecognized query params by default (no metadata capture
+  // wired yet), so today this only survives as long as Gumroad's did for
+  // on-page debugging — it does not yet land in Stripe's transaction data.
+  // Without this the hardcoded checkout URL drops every param.
   var UTM_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
   var UTMS = (function(){
     var params = new URLSearchParams(location.search), stored = {};
@@ -396,7 +410,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     return u.toString();
   }
 
-  // ---- buy: to the live Gumroad checkout (UTMs + offer appended) ----
+  // ---- buy: to the live Stripe checkout (UTMs + offer appended) ----
   function goCheckout(){
     try{ if(window.fbq) fbq('track','InitiateCheckout',{value:7,currency:'USD'}); }catch(e){}
     var dest = checkoutURL();
