@@ -188,7 +188,17 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
 <section>
   <div class="wrap">
     <h2 id="k-prob-h">Day 4 is where it dies.</h2>
-    <p class="lead muted" id="k-prob-b" style="margin-top:14px;">The first morning feels great. Then day four shows up: a rough night, a packed morning, and it's easy to lose track of where the plan left off or what comes next. One missed day becomes three, and the guilt makes it harder to come back than to start. Most plans just stop the day you fall behind — nobody hands you the next step. This closes that gap.</p>
+    <p class="lead muted" id="k-prob-b" style="margin-top:14px;">The first morning feels great. Then day four shows up: a rough night, a packed morning, and it's easy to lose track of where the plan left off or what comes next. One missed day becomes three, and the guilt makes it harder to come back than to start. Most plans just stop the day you fall behind — nobody hands you the next step. <b style="color:var(--text)">The 21-Day Anchor exists to close exactly that gap:</b> a dated plan that hands you the next step every single day, whether you showed up yesterday or not.</p>
+  </div>
+</section>
+
+<!-- WHY WE BUILT IT THIS WAY (honest-transparency block — no personal story, faceless brand) -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="why">
+      <h2 style="font-size:22px;">Where this comes from</h2>
+      <p class="muted" style="margin-top:12px;">Anchored isn't built around one person's story — it's built around a gap you can find in almost every faith app and devotional on the market: they hand you content, and the moment you fall behind, they go quiet. Nobody builds the page for the day you miss. The 21-Day Anchor exists because that gap is real and fixable — a dated plan with grace built into the page itself, not bolted on as an afterthought.</p>
+    </div>
   </div>
 </section>
 
@@ -269,6 +279,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <h2 id="k-final">Ten minutes a day. Twenty-one days. A habit that finally holds.</h2>
     <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
     <div class="ctanote">30-day money-back guarantee · instant access</div>
+    <p class="muted" style="margin-top:22px;font-size:14px;font-style:italic;">P.S. — Whatever you decide, the guarantee above stands: if the 21-Day Anchor doesn't help you build a habit that actually sticks, email us any time in the first 30 days and get every cent back, no questions asked. You keep the plan either way.</p>
   </div>
 </div>
 
@@ -312,8 +323,11 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       // (Cut over from Gumroad `tynak` 2026-08-02 — Gumroad product unpublished
       // same day. Delivery after payment: Stripe redirects straight to
       // anchoredfaith.app/anchored-app.html, same "create your login" flow
-      // Gumroad's receipt used to hand off to.)
-      checkout: "https://buy.stripe.com/00weVfb4T0VJ3ab5Pdbo40d"
+      // Gumroad's receipt used to hand off to. Re-migrated 2026-08-02 later same
+      // day off the shared "Spotted" Stripe account onto Anchored's OWN dedicated
+      // account, acct_1U0BlAIP2ccetVoD — fixes a checkout branding bug where the
+      // merchant name showed as "Spotted".)
+      checkout: "https://buy.stripe.com/cNifZi18z9nF4WueUc5wI00"
     }
     /* ANCHOR-ONLY (2026-07-28): the `peace` offer variant is DISABLED. It showed
        "Peace: 14 Days for Anxious Hearts" copy but its checkout pointed at `tynak`
@@ -327,7 +341,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     ,
     peace: {
       title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
-      checkout: "https://buy.stripe.com/00weVfb4T0VJ3ab5Pdbo40d",
+      checkout: "https://buy.stripe.com/cNifZi18z9nF4WueUc5wI00",
       kicker: "Anchored · Peace in 14 Days",
       h1: 'Your mind won\'t stop. <span class="hl">Scripture speaks straight to it.</span>',
       sub: "14 days of Scripture, prayer, and a simple practice for an anxious, racing mind — 10 minutes a day.",

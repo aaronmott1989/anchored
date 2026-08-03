@@ -833,21 +833,24 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   }
 
   /* ---- Stripe paywall wiring -----------------------------------------------
-     AARON SEAM: paste the real Stripe Payment Link URLs below (his sole-prop Stripe
-     account, same one as Spotted). Until these are real https://buy.stripe.com/...
-     links the paywall CTAs stay in honest "opens at launch" staged mode. Once filled,
+     Live on Anchored's OWN dedicated Stripe account (acct_1U0BlAIP2ccetVoD),
+     migrated 2026-08-02 off the shared "Spotted" account to fix a checkout
+     branding bug (checkout was showing "Spotted" as the merchant name).
      tagPaywallLinks() upgrades each CTA to the live link with client_reference_id
      (= Supabase user id) so the stripe-webhook can match the payer back to THIS member.
-     Set each link's after-payment redirect to  <app-url>/?paid=1  so the app lifts the
-     paywall on return. Brand: "Anchored Faith"; canonical domain: anchoredfaith.app
-     (NOT registered yet — Aaron's ~$15 purchase; until then use the deploy host URL for
-     the redirect). The $7-credit annual link is handled by the EMAIL engine (Path A),
-     not this in-app paywall (Path B / cold trial). */
+     Each link's after-payment redirect is set to  <app-url>/anchored-app.html?paid=1
+     so the app lifts the paywall on return. Brand: "Anchored"; canonical domain:
+     anchoredfaith.app. The $7-credit annual link is handled by the EMAIL engine
+     (Path A), not this in-app paywall (Path B / cold trial) — see ANCHORED7 promo
+     code on the annual link. NOTE: the new Stripe account is still finishing Aaron's
+     activation (business verification + payout bank) as of 2026-08-02 — these links
+     work end-to-end in a real checkout preview but should not be tested with a real
+     charge until the account is confirmed live-capable. */
   var STRIPE_LINKS = {
-    monthly: "https://buy.stripe.com/14A9AV6OD33RaCD5Pdbo405",   // Founding Monthly $8.99/mo (plink_1TyOaRPTFZ0RNnnRfELL0l08)
-    annual:  "https://buy.stripe.com/14AaEZ6ODeMz267cdBbo404",   // Founding Annual $59/yr (plink_1TyOXsPTFZ0RNnnRI7wtHCDW)
-    standardMonthly: "https://buy.stripe.com/cNi14pa0PgUH267b9xbo406",  // Standard Monthly $11.99/mo (plink_1TzUVsPTFZ0RNnnRd8yDjYGw)
-    standardAnnual:  "https://buy.stripe.com/4gMbJ30qfgUH9yzb9xbo407"   // Standard Annual $79/yr (plink_1TzUaIPTFZ0RNnnRuJkuTNhn)
+    monthly: "https://buy.stripe.com/3cI3cw18zarJgFc4fy5wI01",   // Founding Monthly $8.99/mo (plink_1U0BvmIP2ccetVoDqBRnubex)
+    annual:  "https://buy.stripe.com/7sYeVe18z2Zh9cK4fy5wI02",   // Founding Annual $59/yr (plink_1U0C1OIP2ccetVoDeeTxVRKH) — ANCHORED7 promo codes allowed
+    standardMonthly: "https://buy.stripe.com/3cIaEYcRh9nF74C9zS5wI03",  // Standard Monthly $11.99/mo (plink_1U0C4RIP2ccetVoDyKIBjWgG)
+    standardAnnual:  "https://buy.stripe.com/fZu00kcRh57pdt07rK5wI04"   // Standard Annual $79/yr (plink_1U0C9fIP2ccetVoDj2Xdeq0K)
   };
   // Server-authoritative: true once founding_counter.count has reached its cap.
   // Defaults false (show founding pricing) until checkFoundingAvailability()
@@ -1757,8 +1760,38 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   /* ---------- PWA ---------- */
   var deferredPrompt = null;
   function initPWA() {
+    // Root cause of the "stale SW bounces a fresh nav to the wrong content" bug:
+    // browsers only re-check sw.js in the background on their own schedule (up to
+    // 24h), so a member who last visited before a ship could sit on an old worker
+    // indefinitely with no signal anything was wrong. Three belt-and-suspenders
+    // fixes: (1) updateViaCache:"none" so the SW script itself is never served
+    // from GH Pages' HTTP cache (Cache-Control: max-age=600) even as a fallback;
+    // (2) force an explicit update() check on every load AND every time the tab
+    // regains focus/foreground, instead of waiting on the browser's own timer;
+    // (3) once a new worker takes control, reload once so the page that's
+    // showing is guaranteed to match the worker that's now serving it. Mirrors
+    // the same fix applied to spotted/sw.js registration.
     if ("serviceWorker" in navigator) {
-      try { navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(function () {}); } catch (e) {}
+      try {
+        // Only reload on a controller swap if THIS page load was already being
+        // served by a worker — i.e. a real stale→fresh update, not a first-ever
+        // install (which has no stale content to correct, and reloading mid-signup
+        // would just be disruptive).
+        var hadController = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.register("sw.js", { scope: "./", updateViaCache: "none" }).then(function (reg) {
+          if (!reg) return;
+          reg.update().catch(function () {});
+          document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState === "visible") reg.update().catch(function () {});
+          });
+        }).catch(function () {});
+        var reloadedForNewSW = false;
+        navigator.serviceWorker.addEventListener("controllerchange", function () {
+          if (!hadController || reloadedForNewSW) return;
+          reloadedForNewSW = true;
+          location.reload();
+        });
+      } catch (e) {}
     }
     window.addEventListener("beforeinstallprompt", function (e) {
       e.preventDefault(); deferredPrompt = e;
