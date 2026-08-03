@@ -451,11 +451,15 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   }
 
   // ---- buy: to the live Stripe checkout (UTMs + offer appended) ----
-  // FIXED 2026-08-03: fire InitiateCheckout with an eventID, THEN delay the
-  // navigation ~280ms so the pixel's GET beacon actually completes. Previously
-  // fbq() and location.href ran in the SAME tick, so navigating aborted the
-  // in-flight tracking beacon and IC under-reported — which blinded BOTH our
-  // reporting AND Meta's optimization (both ad sets optimize on InitiateCheckout).
+  // REVERTED 2026-08-03 (checkout-leak fix): a prior change deferred this
+  // navigation ~280ms inside a setTimeout so the InitiateCheckout beacon could
+  // finish first. That silently BROKE the redirect inside the Facebook/Instagram
+  // in-app browser — where all paid traffic lands. Those webviews only allow a
+  // top-level navigation that fires synchronously inside the tap handler, so the
+  // deferred location.href was dropped: buyers fired IC but never reached Stripe
+  // (26 InitiateCheckout, 0 purchases, Stripe $0 all-time). We now navigate
+  // synchronously inside the gesture; fbq() ships IC via navigator.sendBeacon,
+  // which survives the navigation, so attribution still holds.
   var checkingOut = false;
   function goCheckout(){
     if(checkingOut) return;               // guard: no double-fire on rapid clicks
@@ -464,7 +468,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     checkingOut = true;
     var eventID = 'ic-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
     try{ if(window.fbq) fbq('track','InitiateCheckout',{value:7,currency:'USD'},{eventID:eventID}); }catch(e){}
-    setTimeout(function(){ location.href = dest; }, 280);   // let the beacon finish
+    location.href = dest;                  // synchronous nav inside the tap — do NOT defer (in-app browsers drop deferred redirects)
   }
   document.querySelectorAll('[data-buy]').forEach(function(a){
     a.addEventListener('click', function(e){ e.preventDefault(); goCheckout(); });
