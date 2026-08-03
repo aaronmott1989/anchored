@@ -17,11 +17,16 @@
   Usage: point the Meta ad at  anchored-tripwire-lp.html?offer=anchor  (default)
                           or    anchored-tripwire-lp.html?offer=peace
   Buyers go to the LIVE Stripe $7 checkout; the checkout captures their email at
-  purchase. There is intentionally NO free email opt-in on this page: we do not
-  operate an email-capture backend for this demand test, so instead of promising
-  a "free card" we can't deliver, both the inline and exit-intent prompts push the
-  honest $7 offer. (A lead Worker exists at aarons-loop/anchored-lead-worker/ and
-  can be wired via a LEAD_ENDPOINT once a Workers-scoped Cloudflare token is set.)
+  purchase. NON-BUYER EMAIL CAPTURE (updated 2026-08-03): the exit-intent modal
+  now carries a free-card opt-in ("The Day You Miss It") that POSTs to the
+  anchored-lead Worker (aarons-loop/anchored-lead-worker/, sends the card via
+  Resend + tags the "Anchored Leads" segment). It FAILS CLOSED: the LEAD_ENDPOINT
+  const near the bottom of this file is blank until that Worker is deployed and
+  security-compliance re-clears it, and while blank the modal stays the honest
+  $7-push (capture form hidden) — so live behavior is unchanged until the endpoint
+  is set. To go live: deploy the Worker (needs a Workers-scoped Cloudflare login),
+  set its RESEND_API_KEY secret, get security's re-clear, then paste the Worker URL
+  into LEAD_ENDPOINT. The inline mid-page prompt stays a $7 reinforcer by design.
 
   FIXED 2026-08-03: `?offer=peace` was being force-overridden to always render the
   Anchor copy (see the `key = "anchor"` history below) because Peace had no
@@ -183,7 +188,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <p class="promise" id="k-promise">The habit doesn't die because the heart isn't in it. It dies around day four, when life gets loud and no plan tells you what to read next or what to do when you miss a day. This is the simple, dated plan that carries you through it.</p>
     <div style="margin-top:24px;">
       <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
-      <div class="ctanote"><b>Instant access.</b> 30-day, no-questions money-back guarantee.</div>
+      <div class="ctanote"><b>Instant access. Yours to keep.</b> If it doesn't stick, email us inside 30 days and pay nothing — no questions.</div>
     </div>
     <div class="trust">
       <div class="t"><div class="ic">↓</div><div class="lbl">Instant access</div><div class="sub">Delivered on the spot</div></div>
@@ -221,8 +226,8 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       <div class="item"><div class="chk">✓</div><div class="txt"><b>A dated 21-day plan</b><span>Open to today's page and the reading, prayer, and reflection are already there. No deciding, no flipping around — just show up.</span></div></div>
       <div class="item"><div class="chk">✓</div><div class="txt"><b>10 minutes, morning or night</b><span>Built for a real, busy life — a short reading, a guided prayer, and one honest reflection. Small enough that you can't fail.</span></div></div>
       <div class="item"><div class="chk">✓</div><div class="txt"><b>The "I missed a day" page</b><span>The single page most plans skip: exactly what to do when you fall behind, so a missed day becomes a step instead of the end.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>21 guided prayer prompts</b><span>If you've never known what to say, these give you the words — and teach you to pray in your own.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>3 verses to carry with you</b><span>Short enough to memorize, chosen for the days that are hard. Hidden in your heart, not just read once.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>The prayer is written for you — word for word</b><span>Never sat there not knowing what to say? Each day's prayer is written out in full, so you can pray it straight off the page — and start praying in your own words over time.</span></div></div>
+      <div class="item"><div class="chk">✓</div><div class="txt"><b>The whole passage, right on the page</b><span>No flipping between apps or hunting a reference — the day's Scripture is printed inline (World English Bible). Open it and read.</span></div></div>
       <div class="item"><div class="chk">✓</div><div class="txt"><b>A simple reflection journal</b><span>One line a day. Look back in three weeks and see how far God has carried you.</span></div></div>
     </div>
   </div>
@@ -243,7 +248,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   <div class="wrap">
     <div class="why">
       <h2 style="font-size:22px;">Why $7?</h2>
-      <p class="muted" style="margin-top:12px;" id="k-why">A devotional book runs $15–$25 and still leaves you deciding when and how. Free plans online hand you a list and vanish the day you fall behind. This is <b>$7, once,</b> for the full 21-day dated plan, the prayer prompts, and the "I missed a day" page free plans refuse to include. Seven dollars vs. another season of meaning to grow closer to God and never quite starting. Easy math.</p>
+      <p class="muted" style="margin-top:12px;" id="k-why">A devotional book runs $15–$25 and still leaves you deciding when and how. Free plans online hand you a list and vanish the day you fall behind. This is <b>$7, once,</b> for the full 21-day dated plan, the prayers written out for you word for word, and the "I missed a day" page free plans refuse to include. Seven dollars vs. another season of meaning to grow closer to God and never quite starting. Easy math.</p>
     </div>
   </div>
 </section>
@@ -254,7 +259,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <div class="app">
       <div class="tag">What happens after</div>
       <h2 style="font-size:21px;margin-top:8px;" id="k-app-h">When the 21 days end, the Anchored app takes over.</h2>
-      <p class="muted" style="margin-top:10px;" id="k-app-b">It keeps your streak, sends the day's verse to you, and your Companion — a warm, encouraging guide — checks in during the windows you tend to drift, and answers your questions about faith and the Bible any time. This plan is your start. The app keeps you walking.</p>
+      <p class="muted" style="margin-top:10px;" id="k-app-b">Your 21 days are yours to keep either way — no subscription, no auto-charge. If you want to keep going after them, the Anchored app takes over: it holds your streak, sends the day's verse, and your Companion checks in during the windows you tend to drift and answers your faith and Bible questions any time. Founding members lock in <b style="color:var(--text)">$59/year for life</b> — and the $7 you pay today comes off it, so your first year is <b style="color:var(--text)">$52</b> (or $8.99/month if you'd rather). Same 30-day money-back guarantee. Totally optional — the plan is yours regardless.</p>
     </div>
   </div>
 </section>
@@ -278,7 +283,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <div id="k-faq">
       <details><summary>I'm new to the Bible. Is this too advanced? <span class="plus">+</span></summary><div class="ans">No. It's dated and day-by-day, with short readings and plain-language prompts, so you always know what to do. You don't need any background — just 10 minutes and a willingness to show up.</div></details>
       <details><summary>What if I miss a day? <span class="plus">+</span></summary><div class="ans">That's exactly what the "I missed a day" page is for. You don't catch up or start over — you just take today. Grace is the whole point, and one faithful day is a win.</div></details>
-      <details><summary>Which Bible translation do I need? <span class="plus">+</span></summary><div class="ans">Any you like. The plan gives you the passage to read in your own Bible, and quotes Scripture from the public-domain World English Bible so it works with whatever version you own.</div></details>
+      <details><summary>Which Bible translation do I need? <span class="plus">+</span></summary><div class="ans">Any you like. Each day's passage is printed right in the app (public-domain World English Bible), so you don't need anything else — though you're welcome to read along in your own Bible too.</div></details>
       <details><summary>How do I get it? <span class="plus">+</span></summary><div class="ans">Instant access after a $7 checkout. Yours to keep. Backed by a 30-day, no-questions money-back guarantee.</div></details>
     </div>
   </div>
@@ -317,6 +322,12 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   <div class="sheet">
     <h3 id="k-m-h">Before you go — the whole plan is just $7.</h3>
     <p id="k-m-p">One payment of $7, yours to keep, with a 30-day money-back guarantee. Don't let another week of meaning-to slip by.</p>
+    <form class="cap" id="leadform" novalidate style="display:none;">
+      <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
+      <button type="submit">Email me the card</button>
+    </form>
+    <div class="capdone" id="capdone">On its way — check your inbox in a minute. 🕊️</div>
+    <p class="consent" id="leadconsent" style="display:none;">Free, no spam, unsubscribe any time. By entering your email you agree to receive it and occasional Anchored emails · <a href="privacy.html">Privacy Policy</a></p>
     <a class="cta" data-buy href="#" style="margin-top:16px;"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
     <span class="skip" id="modalskip">No thanks</span>
   </div>
@@ -363,7 +374,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       whyH: "Why $7?",
       why: 'A single counseling session runs $100+, and a devotional book leaves you deciding when and how. This is <b>$7, once,</b> for 14 dated days built specifically for an anxious mind — Scripture, prayer, and a small daily practice. Not a replacement for a counselor if you need one, but a daily anchor anyone can start tomorrow.',
       appH: "When the 14 days end, the Anchored app takes over.",
-      appB: "It keeps sending you a daily verse and a steadying practice, holds your streak, and your Companion checks in on the anxious days. This plan is your start.",
+      appB: 'Your 14 days are yours to keep either way — no subscription, no auto-charge. If you want to keep going after them, the Anchored app takes over: it keeps sending you a daily verse and a steadying practice, holds your streak, and your Companion checks in on the anxious days. Founding members lock in <b style="color:var(--text)">$59/year for life</b> — and the $7 you pay today comes off it, so your first year is <b style="color:var(--text)">$52</b> (or $8.99/month if you\'d rather). Same 30-day money-back guarantee. Totally optional — the plan is yours regardless.',
       optH: "Still deciding? The whole plan is just $7.",
       optP: "No subscription and no risk — one payment of $7 gets you all 14 days, yours to keep, backed by a 30-day money-back guarantee. You can start calming the noise tomorrow.",
       mH: "Before you go — the whole plan is just $7.",
@@ -495,6 +506,44 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     if(dwell && pct>0.5 && y < lastY - 40 && maxY>600) showModal();
     lastY = y;
   }, {passive:true});
+
+  // ---- non-buyer lead capture: POST to the Anchored lead Worker ----
+  // FAILS CLOSED: LEAD_ENDPOINT is blank until the anchored-lead Worker is
+  // deployed and security re-clears it. While blank, the exit modal stays the
+  // honest $7-push it has always been (the capture form is hidden), so live
+  // behavior is unchanged. Set LEAD_ENDPOINT to the deployed Worker URL to flip
+  // the free-card capture on — no other change needed. Contract matches the
+  // Worker exactly: POST { email, source, ts }.
+  var LEAD_ENDPOINT = ""; // <-- set to the deployed anchored-lead Worker URL to go live
+  if (LEAD_ENDPOINT) {
+    // upgrade the exit modal from "$7-push" to "free card + $7 secondary"
+    set('k-m-h', 'Before you go — take the free card.');
+    set('k-m-p', 'Not ready for the full plan? Get <b>"The Day You Miss It"</b> — one free page (a verse, a short written prayer, one small thing to do) for the day you fall behind. We\'ll email it now.');
+    var lf = document.getElementById('leadform');
+    var lc = document.getElementById('leadconsent');
+    if (lf) lf.style.display = '';
+    if (lc) lc.style.display = '';
+    var mcta = modal.querySelector('[data-buy] span:first-child');
+    if (mcta) mcta.textContent = 'Or start the 21-Day Anchor — $7';
+    if (lf) {
+      lf.addEventListener('submit', function(e){
+        e.preventDefault();
+        var email = (document.getElementById('leademail').value || '').trim();
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { return; }
+        var btn = lf.querySelector('button'); btn.disabled = true;
+        try { if (window.fbq) fbq('track','Lead',{content_name:'day-you-miss-it', offer:key}); } catch(e){}
+        fetch(LEAD_ENDPOINT, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email: email, source: 'exit-modal', ts: Date.now() })
+        }).then(function(){
+          lf.style.display='none';
+          if (lc) lc.style.display='none';
+          document.getElementById('capdone').style.display='block';
+          try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+        }).catch(function(){ btn.disabled=false; });
+      });
+    }
+  }
 })();
 </script>
 </body>
