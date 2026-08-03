@@ -190,6 +190,22 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   .rhythm-k { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
   .rhythm-v { font-size:15px; color:var(--text); }
   .rhythm-v .ref { color:var(--accent); font-weight:700; }
+  /* Guided Today walkthrough */
+  .step-dots { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+  .step-dot { font:inherit; font-size:12px; font-weight:700; background:var(--surface-2);
+    color:var(--muted); border:1px solid var(--border); padding:8px 12px; border-radius:999px; cursor:pointer;
+    transition:border-color var(--fast), color var(--fast), background var(--fast); }
+  .step-dot.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+  .step-panel .verse { font-size:17px; }
+  .prayer-guide { border-left:3px solid var(--accent); background:var(--surface-2); border-radius:8px;
+    padding:12px 14px; font-size:14px; color:var(--text); margin:14px 0; }
+  .passage-block { margin-top:10px; }
+  .passage-ref { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:8px; }
+  .passage-text { font-family:var(--font-display); font-size:15px; line-height:1.7; color:var(--text);
+    max-height:280px; overflow-y:auto; padding-right:4px; }
+  .passage-text sup { color:var(--accent); font-weight:700; margin-right:2px; }
+  .step-nav { display:flex; justify-content:space-between; gap:10px; margin-top:12px; }
+  .step-nav button[disabled] { opacity:.4; cursor:default; }
   .empty-state { color:var(--muted); font-size:14px; padding:24px; text-align:center;
     background:var(--surface-2); border:1px dashed var(--border); border-radius:var(--radius); }
   button.primary { font:inherit; font-weight:700; font-size:14px; letter-spacing:.02em;
@@ -1112,6 +1128,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   var THEMES = {
     peace: {
       label: "Peace over anxiety",
+      focus: "the anxiety weighing on you",
       verses: [
         ["Do not be anxious about anything, but in everything by prayer and petition with thanksgiving, let your requests be made known to God.", "Philippians 4:6"],
         ["Come to me, all you who labor and are heavily burdened, and I will give you rest.", "Matthew 11:28"],
@@ -1131,6 +1148,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     },
     hope: {
       label: "Hope over discouragement",
+      focus: "the discouragement you're carrying",
       verses: [
         ["Yahweh is near to those who have a broken heart, and saves those who have a crushed spirit.", "Psalm 34:18"],
         ["Weeping may stay for the night, but joy comes in the morning.", "Psalm 30:5"],
@@ -1150,6 +1168,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     },
     strength: {
       label: "Strength over temptation",
+      focus: "the temptation you're facing",
       verses: [
         ["No temptation has taken you except what is common to man. God is faithful... he will also make the way of escape.", "1 Corinthians 10:13"],
         ["Submit therefore to God. Resist the devil, and he will flee from you.", "James 4:7"],
@@ -1169,6 +1188,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     },
     comfort: {
       label: "Comfort in grief",
+      focus: "the grief you're carrying",
       verses: [
         ["Blessed are those who mourn, for they shall be comforted.", "Matthew 5:4"],
         ["He will wipe away every tear from their eyes. Death will be no more.", "Revelation 21:4"],
@@ -1188,6 +1208,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     },
     purpose: {
       label: "Direction and purpose",
+      focus: "the direction you're looking for",
       verses: [
         ["Trust in Yahweh with all your heart, and don't lean on your own understanding. In all your ways acknowledge him, and he will make your paths straight.", "Proverbs 3:5-6"],
         ["Your word is a lamp to my feet, and a light for my path.", "Psalm 119:105"],
@@ -1207,6 +1228,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     },
     closeness: {
       label: "Closer to God",
+      focus: "wanting to know God more",
       verses: [
         ["Draw near to God, and he will draw near to you.", "James 4:8"],
         ["As the deer pants for the water brooks, so my soul pants after you, God.", "Psalm 42:1"],
@@ -1285,6 +1307,60 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     "Do one small act of service for someone in your home today.",
     "Sit in silence for one minute and simply say, 'Here I am.'"
   ];
+  // Concrete how-to for each practice above, same index — turns a one-line prompt
+  // into something you can actually just do, no guessing.
+  var PRACTICE_HOW = [
+    "Grab a notebook or open your phone's notes app right now. Write one sentence: “I'm thankful for ___.” Be specific — a person, a moment, a small mercy from today.",
+    "Picture their face. Say their name out loud or in your head, then ask God for one specific thing on their behalf — their health, a decision, their heart.",
+    "Set your phone across the room or in another room right now. Set a 10-minute timer and sit in quiet before you check anything.",
+    "Read the anchor verse above out loud once. Read it again, silently. Notice which word or phrase catches you, and sit with just that for 30 seconds.",
+    "Think of one person who could use a lift today. Open your messages and send one honest line — “thinking of you” or something specific you appreciate about them.",
+    "Step outside or walk a hallway for two minutes. Name three things you see and thank God for each one, out loud or silently.",
+    "Name one thing honestly to God — no cleaning it up. Then say out loud: “Your mercy is new this morning,” and let that be true.",
+    "Read the anchor verse above once more. Cover the screen and say it from memory. Repeat two more times, checking yourself against the verse.",
+    "Pick one small thing — a dish, a chore, a favor — and do it for someone in your home before you do anything else, without being asked.",
+    "Set a one-minute timer. Close your eyes, breathe slowly, and just say “Here I am” to God. No agenda — just presence."
+  ];
+  // The theme prompt lines (e.g. "Name the one worry sitting heaviest on you...")
+  // are 2nd-person COACHING, not 1st-person prayer text — reciting them verbatim
+  // after "Father, I come to you..." breaks grammatically. So this returns a real
+  // opening and closing you pray verbatim, with the day's prompt kept as a
+  // separate guided instruction in between (rendered, not spoken as one script).
+  function prayerScript(focus, promptLine) {
+    return {
+      opening: "Father, I come to you today about " + focus + ".",
+      guide: promptLine,
+      closing: "Thank you for hearing me, for loving me even now, and for never leaving me. In Jesus’ name, Amen."
+    };
+  }
+
+  /* ---------- WEB Bible passage text (fetched once, cached by the SW) ---------- */
+  var PASSAGES_WEB = {};
+  var passagesLoaded = false;
+  function loadPassages() {
+    if (passagesLoaded) return;
+    fetch("passages-web.json").then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        passagesLoaded = true;
+        if (data) { PASSAGES_WEB = data; renderToday(); }
+      }).catch(function () { passagesLoaded = true; });
+  }
+  // Renders real inline verse text for a reading reference. Handles "X · Y" combo
+  // refs (Psalm+Proverbs plan) by rendering both. Returns "" if not cached yet or
+  // the ref isn't a whole-chapter lookup (e.g. a single topical verse) so the
+  // caller can fall back to the anchor verse it already has — never a dead box.
+  function passageHtml(ref) {
+    if (!ref) return "";
+    if (ref.indexOf(" · ") >= 0) {
+      return ref.split(" · ").map(passageHtml).join("");
+    }
+    var verses = PASSAGES_WEB[ref];
+    if (!verses || !verses.length) return "";
+    return '<div class="passage-block"><div class="passage-ref">' + escapeHtml(ref) + ' · WEB</div>' +
+      '<div class="passage-text">' + verses.map(function (v) {
+        return '<sup>' + v[0] + '</sup> ' + escapeHtml(v[1]);
+      }).join(' ') + '</div></div>';
+  }
 
   function getProfile() { return load(LS_PROFILE, null); }
 
@@ -1356,6 +1432,53 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     return '<div class="callout"><strong>Set up your plan first.</strong> Head to <strong>My Walk</strong> and answer a few questions — then ' + where + ' fills in for you. It takes about a minute.</div>';
   }
 
+  /* ---------- guided Today walkthrough (Read / Pray / Practice / Reflect) ----------
+     Design constraint: 10 minutes, can't fail. So: the "Mark today complete" button
+     is ALWAYS visible no matter which step you're on — nothing is gated behind
+     finishing every step. Step position resets only when the day actually rolls
+     over; switching tabs and coming back keeps your place. */
+  var TODAY_STEPS = [
+    { key: "read", label: "Read", icon: "📖" },
+    { key: "pray", label: "Pray", icon: "🙏" },
+    { key: "practice", label: "Practice", icon: "🌱" },
+    { key: "reflect", label: "Reflect", icon: "💭" }
+  ];
+  var todayStep = 0;
+  var todayStepDayNum = null;
+
+  function todayStepContent(stepKey, r) {
+    if (stepKey === "read") {
+      var passage = passageHtml(r.reading);
+      var body = passage ||
+        ('<div class="passage-block"><div class="passage-text">' +
+         '<sup>' + escapeHtml(r.verse[1]) + '</sup> ' + escapeHtml(r.verse[0]) + '</div></div>');
+      return '<h3>📖 Read</h3>' +
+        '<p class="ci-meta">Today\'s reading: <b>' + escapeHtml(r.reading) + '</b> — from ' + escapeHtml(r.planName) + '. Read slowly, there\'s no rush.</p>' +
+        body;
+    }
+    if (stepKey === "pray") {
+      var theme = THEMES[r.theme];
+      var ps = prayerScript(theme.focus, r.prayer);
+      return '<h3>🙏 Pray</h3>' +
+        '<p class="ci-meta">Pray the lines below out loud or in your head. In the middle, pause and pray it in your own words.</p>' +
+        '<div class="verse">' + escapeHtml(ps.opening) + '</div>' +
+        '<div class="prayer-guide">' + escapeHtml(ps.guide) + '</div>' +
+        '<div class="verse">' + escapeHtml(ps.closing) + '</div>';
+    }
+    if (stepKey === "practice") {
+      var i = dayIndex() % PRACTICES.length;
+      return '<h3>🌱 Practice</h3>' +
+        '<p class="rhythm-v" style="font-weight:600;">' + escapeHtml(r.practice) + '</p>' +
+        '<p class="ci-meta">' + escapeHtml(PRACTICE_HOW[i]) + '</p>';
+    }
+    // reflect
+    return '<h3>💭 Reflect</h3>' +
+      '<p class="ci-meta">' + escapeHtml(r.reflection) + '</p>' +
+      '<textarea id="today-reflect-input" placeholder="Type as much or as little as you want (just for you)..."></textarea>' +
+      '<div style="margin-top:8px;"><button type="button" class="theme-btn" id="today-reflect-ask">Ask Companion about this</button></div>' +
+      '<div class="spot-answer" id="today-reflect-answer" hidden></div>';
+  }
+
   function renderToday() {
     var host = document.getElementById("today-body"); if (!host) return;
     var profile = getProfile();
@@ -1365,24 +1488,65 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     }
     var r = todayRhythm(profile);
     var done = isTodayComplete();
+    if (todayStepDayNum !== r.dayNum) { todayStep = 0; todayStepDayNum = r.dayNum; }
+    if (!passagesLoaded) loadPassages();
+
     var html = '';
     html += '<h1 class="page-title">Today</h1>';
     html += '<p class="lede">Day ' + r.dayNum + ' of your walk · ' + escapeHtml(r.themeLabel) + ' · about ' + r.minutes + ' min.</p>';
     html += '<div class="streak">🔥 ' + currentStreak() + '-day streak</div>';
-    // Anchor verse
+    // Anchor verse — always visible up top, it's the thread through all 4 steps.
     html += '<div class="panel"><h3>Today\'s anchor verse</h3>';
     html += '<div class="verse">&ldquo;' + escapeHtml(r.verse[0]) + '&rdquo;<span class="verse-ref">' + escapeHtml(r.verse[1]) + ' · WEB</span></div></div>';
-    // Rhythm
-    html += '<div class="panel"><h3>Your rhythm today</h3>';
-    html += '<div class="rhythm-item"><div class="rhythm-k">📖 Read</div><div class="rhythm-v"><span class="ref">' + escapeHtml(r.reading) + '</span> — from ' + escapeHtml(r.planName) + '.</div></div>';
-    html += '<div class="rhythm-item"><div class="rhythm-k">🙏 Pray</div><div class="rhythm-v">' + escapeHtml(r.prayer) + '</div></div>';
-    html += '<div class="rhythm-item"><div class="rhythm-k">🌱 Practice</div><div class="rhythm-v">' + escapeHtml(r.practice) + '</div></div>';
-    html += '<div class="rhythm-item"><div class="rhythm-k">💭 Reflect</div><div class="rhythm-v">' + escapeHtml(r.reflection) + '</div></div>';
+
+    // Step dots — tap any step, jump straight there.
+    html += '<div class="step-dots" role="tablist">';
+    TODAY_STEPS.forEach(function (s, i) {
+      html += '<button type="button" class="step-dot' + (i === todayStep ? ' active' : '') + '" data-step="' + i + '">' + s.icon + ' ' + s.label + '</button>';
+    });
     html += '</div>';
-    // Complete button
-    html += '<button type="button" class="primary done-btn' + (done ? ' is-done' : '') + '" id="today-done" style="width:100%;">' +
+
+    // Current step's guided content.
+    html += '<div class="panel step-panel">' + todayStepContent(TODAY_STEPS[todayStep].key, r) + '</div>';
+
+    // Back / Continue
+    html += '<div class="step-nav">';
+    html += '<button type="button" class="theme-btn" id="today-back"' + (todayStep === 0 ? ' disabled' : '') + '>← Back</button>';
+    if (todayStep < TODAY_STEPS.length - 1) {
+      html += '<button type="button" class="primary" id="today-continue">Continue to ' + TODAY_STEPS[todayStep + 1].label + ' →</button>';
+    }
+    html += '</div>';
+
+    // Complete button — pinned, always available regardless of step. Can't fail.
+    html += '<button type="button" class="primary done-btn' + (done ? ' is-done' : '') + '" id="today-done" style="width:100%;margin-top:14px;">' +
       (done ? '✓ Done for today — see you tomorrow' : 'Mark today complete') + '</button>';
+
     host.innerHTML = html;
+
+    host.querySelectorAll(".step-dot").forEach(function (btn) {
+      btn.addEventListener("click", function () { todayStep = parseInt(btn.dataset.step, 10) || 0; renderToday(); });
+    });
+    var back = document.getElementById("today-back");
+    if (back) back.addEventListener("click", function () { if (todayStep > 0) { todayStep--; renderToday(); } });
+    var cont = document.getElementById("today-continue");
+    if (cont) cont.addEventListener("click", function () { if (todayStep < TODAY_STEPS.length - 1) { todayStep++; renderToday(); } });
+
+    var askBtn = document.getElementById("today-reflect-ask");
+    if (askBtn) askBtn.addEventListener("click", function () {
+      var input = document.getElementById("today-reflect-input");
+      var raw = input ? input.value : "";
+      raw = trim(raw); if (!raw) return;
+      var res = matchQuestion(raw);
+      logOpenQuestion(raw, res);
+      var out = document.getElementById("today-reflect-answer");
+      if (out) {
+        var ans = res.entry.answer;
+        out.innerHTML = '<div class="sa-spot">' + escapeHtml(ans) + (/—\s*your Companion\s*$/.test(ans) ? "" : ' <span class="sig">— your Companion</span>') + '</div>';
+        out.className = "spot-answer" + (res.crisis ? " crisis" : (res.flag ? " flagged" : ""));
+        out.hidden = false;
+      }
+    });
+
     var db = document.getElementById("today-done");
     if (db) db.addEventListener("click", function () {
       if (isTodayComplete()) return;
@@ -1861,6 +2025,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     localBootDecision();
   }
   initPWA();
+  loadPassages();
 })();
 </script>
 <script>
