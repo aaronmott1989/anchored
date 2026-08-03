@@ -1,0 +1,35 @@
+{
+  "voice_id": "y2Y5MeVPm6ZQXK64WUui",
+  "voice_name": "The Pharaoh - Wisdom Bearer",
+  "model_id": "eleven_multilingual_v2",
+  "voice_settings": {
+    "stability": 0.75,
+    "similarity_boost": 0.75,
+    "style": 0.0,
+    "use_speaker_boost": true
+  },
+  "prayers": {
+    "peace-0": "audio/elevenlabs/prayers/peace-0.mp3",
+    "peace-1": "audio/elevenlabs/prayers/peace-1.mp3",
+    "peace-2": "audio/elevenlabs/prayers/peace-2.mp3",
+    "hope-0": "audio/elevenlabs/prayers/hope-0.mp3",
+    "hope-1": "audio/elevenlabs/prayers/hope-1.mp3",
+    "hope-2": "audio/elevenlabs/prayers/hope-2.mp3",
+    "strength-0": "audio/elevenlabs/prayers/strength-0.mp3",
+    "strength-1": "audio/elevenlabs/prayers/strength-1.mp3",
+    "strength-2": "audio/elevenlabs/prayers/strength-2.mp3",
+    "comfort-0": "audio/elevenlabs/prayers/comfort-0.mp3",
+    "comfort-1": "audio/elevenlabs/prayers/comfort-1.mp3",
+    "comfort-2": "audio/elevenlabs/prayers/comfort-2.mp3",
+    "purpose-0": "audio/elevenlabs/prayers/purpose-0.mp3",
+    "purpose-1": "audio/elevenlabs/prayers/purpose-1.mp3",
+    "purpose-2": "audio/elevenlabs/prayers/purpose-2.mp3",
+    "closeness-0": "audio/elevenlabs/prayers/closeness-0.mp3",
+    "closeness-1": "audio/elevenlabs/prayers/closeness-1.mp3",
+    "closeness-2": "audio/elevenlabs/prayers/closeness-2.mp3"
+  },
+  "passages": {
+    "Psalm 23": "audio/elevenlabs/passages/Psalm-23.mp3",
+    "John 1": "audio/elevenlabs/passages/John-1.mp3"
+  }
+}

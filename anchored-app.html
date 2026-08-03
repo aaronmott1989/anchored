@@ -204,6 +204,8 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   .passage-text { font-family:var(--font-display); font-size:15px; line-height:1.7; color:var(--text);
     max-height:280px; overflow-y:auto; padding-right:4px; }
   .passage-text sup { color:var(--accent); font-weight:700; margin-right:2px; }
+  .audio-play-btn { display:inline-flex; align-items:center; gap:6px; margin-top:10px; }
+  .audio-play-btn.is-playing { border-color:var(--accent); color:var(--accent); background:var(--flag-bg,var(--surface-2)); }
   .step-nav { display:flex; justify-content:space-between; gap:10px; margin-top:12px; }
   .step-nav button[disabled] { opacity:.4; cursor:default; }
   .empty-state { color:var(--muted); font-size:14px; padding:24px; text-align:center;
@@ -981,6 +983,11 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   function applyGateMode() {
     var isSignup = gateMode === "signup";
     document.querySelectorAll(".signup-only").forEach(function (n) { n.style.display = isSignup ? "" : "none"; });
+    // g-first is required for signup but hidden in login mode -- a hidden required
+    // field blocks native form-submit validation, so Log in silently does nothing
+    // (found 2026-08-03 clicking through as a real user). Toggle required with it.
+    var first = document.getElementById("g-first");
+    if (first) { if (isSignup) first.setAttribute("required", ""); else first.removeAttribute("required"); }
     var sub = document.getElementById("gate-submit");
     var lbl = document.getElementById("gate-switch-label");
     var sw = document.getElementById("gate-switch");
@@ -1362,6 +1369,84 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       }).join(' ') + '</div></div>';
   }
 
+  /* ---------- pre-rendered devotion audio (Piper, local & free) ----------
+     Today's read/pray content comes from a bounded, deterministic content
+     bank (a handful of themes, prayers, and reading-plan passages) -- not
+     per-user, not generated live -- so audio is pre-rendered ONCE offline
+     (faith-app/scripts/generate-devotion-audio.py) and served as static
+     files. manifest.json tells us exactly what's actually been rendered so
+     a play button only ever appears when real audio exists behind it --
+     never a dead button, never a silent failure. */
+  var AUDIO_MANIFEST = null;
+  var audioManifestLoaded = false;
+  // ElevenLabs (Aaron's chosen voice, "The Pharaoh - Wisdom Bearer") is the
+  // PRIMARY source once rendered; Piper (free, offline, always fully
+  // rendered) is the automatic fallback. Loaded from a separate manifest so
+  // a missing/incomplete ElevenLabs batch (e.g. credits ran out) never
+  // takes down a button -- resolveAudio() below just falls through to Piper.
+  var ELEVEN_AUDIO_MANIFEST = null;
+  var elevenAudioManifestLoaded = false;
+  function loadAudioManifest() {
+    if (audioManifestLoaded) return;
+    fetch("audio/manifest.json").then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        audioManifestLoaded = true;
+        if (data) { AUDIO_MANIFEST = data; renderToday(); }
+      }).catch(function () { audioManifestLoaded = true; });
+  }
+  function loadElevenAudioManifest() {
+    if (elevenAudioManifestLoaded) return;
+    fetch("audio/manifest-elevenlabs.json").then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        elevenAudioManifestLoaded = true;
+        if (data) { ELEVEN_AUDIO_MANIFEST = data; renderToday(); }
+      }).catch(function () { elevenAudioManifestLoaded = true; });
+  }
+  function resolveAudio(kind, key) {
+    var fromEleven = ELEVEN_AUDIO_MANIFEST && ELEVEN_AUDIO_MANIFEST[kind] && ELEVEN_AUDIO_MANIFEST[kind][key];
+    if (fromEleven) return fromEleven;
+    return AUDIO_MANIFEST && AUDIO_MANIFEST[kind] && AUDIO_MANIFEST[kind][key];
+  }
+  function playButtonHtml(id, src, label) {
+    if (!src) return "";
+    return '<button type="button" class="theme-btn audio-play-btn" id="' + id +
+      '" data-src="' + escapeHtml(src) + '" data-label="' + escapeHtml(label) + '">🔊 ' +
+      escapeHtml(label) + '</button>';
+  }
+  var _devotionAudio = null;
+  var _devotionAudioKey = null;
+  function wireAudioButton(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var src = btn.dataset.src, label = btn.dataset.label;
+      // tap the currently-playing button again -> pause it
+      if (_devotionAudio && _devotionAudioKey === src && !_devotionAudio.paused) {
+        _devotionAudio.pause();
+        btn.classList.remove("is-playing");
+        btn.textContent = "🔊 " + label;
+        return;
+      }
+      // switching tracks: stop whatever else was playing
+      if (_devotionAudio) { _devotionAudio.pause(); }
+      document.querySelectorAll(".audio-play-btn").forEach(function (b) {
+        b.classList.remove("is-playing"); b.textContent = "🔊 " + b.dataset.label;
+      });
+      _devotionAudio = new Audio(src);
+      _devotionAudioKey = src;
+      btn.classList.add("is-playing");
+      btn.textContent = "⏸ Playing…";
+      _devotionAudio.addEventListener("ended", function () {
+        btn.classList.remove("is-playing");
+        btn.textContent = "🔊 " + label;
+      });
+      _devotionAudio.play().catch(function () {
+        btn.classList.remove("is-playing");
+        btn.textContent = "🔊 " + label;
+      });
+    });
+  }
+
   function getProfile() { return load(LS_PROFILE, null); }
 
   function planStart() {
@@ -1452,15 +1537,20 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       var body = passage ||
         ('<div class="passage-block"><div class="passage-text">' +
          '<sup>' + escapeHtml(r.verse[1]) + '</sup> ' + escapeHtml(r.verse[0]) + '</div></div>');
+      var passageAudio = resolveAudio("passages", r.reading);
       return '<h3>📖 Read</h3>' +
         '<p class="ci-meta">Today\'s reading: <b>' + escapeHtml(r.reading) + '</b> — from ' + escapeHtml(r.planName) + '. Read slowly, there\'s no rush.</p>' +
+        playButtonHtml("today-play-passage", passageAudio, "Listen to today's reading") +
         body;
     }
     if (stepKey === "pray") {
       var theme = THEMES[r.theme];
       var ps = prayerScript(theme.focus, r.prayer);
+      var prayerIdx = theme.prayers.indexOf(r.prayer);
+      var prayerAudio = prayerIdx >= 0 && resolveAudio("prayers", r.theme + "-" + prayerIdx);
       return '<h3>🙏 Pray</h3>' +
         '<p class="ci-meta">Pray the lines below out loud or in your head. In the middle, pause and pray it in your own words.</p>' +
+        playButtonHtml("today-play-prayer", prayerAudio, "Listen to today's prayer") +
         '<div class="verse">' + escapeHtml(ps.opening) + '</div>' +
         '<div class="prayer-guide">' + escapeHtml(ps.guide) + '</div>' +
         '<div class="verse">' + escapeHtml(ps.closing) + '</div>';
@@ -1490,6 +1580,8 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     var done = isTodayComplete();
     if (todayStepDayNum !== r.dayNum) { todayStep = 0; todayStepDayNum = r.dayNum; }
     if (!passagesLoaded) loadPassages();
+    if (!audioManifestLoaded) loadAudioManifest();
+    if (!elevenAudioManifestLoaded) loadElevenAudioManifest();
 
     var html = '';
     html += '<h1 class="page-title">Today</h1>';
@@ -1530,6 +1622,18 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     if (back) back.addEventListener("click", function () { if (todayStep > 0) { todayStep--; renderToday(); } });
     var cont = document.getElementById("today-continue");
     if (cont) cont.addEventListener("click", function () { if (todayStep < TODAY_STEPS.length - 1) { todayStep++; renderToday(); } });
+
+    // Play buttons for this step, if real audio exists for today's content.
+    // Also re-sync a button's visual state if it happens to match audio that's
+    // already playing (e.g. a re-render from "Mark complete" while listening).
+    ["today-play-passage", "today-play-prayer"].forEach(function (id) {
+      wireAudioButton(id);
+      var btn = document.getElementById(id);
+      if (btn && _devotionAudio && _devotionAudioKey === btn.dataset.src && !_devotionAudio.paused) {
+        btn.classList.add("is-playing");
+        btn.textContent = "⏸ Playing…";
+      }
+    });
 
     var askBtn = document.getElementById("today-reflect-ask");
     if (askBtn) askBtn.addEventListener("click", function () {

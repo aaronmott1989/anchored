@@ -1,0 +1,28 @@
+{
+  "voice": "alan",
+  "length_scale": 1.05,
+  "prayers": {
+    "peace-0": "audio/prayers/peace-0.ogg",
+    "peace-1": "audio/prayers/peace-1.ogg",
+    "peace-2": "audio/prayers/peace-2.ogg",
+    "hope-0": "audio/prayers/hope-0.ogg",
+    "hope-1": "audio/prayers/hope-1.ogg",
+    "hope-2": "audio/prayers/hope-2.ogg",
+    "strength-0": "audio/prayers/strength-0.ogg",
+    "strength-1": "audio/prayers/strength-1.ogg",
+    "strength-2": "audio/prayers/strength-2.ogg",
+    "comfort-0": "audio/prayers/comfort-0.ogg",
+    "comfort-1": "audio/prayers/comfort-1.ogg",
+    "comfort-2": "audio/prayers/comfort-2.ogg",
+    "purpose-0": "audio/prayers/purpose-0.ogg",
+    "purpose-1": "audio/prayers/purpose-1.ogg",
+    "purpose-2": "audio/prayers/purpose-2.ogg",
+    "closeness-0": "audio/prayers/closeness-0.ogg",
+    "closeness-1": "audio/prayers/closeness-1.ogg",
+    "closeness-2": "audio/prayers/closeness-2.ogg"
+  },
+  "passages": {
+    "John 1": "audio/passages/John-1.ogg",
+    "Psalm 23": "audio/passages/Psalm-23.ogg"
+  }
+}
