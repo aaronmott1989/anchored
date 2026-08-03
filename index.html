@@ -169,6 +169,11 @@
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
+<!-- Cloudflare Turnstile — invisible/managed bot gate for the non-buyer email
+     capture. Explicit render: the widget is drawn only when the exit modal opens
+     (see renderTurnstile() below), so it never renders into a hidden container and
+     never runs on a page view that has no form. Sitekey is public. -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
 
@@ -324,6 +329,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <p id="k-m-p">One payment of $7, yours to keep, with a 30-day money-back guarantee. Don't let another week of meaning-to slip by.</p>
     <form class="cap" id="leadform" novalidate style="display:none;">
       <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
+      <div id="ts-widget" style="flex:1 1 100%;min-height:65px;"></div>
       <button type="submit">Email me the card</button>
     </form>
     <div class="capdone" id="capdone">On its way. Check your inbox in a minute. 🕊️</div>
@@ -483,6 +489,24 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     if(pct > 0.5){ scrolledHalf = true; try{ if(window.fbq) fbq('trackCustom','ScrolledHalf'); }catch(e){} }
   }, {passive:true});
 
+  // ---- Cloudflare Turnstile: render the bot-gate widget lazily ----
+  // Public managed sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io).
+  // Rendered on demand the first time the exit modal opens so it never draws into a
+  // hidden container. Retries briefly while the async api.js finishes loading.
+  var TURNSTILE_SITEKEY = "0x4AAAAAAEFkyywbuJyZkFl1";
+  var tsWidgetId = null, tsTries = 0;
+  function renderTurnstile(){
+    if(tsWidgetId !== null) return;                         // already rendered
+    var el = document.getElementById('ts-widget');
+    if(!el) return;
+    if(!(window.turnstile && window.turnstile.render)){
+      if(tsTries++ < 40) setTimeout(renderTurnstile, 150);  // wait for api.js (~6s max)
+      return;
+    }
+    try{ tsWidgetId = window.turnstile.render(el, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
+    catch(e){ /* re-attempt on next modal open */ }
+  }
+
   // ---- exit-intent / non-buyer prompt: once per visitor ----
   var modal = document.getElementById('modal');
   var shown = false;
@@ -492,6 +516,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     shown = true;
     try{ sessionStorage.setItem('anchored_modal','1'); }catch(e){}
     modal.classList.add('show');
+    if(LEAD_ENDPOINT) renderTurnstile();                    // draw the Turnstile widget now that the form is visible
   }
   function hideModal(){ modal.classList.remove('show'); }
   document.getElementById('modalskip').addEventListener('click', function(){ hideModal(); });
@@ -514,7 +539,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   // behavior is unchanged. Set LEAD_ENDPOINT to the deployed Worker URL to flip
   // the free-card capture on — no other change needed. Contract matches the
   // Worker exactly: POST { email, source, ts }.
-  var LEAD_ENDPOINT = ""; // <-- set to the deployed anchored-lead Worker URL to go live
+  var LEAD_ENDPOINT = "https://anchored-lead.amott1989.workers.dev"; // deployed anchored-lead Worker (Turnstile-gated)
   if (LEAD_ENDPOINT) {
     // upgrade the exit modal from "$7-push" to "free card + $7 secondary"
     set('k-m-h', 'Before you go, take the free card.');
@@ -530,17 +555,32 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
         e.preventDefault();
         var email = (document.getElementById('leademail').value || '').trim();
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { return; }
+        // Turnstile token is required — the Worker rejects with 403 "challenge"
+        // without it. If the widget hasn't produced one yet, (re)render and let it
+        // finish; the visitor resubmits once the check clears.
+        var token = (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : '';
+        if (!token) { renderTurnstile(); return; }
         var btn = lf.querySelector('button'); btn.disabled = true;
         try { if (window.fbq) fbq('track','Lead',{content_name:'day-you-miss-it', offer:key}); } catch(e){}
         fetch(LEAD_ENDPOINT, {
           method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email: email, source: 'exit-modal', ts: Date.now() })
-        }).then(function(){
-          lf.style.display='none';
-          if (lc) lc.style.display='none';
-          document.getElementById('capdone').style.display='block';
-          try { localStorage.setItem('anchored_captured','1'); } catch(e){}
-        }).catch(function(){ btn.disabled=false; });
+          body: JSON.stringify({ email: email, source: 'exit-modal', ts: Date.now(), turnstileToken: token })
+        }).then(function(r){ return r.json().catch(function(){ return {}; }); })
+          .then(function(res){
+            if (res && res.ok) {
+              lf.style.display='none';
+              if (lc) lc.style.display='none';
+              document.getElementById('capdone').style.display='block';
+              try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+            } else {
+              btn.disabled=false;
+              // Turnstile tokens are single-use — reset so a retry gets a fresh one.
+              if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
+            }
+          }).catch(function(){
+            btn.disabled=false;
+            if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
+          });
       });
     }
   }
