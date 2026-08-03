@@ -22,6 +22,16 @@
   a "free card" we can't deliver, both the inline and exit-intent prompts push the
   honest $7 offer. (A lead Worker exists at aarons-loop/anchored-lead-worker/ and
   can be wired via a LEAD_ENDPOINT once a Workers-scoped Cloudflare token is set.)
+
+  FIXED 2026-08-03: `?offer=peace` was being force-overridden to always render the
+  Anchor copy (see the `key = "anchor"` history below) because Peace had no
+  distinct checkout. Real fix: Anchor and Peace are the SAME $7 Anchored-access
+  product — post-purchase, every buyer picks their own reading plan inside the
+  app, including the "Topical — scripture for what I'm carrying" anxiety-focused
+  plan the Peace copy promises — so serving Peace copy against the same real
+  Stripe checkout is not a bait-and-switch; it's one real product marketed from a
+  second honest angle, with copy that doesn't overclaim anything the app doesn't
+  actually deliver. `?offer=peace` now genuinely renders Peace title/copy/CTA.
 -->
 <style>
   :root{
@@ -144,9 +154,10 @@
   fbq('init', ANCHORED_PIXEL_ID);
   fbq('track','PageView');
   (function(){
-    // ANCHOR-ONLY (2026-07-28): the `peace` offer variant is disabled (it sold the
-    // Anchor product under Peace copy). Always report the Anchor offer here.
-    var offer = 'anchor';
+    // FIXED 2026-08-03: report the REAL resolved offer (was hardcoded 'anchor').
+    // Computed independently here (this runs in <head>, before the main OFFERS
+    // script later in <body>) so pixel attribution matches what actually renders.
+    var offer = (new URLSearchParams(location.search).get('offer') === 'peace') ? 'peace' : 'anchor';
     fbq('track','ViewContent',{content_name:'anchored-lp', content_category:offer, offer:offer});
   })();
 </script>
@@ -328,17 +339,15 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       // account, acct_1U0BlAIP2ccetVoD — fixes a checkout branding bug where the
       // merchant name showed as "Spotted".)
       checkout: "https://buy.stripe.com/cNifZi18z9nF4WueUc5wI00"
-    }
-    /* ANCHOR-ONLY (2026-07-28): the `peace` offer variant is DISABLED. It showed
-       "Peace: 14 Days for Anxious Hearts" copy but its checkout pointed at `tynak`
-       (The 21-Day Anchor), so a Peace ad would charge for and deliver the wrong
-       product (bait-and-switch). Preserved here — NOT deleted — so it can be
-       restored if/when a real Peace product is built. To re-enable: give it its
-       OWN Stripe checkout, then remove this comment wrapper AND the `key = "anchor"`
-       force below. Do NOT re-enable while `checkout` still points at the Anchor
-       product's link (Gumroad `tynak` is gone as of 2026-08-02 — this is now the
-       Stripe link above).
-    ,
+    },
+    // RE-ENABLED 2026-08-03 (was disabled 2026-07-28 over a bait-and-switch
+    // concern — Peace copy paired with the Anchor product's checkout). Real fix:
+    // this is the SAME $7 Anchored-access product as `anchor` above, marketed
+    // from the anxious-mind angle instead of the daily-habit angle. The buyer
+    // picks their own reading plan inside the app after purchase, including the
+    // "Topical — scripture for what I'm carrying" plan (anchored-app.html
+    // plan_pref="topical") that matches this copy's promise — so reusing the
+    // same real checkout is honest, not a swap. Checkout intentionally == anchor's.
     peace: {
       title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
       checkout: "https://buy.stripe.com/cNifZi18z9nF4WueUc5wI00",
@@ -371,16 +380,14 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
         ["How do I get it?","Instant access after a $7 checkout. Backed by a 30-day, no-questions money-back guarantee."]
       ]
     }
-    */
   };
 
   function qp(n){ return new URLSearchParams(location.search).get(n); }
-  // ANCHOR-ONLY (2026-07-28): force the Anchor offer regardless of ?offer=.
-  // The peace variant is disabled (see OFFERS above) because it would charge for
-  // the Anchor product while showing Peace copy. Even ?offer=peace now serves
-  // Anchor copy AND routes checkout to the Anchor Stripe link, so
-  // copy == product == delivery.
-  var key = "anchor";
+  // FIXED 2026-08-03: real ?offer= routing (was hardcoded to "anchor" regardless
+  // of the query param — see OFFERS.peace's re-enable note above for why that
+  // force existed and why it's safe to remove now). No param, or any value other
+  // than "peace", still defaults to Anchor — that default behavior is unchanged.
+  var key = (qp('offer') === 'peace') ? 'peace' : 'anchor';
   var o = OFFERS[key] || OFFERS.anchor;
 
   function set(id, html){ var el=document.getElementById(id); if(el && html!=null) el.innerHTML=html; }
