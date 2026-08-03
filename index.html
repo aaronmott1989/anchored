@@ -208,7 +208,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   <div class="wrap">
     <div class="why">
       <h2 style="font-size:22px;">Where this comes from</h2>
-      <p class="muted" style="margin-top:12px;">Anchored isn't built around one person's story — it's built around a gap you can find in almost every faith app and devotional on the market: they hand you content, and the moment you fall behind, they go quiet. Nobody builds the page for the day you miss. The 21-Day Anchor exists because that gap is real and fixable — a dated plan with grace built into the page itself, not bolted on as an afterthought.</p>
+      <p class="muted" id="k-where-body" style="margin-top:12px;">Anchored isn't built around one person's story — it's built around a gap you can find in almost every faith app and devotional on the market: they hand you content, and the moment you fall behind, they go quiet. Nobody builds the page for the day you miss. The 21-Day Anchor exists because that gap is real and fixable — a dated plan with grace built into the page itself, not bolted on as an afterthought.</p>
     </div>
   </div>
 </section>
@@ -290,7 +290,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <h2 id="k-final">Ten minutes a day. Twenty-one days. A habit that finally holds.</h2>
     <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
     <div class="ctanote">30-day money-back guarantee · instant access</div>
-    <p class="muted" style="margin-top:22px;font-size:14px;font-style:italic;">P.S. — Whatever you decide, the guarantee above stands: if the 21-Day Anchor doesn't help you build a habit that actually sticks, email us any time in the first 30 days and get every cent back, no questions asked. You keep the plan either way.</p>
+    <p class="muted" id="k-ps" style="margin-top:22px;font-size:14px;font-style:italic;">P.S. — Whatever you decide, the guarantee above stands: if the 21-Day Anchor doesn't help you build a habit that actually sticks, email us any time in the first 30 days and get every cent back, no questions asked. You keep the plan either way.</p>
   </div>
 </div>
 
@@ -356,6 +356,8 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       sub: "14 days of Scripture, prayer, and a simple practice for an anxious, racing mind — 10 minutes a day.",
       promise: "Worry doesn't back down because someone tells you to calm down. It quiets when you have something truer to hold onto, day after day. This is 14 dated days of Scripture for worry, with a prayer and one small practice to steady you each morning.",
       buy: "Start Peace in 14 Days — $7",
+      whereBody: "Anchored isn't built around one person's story — it's built around a gap you can find in almost every faith app and devotional on the market: they hand you content, and the moment you fall behind, they go quiet. Nobody builds the page for the day your mind won't quiet. Peace exists because that gap is real and fixable — 14 dated days of Scripture for worry, with grace built into the page itself, not bolted on as an afterthought.",
+      ps: "P.S. — Whatever you decide, the guarantee above stands: if Peace doesn't help you build a quieter, steadier daily habit, email us any time in the first 30 days and get every cent back, no questions asked. You keep the plan either way.",
       probH: "You can't think your way out of worry.",
       probB: "The racing thoughts, the 3am spiral, the tight chest — willpower doesn't touch it, and 'just have more faith' only adds guilt. What actually helps is a daily anchor: a true word to return to, a prayer to pray, and one small thing to do. This gives you exactly that, dated for 14 days so you never have to decide when your mind is already loud.",
       whyH: "Why $7?",
@@ -397,7 +399,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     set("k-prob-h", o.probH); set("k-prob-b", o.probB);
     set("k-why", o.why); set("k-app-h", o.appH); set("k-app-b", o.appB);
     set("k-opt-h", o.optH); set("k-opt-p", o.optP); set("k-m-h", o.mH); set("k-m-p", o.mP);
-    set("k-final", o.final);
+    set("k-final", o.final); set("k-where-body", o.whereBody); set("k-ps", o.ps);
     if(o.stack){ document.getElementById("k-stack").innerHTML = o.stack.map(function(s){
       return '<div class="item"><div class="chk">✓</div><div class="txt"><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>';
     }).join(""); }
