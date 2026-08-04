@@ -158,6 +158,11 @@
   .proof .audio .albl{font-size:13.5px;font-weight:700;margin-bottom:9px;}
   .proof .audio .amute{color:var(--muted);font-weight:500;}
   .proof audio{width:100%;display:block;}
+  .proof .shots{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .proof .shots figure{margin:0;}
+  .proof .shots img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:14px;background:#0f0d0a;}
+  .proof .shots figcaption{margin-top:8px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.4;}
+  @media (max-width:640px){ .proof .shots{grid-template-columns:1fr;max-width:340px;margin-left:auto;margin-right:auto;gap:20px;} }
 </style>
 <!-- ============================================================
      META PIXEL — Anchored (its OWN dedicated pixel; NOT the Spotted pixel).
@@ -347,7 +352,21 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
           Your browser can't play this sample here — it's included free inside the app.
         </audio>
       </div>
-      <p class="psub" style="margin-top:14px;">No fake reviews, no borrowed testimonials. The honest story of who's behind this is in <b style="color:var(--text)">"Where this comes from"</b> above.</p>
+      <div class="shots">
+        <figure>
+          <img src="proof/app-today.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored app's Today screen: the day's anchor verse (Matthew 11:28, World English Bible) with Read, Pray, Practice and Reflect, and today's passage printed inline.">
+          <figcaption>Your day, already laid out — the passage printed right on the page.</figcaption>
+        </figure>
+        <figure>
+          <img src="proof/app-pray.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored app's Pray screen: a prayer written out word for word, with an option to listen to it read aloud.">
+          <figcaption>The prayer written for you, word for word.</figcaption>
+        </figure>
+        <figure>
+          <img src="proof/app-companion.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored Companion answering 'I missed a day and I feel like I fell behind' with grace: there's no catching up to do, His mercies are new every morning.">
+          <figcaption>A Companion in your corner on the days you'd drift.</figcaption>
+        </figure>
+      </div>
+      <p class="psub" style="margin-top:16px;">Real screens from inside Anchored — not a preview reel. No fake reviews, no borrowed testimonials. The honest story of who's behind this is in <b style="color:var(--text)">"Where this comes from"</b> above.</p>
     </div>
   </div>
 </section>
