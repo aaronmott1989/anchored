@@ -17,16 +17,18 @@
   Usage: point the Meta ad at  anchored-tripwire-lp.html?offer=anchor  (default)
                           or    anchored-tripwire-lp.html?offer=peace
   Buyers go to the LIVE Stripe $7 checkout; the checkout captures their email at
-  purchase. NON-BUYER EMAIL CAPTURE (updated 2026-08-03): the exit-intent modal
-  now carries a free-card opt-in ("The Day You Miss It") that POSTs to the
-  anchored-lead Worker (aarons-loop/anchored-lead-worker/, sends the card via
-  Resend + tags the "Anchored Leads" segment). It FAILS CLOSED: the LEAD_ENDPOINT
-  const near the bottom of this file is blank until that Worker is deployed and
-  security-compliance re-clears it, and while blank the modal stays the honest
-  $7-push (capture form hidden) — so live behavior is unchanged until the endpoint
-  is set. To go live: deploy the Worker (needs a Workers-scoped Cloudflare login),
-  set its RESEND_API_KEY secret, get security's re-clear, then paste the Worker URL
-  into LEAD_ENDPOINT. The inline mid-page prompt stays a $7 reinforcer by design.
+  purchase. NON-BUYER EMAIL CAPTURE (rev 2026-08-04, pass 2): the exit-intent
+  modal offers the "5 mornings" free devotional magnet (B2 in
+  AnchoredOfferFix-Package.md) that POSTs to the anchored-lead Worker, which TAGS
+  the email into the Resend "Anchored Leads" segment; the Resend "Anchored Lead
+  Magnet Nurture" automation (Day 0-4) owns delivery. FAILS CLOSED TWICE: (1) the
+  CAPTURE_LIVE flag near the bottom is FALSE until that automation is ENABLED, and
+  while FALSE the modal is a pure $7-push (no email field shown) so NO lead is ever
+  captured against a promise nothing delivers; (2) LEAD_ENDPOINT would also blank
+  the form. The "5 mornings" copy is already the security-cleared wording — to go
+  live: security re-clears the rebuilt templates → enable the automation → flip
+  CAPTURE_LIVE to true in the SAME change. The inline mid-page prompt stays a $7
+  reinforcer by design.
 
   FIXED 2026-08-03: `?offer=peace` was being force-overridden to always render the
   Anchor copy (see the `key = "anchor"` history below) because Peace had no
@@ -399,10 +401,10 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <form class="cap" id="leadform" novalidate style="display:none;">
       <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
       <div id="ts-widget" style="flex:1 1 100%;min-height:65px;"></div>
-      <button type="submit">Email me the card</button>
+      <button type="submit">Send me the 5 mornings →</button>
     </form>
-    <div class="capdone" id="capdone">On its way. Check your inbox in a minute. 🕊️</div>
-    <p class="consent" id="leadconsent" style="display:none;">Free, no spam, unsubscribe any time. By entering your email you agree to receive it and occasional Anchored emails · <a href="privacy.html">Privacy Policy</a></p>
+    <div class="capdone" id="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+    <p class="consent" id="leadconsent" style="display:none;">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
     <a class="cta" data-buy href="#" style="margin-top:16px;"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
     <span class="skip" id="modalskip">No thanks</span>
   </div>
@@ -586,6 +588,13 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   }
 
   // ---- exit-intent / non-buyer prompt: once per visitor ----
+  // CAPTURE_LIVE gates the non-buyer email capture. It stays FALSE until the Resend
+  // "Anchored Lead Magnet Nurture" automation is ENABLED (security must re-clear the
+  // rebuilt 5-mornings templates first). While FALSE the exit modal is a pure
+  // $7-push (no email field shown) so NO lead is ever captured against a promise
+  // nothing delivers. Flip to true in the SAME change that enables the automation —
+  // the "5 mornings" copy below is already the security-cleared wording.
+  var CAPTURE_LIVE = false;
   var modal = document.getElementById('modal');
   var shown = false;
   function alreadyDone(){ try{ return localStorage.getItem('anchored_captured')==='1' || sessionStorage.getItem('anchored_modal')==='1'; }catch(e){ return false; } }
@@ -594,7 +603,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     shown = true;
     try{ sessionStorage.setItem('anchored_modal','1'); }catch(e){}
     modal.classList.add('show');
-    if(LEAD_ENDPOINT) renderTurnstile();                    // draw the Turnstile widget now that the form is visible
+    if(LEAD_ENDPOINT && CAPTURE_LIVE) renderTurnstile();    // draw the Turnstile widget only when the capture form is actually shown
   }
   function hideModal(){ modal.classList.remove('show'); }
   document.getElementById('modalskip').addEventListener('click', function(){ hideModal(); });
@@ -616,15 +625,15 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   // TAGS the email into the Resend "Anchored Leads" segment. As of 2026-08-04 the
   // Worker no longer sends any email itself — the Resend "Anchored Lead Magnet
   // Nurture" automation owns delivery (Email 1 fires Day 0 on segment entry).
-  // INTERIM (Workstream-B pass 2 pending): that automation is still DISABLED and
-  // this modal's copy still says "the free card." Pass 2 swaps the modal copy to
-  // the B2 "5 mornings" magnet AND enables the automation together — until then a
-  // captured lead is tagged but not yet emailed.
+  // GATED by CAPTURE_LIVE (declared above): while FALSE this whole block is skipped,
+  // the email field stays hidden, and the modal is a pure honest $7-push. Flip
+  // CAPTURE_LIVE=true only in the same change that ENABLES the Resend automation, so
+  // the "5 mornings" promise always has live delivery behind it.
   var LEAD_ENDPOINT = "https://anchored-lead.amott1989.workers.dev"; // deployed anchored-lead Worker (Turnstile-gated)
-  if (LEAD_ENDPOINT) {
-    // upgrade the exit modal from "$7-push" to "free card + $7 secondary"
-    set('k-m-h', 'Before you go, take the free card.');
-    set('k-m-p', 'Not ready for the full plan? Get <b>"The Day You Miss It"</b>: one free page (a verse, a short written prayer, one small thing to do) for the day you fall behind. We\'ll email it now.');
+  if (LEAD_ENDPOINT && CAPTURE_LIVE) {
+    // the exit modal offers the free "5 mornings" devotional magnet (B2 #1)
+    set('k-m-h', 'Leaving? Take 5 mornings with you — free.');
+    set('k-m-p', 'Not ready for the app yet? No problem. Give me your email and I\'ll send you 5 days of Anchored, one each morning: the passage, a prayer written for you, and one small thing to do. Free. Unsubscribe anytime.');
     var lf = document.getElementById('leadform');
     var lc = document.getElementById('leadconsent');
     if (lf) lf.style.display = '';
@@ -642,7 +651,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
         var token = (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : '';
         if (!token) { renderTurnstile(); return; }
         var btn = lf.querySelector('button'); btn.disabled = true;
-        try { if (window.fbq) fbq('track','Lead',{content_name:'day-you-miss-it', offer:key}); } catch(e){}
+        try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings', offer:key}); } catch(e){}
         fetch(LEAD_ENDPOINT, {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email: email, source: 'exit-modal', ts: Date.now(), turnstileToken: token })
