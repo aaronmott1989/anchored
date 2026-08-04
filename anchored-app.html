@@ -1010,6 +1010,12 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   function getMember() { return load(LS_MEMBER, null); }
   function hasAccount() { try { return !!localStorage.getItem(LS_AUTH); } catch (e) { return false; } }
 
+  // A buyer returning from Stripe checkout (success URL carries ?purchased=1) is ALWAYS a
+  // fresh-account flow: force signup even if a stale _auth from a prior visit on this device
+  // would otherwise flip the gate to "login", and reassure them the payment went through.
+  // Their in-app entitlement is granted server-side when the stripe-webhook matches the
+  // email they create the account with to the email on their Stripe checkout.
+  var PURCHASED = (function () { try { return location.search.indexOf("purchased=1") !== -1; } catch (e) { return false; } })();
   var gateMode = "signup";
   function applyGateMode() {
     var isSignup = gateMode === "signup";
@@ -1027,7 +1033,9 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     if (lbl) lbl.textContent = isSignup ? "Already have an account?" : "New here?";
     if (sw) sw.textContent = isSignup ? "Log in" : "Create account";
     if (lede) lede.textContent = isSignup
-      ? "Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet."
+      ? (PURCHASED
+          ? "You're in — your purchase went through. Create your account to unlock your plan and start today."
+          : "Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet.")
       : "Welcome back. Log in and pick up your walk right where you left off.";
   }
 
@@ -2193,7 +2201,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       applyGate(); renderAll(); renderAcct();
     } else {
       document.body.classList.add("gated");
-      gateMode = hasAccount() ? "login" : "signup";
+      gateMode = (PURCHASED || !hasAccount()) ? "signup" : "login";
       applyGateMode();
     }
   }
