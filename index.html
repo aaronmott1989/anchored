@@ -190,6 +190,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <div class="kicker" id="k-kicker">Anchored · The 21-Day Anchor</div>
     <h1 id="k-h1" style="margin-top:14px;">Quiet times don't fail on day 1. <span class="hl">They fail on day 4.</span></h1>
     <p class="sub" id="k-sub">A dated 21-day plan that makes time with God a daily habit, in 10 minutes a day.</p>
+    <p class="sub" id="k-objkill" style="margin-top:6px;font-weight:600;">(No catching up. No guilt. No wondering what to read.)</p>
     <p class="promise" id="k-promise">The heart is usually there. What gives out is the plan, around day four, when life gets loud and nothing tells you what to read next or what to do after a day you miss. This dated plan carries you through that stretch.</p>
     <div style="margin-top:24px;">
       <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
@@ -210,6 +211,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   <div class="wrap">
     <h2 id="k-prob-h">Day 4 is where it dies.</h2>
     <p class="lead muted" id="k-prob-b" style="margin-top:14px;">The first morning feels great. Then day four arrives: a rough night, a packed morning, and you lose track of where the plan left off. One missed day turns into three, and the guilt makes coming back harder than starting did. Most plans go quiet the day you fall behind and leave you to find your own way back. <b style="color:var(--text)">The 21-Day Anchor was built to fix that:</b> a dated plan that hands you the next step every day, whether you showed up yesterday or not.</p>
+    <p class="promise" id="k-mechreframe" style="margin-top:16px;">You don't feel your way into a walk with God. You show up your way into it — one small day at a time.</p>
   </div>
 </section>
 
@@ -417,6 +419,9 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     set("k-why", o.why); set("k-app-h", o.appH); set("k-app-b", o.appB);
     set("k-opt-h", o.optH); set("k-opt-p", o.optP); set("k-m-h", o.mH); set("k-m-p", o.mP);
     set("k-final", o.final); set("k-where-body", o.whereBody); set("k-ps", o.ps);
+    // Anchor-only Magin-teardown copy (#3/#4): hide on the Peace variant, which has its own tuned hero/problem copy.
+    var _ok=document.getElementById("k-objkill"); if(_ok) _ok.style.display="none";
+    var _mr=document.getElementById("k-mechreframe"); if(_mr) _mr.style.display="none";
     if(o.stack){ document.getElementById("k-stack").innerHTML = o.stack.map(function(s){
       return '<div class="item"><div class="chk">✓</div><div class="txt"><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>';
     }).join(""); }
