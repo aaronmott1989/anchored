@@ -21,14 +21,14 @@
   modal offers the "5 mornings" free devotional magnet (B2 in
   AnchoredOfferFix-Package.md) that POSTs to the anchored-lead Worker, which TAGS
   the email into the Resend "Anchored Leads" segment; the Resend "Anchored Lead
-  Magnet Nurture" automation (Day 0-4) owns delivery. FAILS CLOSED TWICE: (1) the
-  CAPTURE_LIVE flag near the bottom is FALSE until that automation is ENABLED, and
-  while FALSE the modal is a pure $7-push (no email field shown) so NO lead is ever
-  captured against a promise nothing delivers; (2) LEAD_ENDPOINT would also blank
-  the form. The "5 mornings" copy is already the security-cleared wording — to go
-  live: security re-clears the rebuilt templates → enable the automation → flip
-  CAPTURE_LIVE to true in the SAME change. The inline mid-page prompt stays a $7
-  reinforcer by design.
+  Magnet Nurture" automation (Day 0-4) owns delivery. WENT LIVE 2026-08-04: security
+  ALL-PASS on the rebuilt "5 mornings" templates + worker v0bb82823 → the automation
+  was ENABLED and CAPTURE_LIVE flipped to true in the same coordinated change, so
+  both the exit-intent modal AND the below-fold capture surface now show the email
+  field + "5 mornings" copy with live delivery behind them. The fail-closed design
+  still stands (if CAPTURE_LIVE is ever set back to false, or LEAD_ENDPOINT blanked,
+  both surfaces revert to a pure $7-push with no email field). The inline mid-page
+  prompt stays a $7 reinforcer by design.
 
   FIXED 2026-08-03: `?offer=peace` was being force-overridden to always render the
   Anchor copy (see the `key = "anchor"` history below) because Peace had no
@@ -394,6 +394,25 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   </div>
 </div>
 
+<!-- B2 #2 — BELOW-FOLD FREE CAPTURE (soft alternative; sits AFTER the final buy CTA, never above the buy path).
+     Hidden by default; JS reveals + wires it only when CAPTURE_LIVE && LEAD_ENDPOINT (same fail-closed gate as the
+     exit modal), so it never promises "5 mornings" without live delivery behind it. Posts source=below_fold. -->
+<section id="belowfold-capture" style="padding-top:6px;display:none;">
+  <div class="wrap">
+    <div class="optin">
+      <h3>Not ready to buy? Start free.</h3>
+      <p>Get a 5-day sneak peek — one devotional every morning (passage + a written prayer + one small practice). See exactly how Anchored feels before you spend a cent.</p>
+      <form class="cap" id="bfleadform" novalidate>
+        <input type="email" id="bfleademail" name="email" placeholder="you@email.com" autocomplete="email" required>
+        <div id="ts-widget-bf" style="flex:1 1 100%;min-height:65px;"></div>
+        <button type="submit">Send me the free 5 mornings →</button>
+      </form>
+      <div class="capdone" id="bfcapdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+      <p class="consent" id="bfleadconsent">One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="logo" style="font-size:16px;justify-content:center;">Anchored<span class="dot">.</span></div>
@@ -607,13 +626,13 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   }
 
   // ---- exit-intent / non-buyer prompt: once per visitor ----
-  // CAPTURE_LIVE gates the non-buyer email capture. It stays FALSE until the Resend
-  // "Anchored Lead Magnet Nurture" automation is ENABLED (security must re-clear the
-  // rebuilt 5-mornings templates first). While FALSE the exit modal is a pure
-  // $7-push (no email field shown) so NO lead is ever captured against a promise
-  // nothing delivers. Flip to true in the SAME change that enables the automation —
-  // the "5 mornings" copy below is already the security-cleared wording.
-  var CAPTURE_LIVE = false;
+  // CAPTURE_LIVE gates the non-buyer email capture (exit modal + below-fold surface).
+  // Set TRUE 2026-08-04 in the same coordinated change that ENABLED the Resend
+  // "Anchored 5 Mornings Nurture" automation (security ALL-PASS on the rebuilt
+  // 5-mornings templates + worker v0bb82823). If ever set back to FALSE, both capture
+  // surfaces revert to a pure $7-push (no email field) so no lead is captured against
+  // a promise nothing delivers. The "5 mornings" copy below is the security-cleared wording.
+  var CAPTURE_LIVE = true;
   var modal = document.getElementById('modal');
   var shown = false;
   function alreadyDone(){ try{ return localStorage.getItem('anchored_captured')==='1' || sessionStorage.getItem('anchored_modal')==='1'; }catch(e){ return false; } }
@@ -689,6 +708,65 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
           }).catch(function(){
             btn.disabled=false;
             if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
+          });
+      });
+    }
+  }
+
+  // ---- B2 #2: below-the-fold free capture (soft alternative, after the buy path) ----
+  // Same fail-closed gate as the exit modal: only revealed + wired when capture is
+  // live and the Worker endpoint is set, so it never promises "5 mornings" without
+  // live delivery. Its own Turnstile widget, rendered lazily when it scrolls into view.
+  if (LEAD_ENDPOINT && CAPTURE_LIVE) {
+    var bfSection = document.getElementById('belowfold-capture');
+    var bfForm = document.getElementById('bfleadform');
+    var tsWidgetBfId = null, tsBfTries = 0;
+    function renderTurnstileBF(){
+      if(tsWidgetBfId !== null) return;
+      var el = document.getElementById('ts-widget-bf');
+      if(!el) return;
+      if(!(window.turnstile && window.turnstile.render)){
+        if(tsBfTries++ < 40) setTimeout(renderTurnstileBF, 150);   // wait for api.js (~6s max)
+        return;
+      }
+      try{ tsWidgetBfId = window.turnstile.render(el, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
+      catch(e){ /* re-attempt on next trigger */ }
+    }
+    if (bfSection) {
+      bfSection.style.display = '';
+      if ('IntersectionObserver' in window) {
+        var bfObs = new IntersectionObserver(function(ents){
+          ents.forEach(function(en){ if(en.isIntersecting){ renderTurnstileBF(); bfObs.disconnect(); } });
+        }, { rootMargin: '0px 0px 200px 0px' });
+        bfObs.observe(bfSection);
+      } else { renderTurnstileBF(); }
+    }
+    if (bfForm) {
+      bfForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var email = (document.getElementById('bfleademail').value || '').trim();
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { return; }
+        var token = (window.turnstile && tsWidgetBfId !== null) ? window.turnstile.getResponse(tsWidgetBfId) : '';
+        if (!token) { renderTurnstileBF(); return; }
+        var btn = bfForm.querySelector('button'); btn.disabled = true;
+        try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings', offer:key}); } catch(e){}
+        fetch(LEAD_ENDPOINT, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email: email, source: 'below_fold', ts: Date.now(), turnstileToken: token })
+        }).then(function(r){ return r.json().catch(function(){ return {}; }); })
+          .then(function(res){
+            if (res && res.ok) {
+              bfForm.style.display='none';
+              var bfc = document.getElementById('bfleadconsent'); if (bfc) bfc.style.display='none';
+              document.getElementById('bfcapdone').style.display='block';
+              try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+            } else {
+              btn.disabled=false;
+              if (window.turnstile && tsWidgetBfId !== null) window.turnstile.reset(tsWidgetBfId);
+            }
+          }).catch(function(){
+            btn.disabled=false;
+            if (window.turnstile && tsWidgetBfId !== null) window.turnstile.reset(tsWidgetBfId);
           });
       });
     }
