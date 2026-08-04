@@ -131,6 +131,31 @@
   .sheet p{color:var(--muted);font-size:14.5px;margin-top:8px;}
   .sheet .skip{display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;}
   @media(min-width:560px){.modal{align-items:center;}.sheet{border-radius:22px;border-bottom:1px solid var(--line);}}
+  /* A1 — what your $7 unlocks (itemization at the buy moment) */
+  .unlock{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 8px;}
+  .unlock h3{font-size:13px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+  .unlock ul{list-style:none;margin:0;padding:0;}
+  .unlock li{display:flex;gap:10px;padding:0 0 10px;font-size:14.5px;line-height:1.45;}
+  .unlock li .uc{flex:0 0 18px;color:var(--gold);font-weight:900;font-size:14px;line-height:1.5;}
+  .unlock li b{font-weight:750;color:var(--text);}
+  .unlock li .ut{color:var(--muted);}
+  .proofpoint{display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;}
+  /* A5 — how a morning works (process credibility) */
+  .rhythm{margin-top:24px;}
+  .rhythm h3{font-size:13px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;text-align:center;}
+  .rhythm .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .rhythm .step{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center;}
+  .rhythm .step .n{width:26px;height:26px;margin:0 auto 8px;border-radius:50%;background:rgba(229,184,92,.16);color:var(--gold);font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .rhythm .step b{display:block;font-size:15px;margin-bottom:2px;}
+  .rhythm .step span{color:var(--muted);font-size:12.5px;line-height:1.35;}
+  /* A4 — see it before you buy (owned proof) */
+  .proof{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
+  .proof h2{font-size:22px;}
+  .proof .psub{color:var(--muted);font-size:14.5px;margin-top:10px;}
+  .proof .audio{margin-top:16px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .proof .audio .albl{font-size:13.5px;font-weight:700;margin-bottom:9px;}
+  .proof .audio .amute{color:var(--muted);font-weight:500;}
+  .proof audio{width:100%;display:block;}
 </style>
 <!-- ============================================================
      META PIXEL — Anchored (its OWN dedicated pixel; NOT the Spotted pixel).
@@ -193,6 +218,18 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <p class="sub" id="k-objkill" style="margin-top:6px;font-weight:600;">(No catching up. No guilt. No wondering what to read.)</p>
     <p class="promise" id="k-promise">The heart is usually there. What gives out is the plan, around day four, when life gets loud and nothing tells you what to read next or what to do after a day you miss. This dated plan carries you through that stretch.</p>
     <div style="margin-top:24px;">
+      <!-- A1: itemize what the $7 unlocks, immediately above the primary buy button (anchor variant; hidden on ?offer=peace) -->
+      <div class="unlock" id="k-unlock" style="margin-bottom:18px;">
+        <h3>What your $7 unlocks today</h3>
+        <ul>
+          <li><span class="uc">✓</span><span><b>A dated 21-day plan.</b> <span class="ut">Open the app and Day 1 is already there. No "where do I start."</span></span></li>
+          <li><span class="uc">✓</span><span><b>The whole passage, right on the page.</b> <span class="ut">The day's Scripture printed inline (World English Bible). No flipping between apps, no hunting a reference.</span></span></li>
+          <li><span class="uc">✓</span><span><b>The prayer written for you, word for word.</b> <span class="ut">Never sit there not knowing what to say. Read it straight off the page; pray in your own words when you're ready.</span></span></li>
+          <li><span class="uc">✓</span><span><b>One small thing to actually do with it.</b> <span class="ut">A single practice each day, so it doesn't stay on the page.</span></span></li>
+          <li><span class="uc">✓</span><span><b>A Companion in your corner.</b> <span class="ut">Ask it anything about the verse, prayer, or the app; it checks in on the days you'd usually drift.</span></span></li>
+          <li><span class="uc">✓</span><span><b>Yours in 60 seconds, on any device.</b> <span class="ut">Instant access, nothing to install, your streak follows you.</span></span></li>
+        </ul>
+      </div>
       <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
       <div class="ctanote"><b>Instant access. Yours to keep.</b> If it doesn't stick, email us inside 30 days and pay nothing. No questions.</div>
     </div>
@@ -200,6 +237,17 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       <div class="t"><div class="ic">↓</div><div class="lbl">Instant access</div><div class="sub">Delivered on the spot</div></div>
       <div class="t"><div class="ic">↺</div><div class="lbl">30-day refund</div><div class="sub">No questions asked</div></div>
       <div class="t"><div class="ic">$</div><div class="lbl">$7 once</div><div class="sub">No subscription</div></div>
+    </div>
+    <!-- A4 inline proof pointer near the buy block -->
+    <a href="#k-proof" class="proofpoint">🔊 Hear a real prayer from inside the app ↓</a>
+    <!-- A5: how a morning works (process credibility), near the itemization block -->
+    <div class="rhythm" id="k-rhythm">
+      <h3>How a morning works — about 10 minutes</h3>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><b>Read</b><span>the day's passage, already on the page.</span></div>
+        <div class="step"><div class="n">2</div><b>Pray</b><span>the words written for you.</span></div>
+        <div class="step"><div class="n">3</div><b>Do</b><span>one small thing, and tap done. Your streak keeps itself.</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -279,6 +327,25 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       <p id="k-opt-p">No subscription, no risk. One payment of $7 gets you all 21 days, yours to keep, backed by a 30-day, no-questions money-back guarantee. You can start tomorrow morning.</p>
       <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
       <p class="consent" style="margin-top:12px;">30-day money-back guarantee · instant access · <a href="privacy.html">Privacy Policy</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- A4 — SEE IT BEFORE YOU BUY (owned proof: free Piper devotion audio + transparency block above) -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="proof" id="k-proof">
+      <h2>See what you're getting — before you pay.</h2>
+      <p class="psub">Here's a real piece of the daily rhythm: a prayer from inside Anchored, read aloud in the free in-app audio. Not a preview reel — this is the actual product.</p>
+      <div class="audio">
+        <div class="albl">Anchored daily audio <span class="amute">· a prayer from the app, read aloud (free, included)</span></div>
+        <audio controls preload="none">
+          <source src="audio/lp-sample-devotion.mp3" type="audio/mpeg">
+          <source src="audio/prayers/closeness-0.ogg" type="audio/ogg">
+          Your browser can't play this sample here — it's included free inside the app.
+        </audio>
+      </div>
+      <p class="psub" style="margin-top:14px;">No fake reviews, no borrowed testimonials. The honest story of who's behind this is in <b style="color:var(--text)">"Where this comes from"</b> above.</p>
     </div>
   </div>
 </section>
@@ -422,6 +489,8 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     // Anchor-only Magin-teardown copy (#3/#4): hide on the Peace variant, which has its own tuned hero/problem copy.
     var _ok=document.getElementById("k-objkill"); if(_ok) _ok.style.display="none";
     var _mr=document.getElementById("k-mechreframe"); if(_mr) _mr.style.display="none";
+    // A1 itemization is anchor-specific ("21-day plan", Companion): hide on Peace, which has its own value stack below.
+    var _uk=document.getElementById("k-unlock"); if(_uk) _uk.style.display="none";
     if(o.stack){ document.getElementById("k-stack").innerHTML = o.stack.map(function(s){
       return '<div class="item"><div class="chk">✓</div><div class="txt"><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>';
     }).join(""); }
@@ -542,12 +611,15 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   }, {passive:true});
 
   // ---- non-buyer lead capture: POST to the Anchored lead Worker ----
-  // FAILS CLOSED: LEAD_ENDPOINT is blank until the anchored-lead Worker is
-  // deployed and security re-clears it. While blank, the exit modal stays the
-  // honest $7-push it has always been (the capture form is hidden), so live
-  // behavior is unchanged. Set LEAD_ENDPOINT to the deployed Worker URL to flip
-  // the free-card capture on — no other change needed. Contract matches the
-  // Worker exactly: POST { email, source, ts }.
+  // LEAD_ENDPOINT is LIVE (deployed, Turnstile-gated). On submit the page POSTs
+  // { email, source, ts, turnstileToken }; the Worker verifies the challenge and
+  // TAGS the email into the Resend "Anchored Leads" segment. As of 2026-08-04 the
+  // Worker no longer sends any email itself — the Resend "Anchored Lead Magnet
+  // Nurture" automation owns delivery (Email 1 fires Day 0 on segment entry).
+  // INTERIM (Workstream-B pass 2 pending): that automation is still DISABLED and
+  // this modal's copy still says "the free card." Pass 2 swaps the modal copy to
+  // the B2 "5 mornings" magnet AND enables the automation together — until then a
+  // captured lead is tagged but not yet emailed.
   var LEAD_ENDPOINT = "https://anchored-lead.amott1989.workers.dev"; // deployed anchored-lead Worker (Turnstile-gated)
   if (LEAD_ENDPOINT) {
     // upgrade the exit modal from "$7-push" to "free card + $7 secondary"
