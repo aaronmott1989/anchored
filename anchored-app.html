@@ -206,6 +206,10 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   .passage-text sup { color:var(--accent); font-weight:700; margin-right:2px; }
   .audio-play-btn { display:inline-flex; align-items:center; gap:6px; margin-top:10px; }
   .audio-play-btn.is-playing { border-color:var(--accent); color:var(--accent); background:var(--flag-bg,var(--surface-2)); }
+  .pr-theme { font-family:var(--font-display); font-weight:600; font-size:15px; letter-spacing:.02em; color:var(--accent); margin:26px 0 4px; }
+  .pr-theme:first-of-type { margin-top:8px; }
+  .pr-group { display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+  .pr-group .audio-play-btn { margin-top:4px; white-space:normal; text-align:left; max-width:100%; }
   .step-nav { display:flex; justify-content:space-between; gap:10px; margin-top:12px; }
   .step-nav button[disabled] { opacity:.4; cursor:default; }
   .empty-state { color:var(--muted); font-size:14px; padding:24px; text-align:center;
@@ -415,6 +419,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     <button class="tab-btn" role="tab" data-view="checkin" aria-selected="false">Check-In</button>
     <button class="tab-btn" role="tab" data-view="companion" aria-selected="false">Companion</button>
     <button class="tab-btn" role="tab" data-view="walk" aria-selected="false">My Walk</button>
+    <button class="tab-btn" role="tab" data-view="prayer" aria-selected="false" id="tab-prayer" hidden>Prayer Room</button>
   </nav>
 
   <!-- ============ TODAY ============ -->
@@ -605,6 +610,11 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     <div id="walk-results" hidden></div>
   </section>
 
+  <!-- ============ PRAYER ROOM (order-bump entitlement) ============ -->
+  <section class="panel-view" id="view-prayer">
+    <div id="prayer-body"></div>
+  </section>
+
   <footer class="foot">
     Anchored is a daily-discipline companion, not a substitute for your church, a pastor, or professional care.
     If you're in crisis or thinking about harming yourself, call or text <strong>988</strong> (US Suicide &amp; Crisis Lifeline) right now, or your local emergency number.
@@ -642,6 +652,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   var LS_AUTHED    = "anchored_authed";    // session flag
   var LS_SUB_STATUS= "anchored_sub_status";   // 'none'|'trial'|'active'|'expired'
   var LS_TRIAL_EXP = "anchored_trial_expires";// ISO8601
+  var LS_PRAYER_ROOM = "anchored_prayer_room";// "1" when the $9 Prayer Room bump is owned (server-set)
 
   var REDUCE_MOTION = false;
   try { if (location.search.indexOf("selftest") !== -1) REDUCE_MOTION = true; } catch (e) {}
@@ -747,6 +758,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
         if (!r.data) return "empty";
         var d = r.data, app = d.app_state || {};
         cacheSubState(d.subscription_status, d.trial_expires_at);
+        cachePrayerRoom(d.prayer_room);
         suspendPush = true;
         try {
           appStateKeys().forEach(function (k) {
@@ -822,7 +834,26 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     } catch (e) {}
   }
   function clearSubCache() {
-    try { localStorage.removeItem(LS_SUB_STATUS); localStorage.removeItem(LS_TRIAL_EXP); } catch (e) {}
+    try { localStorage.removeItem(LS_SUB_STATUS); localStorage.removeItem(LS_TRIAL_EXP); localStorage.removeItem(LS_PRAYER_ROOM); } catch (e) {}
+  }
+  // Prayer Room entitlement (members.prayer_room, service-only column). Cached locally
+  // only to render the tab; the server row is authoritative. Never client-writable.
+  function cachePrayerRoom(owned) {
+    try {
+      if (owned === true) localStorage.setItem(LS_PRAYER_ROOM, "1");
+      else if (owned === false) localStorage.removeItem(LS_PRAYER_ROOM);
+      // undefined/null (column absent from an old pull) -> leave cache untouched
+    } catch (e) {}
+  }
+  function hasPrayerRoom() { try { return localStorage.getItem(LS_PRAYER_ROOM) === "1"; } catch (e) { return false; } }
+  // Show/hide the Prayer Room tab. If it was the active view and entitlement is gone,
+  // fall back to Today so no one is stranded on a now-hidden panel.
+  function applyPrayerRoomGate() {
+    var tab = document.getElementById("tab-prayer");
+    if (!tab) return;
+    var owned = hasPrayerRoom();
+    tab.hidden = !owned;
+    if (!owned && tab.getAttribute("aria-selected") === "true") switchView("today");
   }
   // Ask the backend to open this account's ONE 7-day trial (idempotent server-side).
   function startTrial() {
@@ -1114,6 +1145,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   }
   function applyGate() {
     if (!isAuthed()) return;
+    applyPrayerRoomGate();
     if (isPaywalled()) {
       document.body.classList.add("paywalled");
       // Resolve founding-cap availability BEFORE wiring the Stripe links, so a
@@ -1445,6 +1477,59 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
         btn.textContent = "🔊 " + label;
       });
     });
+  }
+
+  /* ---- Prayer Room ($9 order-bump entitlement) ------------------------------
+     Reveals the full spoken-prayer library on demand: 18 guided prayers (6 themes
+     x 3) + Psalm 23 and John 1 read aloud. Reuses the existing audio manifest +
+     resolveAudio/playButtonHtml/wireAudioButton — no new audio plumbing. Labels
+     come from the real prayer prompt text in THEMES (first line), falling back to
+     a generic label if a theme/prayer is ever missing. Only ever rendered for an
+     entitled member (tab is hidden otherwise). */
+  var PRAYER_ROOM = {
+    themes: [
+      ["comfort",   "Comfort"],
+      ["peace",     "Peace"],
+      ["hope",      "Hope"],
+      ["strength",  "Strength"],
+      ["purpose",   "Purpose"],
+      ["closeness", "Closeness"]
+    ],
+    passages: [["Psalm 23", "Psalm 23 — read aloud"], ["John 1", "John 1 — read aloud"]]
+  };
+  function prayerLabel(theme, i) {
+    var t = THEMES && THEMES[theme];
+    var line = t && t.prayers && t.prayers[i];
+    if (line) { line = String(line).split(/(?<=[.?!])\s/)[0]; if (line.length > 72) line = line.slice(0, 69) + "…"; return line; }
+    return "Prayer " + (i + 1);
+  }
+  function renderPrayerRoom() {
+    var host = document.getElementById("prayer-body");
+    if (!host) return;
+    var html = '<h1 class="page-title">Prayer Room</h1>' +
+      '<p class="lede">A prayer for whatever you’re carrying — open any one, any time. Yours to keep.</p>';
+    var wire = [];
+    PRAYER_ROOM.themes.forEach(function (pair) {
+      var theme = pair[0], nice = pair[1];
+      var group = "";
+      for (var i = 0; i < 3; i++) {
+        var src = resolveAudio("prayers", theme + "-" + i);
+        var id = "pr-" + theme + "-" + i;
+        var btn = playButtonHtml(id, src, prayerLabel(theme, i));
+        if (btn) { group += btn; wire.push(id); }
+      }
+      if (group) html += '<h2 class="pr-theme">' + escapeHtml(nice) + '</h2><div class="pr-group">' + group + '</div>';
+    });
+    var passHtml = "";
+    PRAYER_ROOM.passages.forEach(function (p, idx) {
+      var src = resolveAudio("passages", p[0]);
+      var id = "pr-passage-" + idx;
+      var btn = playButtonHtml(id, src, p[1]);
+      if (btn) { passHtml += btn; wire.push(id); }
+    });
+    if (passHtml) html += '<h2 class="pr-theme">Scripture, read aloud</h2><div class="pr-group">' + passHtml + '</div>';
+    host.innerHTML = html;
+    wire.forEach(function (id) { wireAudioButton(id); });
   }
 
   function getProfile() { return load(LS_PROFILE, null); }
@@ -2018,6 +2103,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     if (view === "plan") renderPlan();
     if (view === "checkin") { renderStreakWrap(); renderCheckins(); }
     if (view === "companion") renderCompanion();
+    if (view === "prayer") renderPrayerRoom();
     try { window.scrollTo({ top: 0, behavior: REDUCE_MOTION ? "auto" : "smooth" }); } catch (e) {}
   }
 
