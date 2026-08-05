@@ -1011,12 +1011,18 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   function getMember() { return load(LS_MEMBER, null); }
   function hasAccount() { try { return !!localStorage.getItem(LS_AUTH); } catch (e) { return false; } }
 
-  // A buyer returning from Stripe checkout (success URL carries ?purchased=1) is ALWAYS a
-  // fresh-account flow: force signup even if a stale _auth from a prior visit on this device
-  // would otherwise flip the gate to "login", and reassure them the payment went through.
-  // Their in-app entitlement is granted server-side when the stripe-webhook matches the
-  // email they create the account with to the email on their Stripe checkout.
-  var PURCHASED = (function () { try { return location.search.indexOf("purchased=1") !== -1; } catch (e) { return false; } })();
+  // A buyer returning from a Stripe checkout is ALWAYS a fresh-account flow: force signup
+  // even if a stale _auth from a prior visit on this device would otherwise flip the gate
+  // to "login", and reassure them the payment went through. Two success-URL shapes reach
+  // here: ?purchased=1, and ?paid=1 (the redirect on all four live Stripe Payment Links).
+  // When the ?paid=1 buyer has a live session it's an in-app upgrade — boot's session branch
+  // runs maybePollPaidReturn() and lifts the paywall (that path is untouched). When they
+  // DON'T (a cold buyer from the email drip with no account/session yet), we fall through to
+  // HERE so they can create an account — or log in to an existing one — and then get their
+  // entitlement poll (doSignup/doLogin call maybePollPaidReturn() once auth completes).
+  // Entitlement is granted server-side when the stripe-webhook matches the email they
+  // create/sign in with to the email on their Stripe checkout.
+  var PURCHASED = (function () { try { var s = location.search; return s.indexOf("purchased=1") !== -1 || s.indexOf("paid=1") !== -1; } catch (e) { return false; } })();
   var gateMode = "signup";
   function applyGateMode() {
     var isSignup = gateMode === "signup";
@@ -1069,7 +1075,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
         if (r.ok && r.session) {
           // Push the row FIRST (start-trial PATCHes an existing members row), then open
           // the account's one 7-day trial. Idempotent server-side, so a retry is harmless.
-          cloudPushNow().then(function () { return startTrialWithRetry(3); }).then(function () { applyGate(); });
+          cloudPushNow().then(function () { return startTrialWithRetry(3); }).then(function () { applyGate(); maybePollPaidReturn(); });
         } else if (r.error && /already|registered|exists/i.test(r.error)) {
           try { toast("Looks like you already have an account — log out, then log in to sync your walk.", "err"); } catch (e) {}
         }
@@ -1089,7 +1095,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       // Known device: unlock instantly, then verify + sync in the background.
       setAuthed(true); unlockApp();
       if (CLOUD) cloudSignIn(email, pass).then(function (r) {
-        if (r.ok) syncOnEntry();
+        if (r.ok) { syncOnEntry(); maybePollPaidReturn(); }
         else if (!r.superseded) { try { toast("Unlocked offline — cloud backup is paused until you reconnect.", "err"); } catch (e) {} }
       });
       return;
@@ -1103,7 +1109,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       cloudPull().then(function (res) {
         if (res === "error") { if (err) err.textContent = "Logged in, but couldn't load your walk yet. Check your connection and try again."; return; }
         save(LS_AUTH, { hash: hashPass(pass, email) });
-        setAuthed(true); unlockApp();
+        setAuthed(true); unlockApp(); maybePollPaidReturn();
       });
     });
   }
