@@ -1,45 +1,44 @@
 <!DOCTYPE html>
 <!-- DEPLOY SOURCE OF TRUTH: THIS file (C:\Users\amott\anchored-build\index.html)
-     is the real live Anchored LP deploy source — do NOT rebuild the live LP from
-     anywhere else. The repo copy at aarons-loop/faith-app/anchored-tripwire-lp.html
-     is a synced mirror for reference only (see faith-app/DEPLOY-SOURCE.md). -->
+     is the real live Anchored ROOT landing page deploy source (GitHub Pages ->
+     anchoredfaith.app). Do NOT rebuild the live LP from anywhere else. The repo
+     copy at aarons-loop/faith-app/index.html is a byte-identical synced mirror
+     (see faith-app/DEPLOY-SOURCE.md).
+
+     REBUILT 2026-08-05 (Aaron's direct order, voice): the $7 "21-Day Anchor"
+     tripwire page was RETIRED. This root page now leads with the FREE "5 Mornings"
+     email opt-in as the main feed, with the email capture repeated in MULTIPLE
+     places down the page (hero / mid / faq / bottom) — the same idea as the old
+     $7 page's many buy buttons, applied to the email capture instead. Every form
+     is a real capture point: same anchored-lead Worker POST, each with its own
+     lazily-rendered Cloudflare Turnstile widget, same email validation. After ANY
+     form succeeds, every form on the page flips to the success state.
+
+     WHAT WAS KILLED: all $7 / tripwire elements — price mentions, buy buttons,
+     Stripe checkout links, the $9 bump, and InitiateCheckout pixel wiring. The
+     in-app founding paywall (anchored-app.html) is untouched; members still buy
+     founding in-app. This is ONLY the root LP.
+
+     PIXEL: dedicated Anchored pixel 1407254754557742 (ad account 37985900). Fires
+     PageView + ViewContent on load. A browser Lead event fires ONLY on a confirmed
+     NEW-lead success (worker HTTP 200 && !existing), with a dedup eventID (also
+     POSTed as event_id). No InitiateCheckout on this page anymore.
+
+     HONESTY GUARDS (locked): no reach-out claims — every capability is pull-based
+     ("when you open it"); grace-day copy ("no reset to zero, just open today") is
+     true (streak counts mornings, never resets); Scripture is World English Bible
+     (public domain), labeled; a consent line matching free.html sits under every
+     form; terms / privacy / crisis footer preserved.
+
+     free.html is the live ad-test surface and is FROZEN — do not touch it. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="anchored-icon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#12100C">
-<title>Anchored — The 21-Day Anchor ($7)</title>
-<meta name="description" content="Build a daily time with God that actually sticks. A dated 21-day plan for $7 once. 30-day money-back guarantee.">
-<!--
-  Anchored tripwire pre-sell page. THIRD-MACHINE demand-test clone of
-  spotted-tripwire-lp.html. ONE file, two offers.
-  Usage: point the Meta ad at  anchored-tripwire-lp.html?offer=anchor  (default)
-                          or    anchored-tripwire-lp.html?offer=peace
-  Buyers go to the LIVE Stripe $7 checkout; the checkout captures their email at
-  purchase. NON-BUYER EMAIL CAPTURE (rev 2026-08-04, pass 2): the exit-intent
-  modal offers the "5 mornings" free devotional magnet (B2 in
-  AnchoredOfferFix-Package.md) that POSTs to the anchored-lead Worker, which TAGS
-  the email into the Resend "Anchored Leads" segment; the Resend "Anchored Lead
-  Magnet Nurture" automation (Day 0-4) owns delivery. WENT LIVE 2026-08-04: security
-  ALL-PASS on the rebuilt "5 mornings" templates + worker v0bb82823 → the automation
-  was ENABLED and CAPTURE_LIVE flipped to true in the same coordinated change, so
-  both the exit-intent modal AND the below-fold capture surface now show the email
-  field + "5 mornings" copy with live delivery behind them. The fail-closed design
-  still stands (if CAPTURE_LIVE is ever set back to false, or LEAD_ENDPOINT blanked,
-  both surfaces revert to a pure $7-push with no email field). The inline mid-page
-  prompt stays a $7 reinforcer by design.
-
-  FIXED 2026-08-03: `?offer=peace` was being force-overridden to always render the
-  Anchor copy (see the `key = "anchor"` history below) because Peace had no
-  distinct checkout. Real fix: Anchor and Peace are the SAME $7 Anchored-access
-  product — post-purchase, every buyer picks their own reading plan inside the
-  app, including the "Topical — scripture for what I'm carrying" anxiety-focused
-  plan the Peace copy promises — so serving Peace copy against the same real
-  Stripe checkout is not a bait-and-switch; it's one real product marketed from a
-  second honest angle, with copy that doesn't overclaim anything the app doesn't
-  actually deliver. `?offer=peace` now genuinely renders Peace title/copy/CTA.
--->
+<title>Anchored — Five Free Mornings with God</title>
+<meta name="description" content="Five free mornings with God — one short email a day for 5 days: the passage, a prayer written for you, and one small thing to do. No cost, no card. Unsubscribe anytime.">
 <style>
   :root{
     --bg:#12100C; --bg2:#181510; --card:#1C1913; --line:#38311F;
@@ -71,69 +70,32 @@
       radial-gradient(90% 60% at 100% 0%, rgba(127,176,166,.06), transparent 55%);}
   .hero .sub{font-size:clamp(16px,4.4vw,19px);color:var(--text);margin-top:16px;font-weight:600;}
   .hero .promise{color:var(--muted);margin-top:12px;font-size:15.5px;}
-  .cta{
-    display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
-    background:var(--gold);color:var(--gold-ink);font-weight:850;font-size:18px;
-    border:0;border-radius:14px;padding:17px 20px;cursor:pointer;text-decoration:none;
-    box-shadow:0 10px 30px rgba(229,184,92,.24);transition:transform .06s ease, box-shadow .2s ease;letter-spacing:.01em;
-  }
-  .cta:active{transform:translateY(1px) scale(.995);}
-  .cta .arrow{font-weight:900;}
-  .ctanote{text-align:center;color:var(--muted);font-size:13px;margin-top:11px;}
-  .ctanote b{color:var(--text);}
+  section{padding:30px 0;}
+  .lead{font-size:17px;}
+  .divider{height:1px;background:var(--line);margin:0;border:0;}
   .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 4px;}
   .trust .t{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;}
   .trust .t .ic{color:var(--gold);font-size:16px;line-height:1;}
   .trust .t .lbl{font-size:11.5px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
   .trust .t .sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
-  section{padding:30px 0;}
-  .lead{font-size:17px;}
-  .divider{height:1px;background:var(--line);margin:0;border:0;}
-  .stack{margin-top:18px;display:flex;flex-direction:column;gap:12px;}
-  .item{display:flex;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;}
-  .item .chk{flex:0 0 22px;height:22px;border-radius:7px;background:rgba(229,184,92,.16);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;margin-top:1px;}
-  .item .txt b{display:block;font-size:15.5px;margin-bottom:2px;}
-  .item .txt span{color:var(--muted);font-size:14px;}
-  .guarantee{border:1.5px solid var(--gold);border-radius:var(--radius);padding:20px;background:linear-gradient(180deg, rgba(229,184,92,.07), transparent);}
-  .guarantee .g-h{display:flex;align-items:center;gap:10px;font-weight:850;font-size:17px;}
-  .guarantee .seal{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;}
-  .guarantee p{margin-top:10px;color:var(--muted);font-size:14.5px;}
-  .why{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
-  .why b{color:var(--text);}
-  .app{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
-  .app .tag{color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;}
-  .optin{background:var(--bg2);border:1px dashed #4a4029;border-radius:var(--radius);padding:20px;}
-  .optin h3{font-size:18px;font-weight:800;}
-  .optin p{color:var(--muted);font-size:14px;margin-top:6px;}
+  /* signup card — reused for every capture point on the page */
+  .signup{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .signup h3{font-size:18px;font-weight:800;}
+  .signup p.formp{color:var(--muted);font-size:14px;margin-top:6px;}
   form.cap{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
   form.cap input[type=email]{flex:1 1 200px;min-width:0;background:#0f0d09;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:14px 14px;font-size:16px;}
   form.cap input[type=email]:focus{outline:none;border-color:var(--gold);}
-  form.cap button{flex:0 0 auto;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;padding:0 18px;font-size:15px;cursor:pointer;}
-  .capdone{color:var(--gold);font-weight:700;font-size:14.5px;margin-top:12px;display:none;}
-  .consent{color:var(--muted);font-size:12px;margin-top:10px;line-height:1.5;}
+  form.cap button{
+    flex:0 0 auto;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;
+    padding:0 18px;min-height:50px;font-size:15px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);
+  }
+  form.cap button:disabled{opacity:.6;cursor:default;}
+  .ts-slot{flex:1 1 100%;min-height:65px;}
+  .capdone{color:var(--gold);font-weight:700;font-size:15px;margin-top:12px;display:none;line-height:1.5;}
+  .caperr{color:var(--red);font-size:13.5px;margin-top:10px;display:none;}
+  .consent{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.5;}
   .consent a{color:var(--muted);text-decoration:underline;}
-  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin-top:10px;background:var(--card);}
-  details summary{list-style:none;cursor:pointer;padding:15px 0;font-weight:700;font-size:15.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
-  details summary::-webkit-details-marker{display:none;}
-  details summary .plus{color:var(--gold);font-weight:900;font-size:20px;transition:transform .2s;}
-  details[open] summary .plus{transform:rotate(45deg);}
-  details .ans{color:var(--muted);font-size:14.5px;padding:0 0 16px;}
-  .finalcta{text-align:center;padding:34px 0 40px;}
-  .finalcta h2{margin-bottom:18px;}
-  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;}
-  footer a{color:var(--muted);text-decoration:underline;}
-  .stickybuy{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(18,16,12,.95);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 20px calc(10px + env(safe-area-inset-bottom));transform:translateY(120%);transition:transform .25s ease;}
-  .stickybuy.show{transform:translateY(0);}
-  .stickybuy .cta{font-size:16px;padding:14px 18px;}
-  .modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.66);display:none;align-items:flex-end;justify-content:center;}
-  .modal.show{display:flex;}
-  .sheet{background:var(--bg2);border-top-left-radius:22px;border-top-right-radius:22px;border:1px solid var(--line);border-bottom:0;width:100%;max-width:640px;padding:24px 22px calc(26px + env(safe-area-inset-bottom));animation:up .25s ease;}
-  @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
-  .sheet h3{font-size:21px;font-weight:850;letter-spacing:-.01em;}
-  .sheet p{color:var(--muted);font-size:14.5px;margin-top:8px;}
-  .sheet .skip{display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;cursor:pointer;}
-  @media(min-width:560px){.modal{align-items:center;}.sheet{border-radius:22px;border-bottom:1px solid var(--line);}}
-  /* A1 — what your $7 unlocks (itemization at the buy moment) */
+  /* itemization */
   .unlock{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 8px;}
   .unlock h3{font-size:13px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
   .unlock ul{list-style:none;margin:0;padding:0;}
@@ -141,8 +103,7 @@
   .unlock li .uc{flex:0 0 18px;color:var(--gold);font-weight:900;font-size:14px;line-height:1.5;}
   .unlock li b{font-weight:750;color:var(--text);}
   .unlock li .ut{color:var(--muted);}
-  .proofpoint{display:block;text-align:center;color:var(--muted);font-size:13px;margin-top:14px;text-decoration:underline;}
-  /* A5 — how a morning works (process credibility) */
+  /* how-a-morning-works */
   .rhythm{margin-top:24px;}
   .rhythm h3{font-size:13px;font-weight:850;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;text-align:center;}
   .rhythm .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -150,35 +111,34 @@
   .rhythm .step .n{width:26px;height:26px;margin:0 auto 8px;border-radius:50%;background:rgba(229,184,92,.16);color:var(--gold);font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;}
   .rhythm .step b{display:block;font-size:15px;margin-bottom:2px;}
   .rhythm .step span{color:var(--muted);font-size:12.5px;line-height:1.35;}
-  /* A4 — see it before you buy (owned proof) */
+  /* proof strip (real authenticated app screens) */
   .proof{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
   .proof h2{font-size:22px;}
   .proof .psub{color:var(--muted);font-size:14.5px;margin-top:10px;}
-  .proof .audio{margin-top:16px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
-  .proof .audio .albl{font-size:13.5px;font-weight:700;margin-bottom:9px;}
-  .proof .audio .amute{color:var(--muted);font-weight:500;}
-  .proof audio{width:100%;display:block;}
   .proof .shots{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
   .proof .shots figure{margin:0;}
   .proof .shots img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:14px;background:#0f0d0a;}
   .proof .shots figcaption{margin-top:8px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.4;}
   @media (max-width:640px){ .proof .shots{grid-template-columns:1fr;max-width:340px;margin-left:auto;margin-right:auto;gap:20px;} }
+  .why{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .why b{color:var(--text);}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin-top:10px;background:var(--card);}
+  details summary{list-style:none;cursor:pointer;padding:15px 0;font-weight:700;font-size:15.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary .plus{color:var(--gold);font-weight:900;font-size:20px;transition:transform .2s;}
+  details[open] summary .plus{transform:rotate(45deg);}
+  details .ans{color:var(--muted);font-size:14.5px;padding:0 0 16px;}
+  .finalcta{text-align:center;padding:8px 0 6px;}
+  .finalcta h2{margin-bottom:16px;}
+  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;}
+  footer a{color:var(--muted);text-decoration:underline;}
 </style>
 <!-- ============================================================
-     META PIXEL — Anchored (its OWN dedicated pixel; NOT the Spotted pixel).
-     Fires PageView + ViewContent on load. InitiateCheckout fires on the buy
-     click (see goCheckout below). Engaged10s / ScrolledHalf custom events fire
-     from the engagement block. NOTE (2026-08-02): checkout moved from Gumroad to
-     a Stripe Payment Link; the Gumroad Conversions-API Purchase ping
-     (functions/api/gumroad-ping.js) no longer fires for this product, so
-     server-side Purchase attribution to this pixel is currently NOT wired for
-     Stripe — InitiateCheckout still fires client-side below. Flagged as a
-     follow-up (needs a Stripe webhook -> CAPI ping, same pattern as gumroad-ping.js).
-     Pixel ID 1407254754557742 = the dedicated Anchored pixel (ad account
-     37985900). It appears in the const below AND the <noscript> img. <<<
-     ============================================================ -->
+     META PIXEL — Anchored (its OWN dedicated pixel, ID 1407254754557742,
+     ad account 37985900). Fires PageView + ViewContent on load. The Lead event
+     fires later, ONLY on a confirmed NEW-lead signup (see the shared form handler).
+     NO InitiateCheckout — the $7 tripwire was retired 2026-08-05. -->
 <script>
-  // Anchored Meta Pixel ID (dedicated; NOT the Spotted pixel).
   const ANCHORED_PIXEL_ID = "1407254754557742";
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -190,21 +150,15 @@
   'https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', ANCHORED_PIXEL_ID);
   fbq('track','PageView');
-  (function(){
-    // FIXED 2026-08-03: report the REAL resolved offer (was hardcoded 'anchor').
-    // Computed independently here (this runs in <head>, before the main OFFERS
-    // script later in <body>) so pixel attribution matches what actually renders.
-    var offer = (new URLSearchParams(location.search).get('offer') === 'peace') ? 'peace' : 'anchor';
-    fbq('track','ViewContent',{content_name:'anchored-lp', content_category:offer, offer:offer});
-  })();
+  fbq('track','ViewContent',{content_name:'anchored-lp', content_category:'free'});
 </script>
 <noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
-<!-- Cloudflare Turnstile — invisible/managed bot gate for the non-buyer email
-     capture. Explicit render: the widget is drawn only when the exit modal opens
-     (see renderTurnstile() below), so it never renders into a hidden container and
-     never runs on a page view that has no form. Sitekey is public. -->
+<!-- Cloudflare Turnstile — managed bot gate for every email capture. Explicit
+     render: each form's widget is drawn lazily when it scrolls near view (below-fold
+     pattern) so page speed doesn't die. Public sitekey (allowed domains:
+     anchoredfaith.app + aaronmott1989.github.io). -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
@@ -212,150 +166,94 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
 <header>
   <div class="wrap bar">
     <div class="logo">Anchored<span class="dot">.</span></div>
-    <div class="pricepill">$7 · one time</div>
+    <div class="pricepill">Free · 5 mornings</div>
   </div>
 </header>
 
-<!-- HERO -->
+<!-- HERO = the free 5-mornings signup (capture point 1 of 4) -->
 <div class="hero">
   <div class="wrap">
-    <div class="kicker" id="k-kicker">Anchored · The 21-Day Anchor</div>
-    <h1 id="k-h1" style="margin-top:14px;">Quiet times don't fail on day 1. <span class="hl">They fail on day 4.</span></h1>
-    <p class="sub" id="k-sub">A dated 21-day plan that makes time with God a daily habit, in 10 minutes a day.</p>
-    <p class="sub" id="k-objkill" style="margin-top:6px;font-weight:600;">(No catching up. No guilt. No wondering what to read.)</p>
-    <p class="promise" id="k-promise">The heart is usually there. What gives out is the plan, around day four, when life gets loud and nothing tells you what to read next or what to do after a day you miss. This dated plan carries you through that stretch.</p>
-    <div style="margin-top:24px;">
-      <!-- A1: itemize what the $7 unlocks, immediately above the primary buy button (anchor variant; hidden on ?offer=peace) -->
-      <div class="unlock" id="k-unlock" style="margin-bottom:18px;">
-        <h3>What your $7 unlocks today</h3>
-        <ul>
-          <li><span class="uc">✓</span><span><b>A dated 21-day plan.</b> <span class="ut">Open the app and Day 1 is already there. No "where do I start."</span></span></li>
-          <li><span class="uc">✓</span><span><b>The whole passage, right on the page.</b> <span class="ut">The day's Scripture printed inline (World English Bible). No flipping between apps, no hunting a reference.</span></span></li>
-          <li><span class="uc">✓</span><span><b>The prayer written for you, word for word.</b> <span class="ut">Never sit there not knowing what to say. Read it straight off the page; pray in your own words when you're ready.</span></span></li>
-          <li><span class="uc">✓</span><span><b>One small thing to actually do with it.</b> <span class="ut">A single practice each day, so it doesn't stay on the page.</span></span></li>
-          <li><span class="uc">✓</span><span><b>A Companion in your corner.</b> <span class="ut">Ask it anything about the verse, prayer, or the app; it's there the moment you open it, steady on the days you'd usually drift.</span></span></li>
-          <li><span class="uc">✓</span><span><b>Yours in 60 seconds, on any device.</b> <span class="ut">Instant access, nothing to install, your streak follows you.</span></span></li>
-        </ul>
-      </div>
-      <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
-      <div class="ctanote"><b>Instant access. Yours to keep.</b> If it doesn't stick, email us inside 30 days and pay nothing. No questions.</div>
+    <div class="kicker">Anchored · 5 free mornings</div>
+    <h1 style="margin-top:14px;">"Did you read today?" <span class="hl">The text you wish a brother would send.</span></h1>
+    <p class="sub">You keep starting over — quietly, alone. Start with five mornings you don't have to do by yourself.</p>
+    <p class="promise">One short email each morning for five days: the passage, a prayer written for you, and one small thing to do. Free. It's the feeling of someone in your corner — without the guilt.</p>
+
+    <div class="signup" data-cap data-source="lp-hero" style="margin-top:24px;">
+      <h3>Send me the free 5 mornings</h3>
+      <p class="formp">Drop your email. Your first morning arrives shortly, then one each morning for five days.</p>
+      <form class="cap" novalidate>
+        <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+        <div class="ts-slot"></div>
+        <button type="submit">Send me the free 5 mornings →</button>
+      </form>
+      <div class="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+      <div class="caperr">Something hiccupped — please try that once more.</div>
+      <p class="consent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
     </div>
+
     <div class="trust">
-      <div class="t"><div class="ic">↓</div><div class="lbl">Instant access</div><div class="sub">Delivered on the spot</div></div>
-      <div class="t"><div class="ic">↺</div><div class="lbl">30-day refund</div><div class="sub">No questions asked</div></div>
-      <div class="t"><div class="ic">$</div><div class="lbl">$7 once</div><div class="sub">No subscription</div></div>
-    </div>
-    <!-- A4 inline proof pointer near the buy block -->
-    <a href="#k-proof" class="proofpoint">🔊 Hear a real prayer from inside the app ↓</a>
-    <!-- A5: how a morning works (process credibility), near the itemization block -->
-    <div class="rhythm" id="k-rhythm">
-      <h3>How a morning works — about 10 minutes</h3>
-      <div class="steps">
-        <div class="step"><div class="n">1</div><b>Read</b><span>the day's passage, already on the page.</span></div>
-        <div class="step"><div class="n">2</div><b>Pray</b><span>the words written for you.</span></div>
-        <div class="step"><div class="n">3</div><b>Do</b><span>one small thing, and tap done. Your streak keeps itself.</span></div>
-      </div>
+      <div class="t"><div class="ic">✓</div><div class="lbl">Completely free</div><div class="sub">No card, no catch</div></div>
+      <div class="t"><div class="ic">✉</div><div class="lbl">One email a day</div><div class="sub">5 mornings, then done</div></div>
+      <div class="t"><div class="ic">↩</div><div class="lbl">Unsubscribe anytime</div><div class="sub">One tap, no hard feelings</div></div>
     </div>
   </div>
 </div>
 
 <hr class="divider">
 
-<!-- PROBLEM -->
+<!-- WHAT ARRIVES + HOW A MORNING WORKS (value / how-it-works block) -->
 <section>
   <div class="wrap">
-    <h2 id="k-prob-h">Day 4 is where it dies.</h2>
-    <p class="lead muted" id="k-prob-b" style="margin-top:14px;">The first morning feels great. Then day four arrives: a rough night, a packed morning, and you lose track of where the plan left off. One missed day turns into three, and the guilt makes coming back harder than starting did. Most plans go quiet the day you fall behind and leave you to find your own way back. <b style="color:var(--text)">The 21-Day Anchor was built to fix that:</b> a dated plan that hands you the next step every day, whether you showed up yesterday or not.</p>
-    <p class="promise" id="k-mechreframe" style="margin-top:16px;">You don't feel your way into a walk with God. You show up your way into it — one small day at a time.</p>
-  </div>
-</section>
-
-<!-- WHY WE BUILT IT THIS WAY (honest-transparency block — no personal story, faceless brand) -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <div class="why">
-      <h2 style="font-size:22px;">Where this comes from</h2>
-      <p class="muted" id="k-where-body" style="margin-top:12px;">Anchored doesn't run on one person's story. It fixes a gap you'll find in almost every faith app and devotional: they hand you content, then go quiet the moment you fall behind. Few of them build a page for the day you miss. The 21-Day Anchor does exactly that, with grace written into the plan itself instead of tacked on at the end.</p>
+    <h2>What lands in your inbox each morning</h2>
+    <div class="unlock" style="margin-top:18px;">
+      <h3>Five mornings — one short email each</h3>
+      <ul>
+        <li><span class="uc">✓</span><span><b>The day's passage, right in the email.</b> <span class="ut">No hunting a reference or flipping between apps — the Scripture is printed for you (World English Bible).</span></span></li>
+        <li><span class="uc">✓</span><span><b>A prayer written for you, word for word.</b> <span class="ut">Never sit there not knowing what to say. Read it straight off the page, then pray in your own words when you're ready.</span></span></li>
+        <li><span class="uc">✓</span><span><b>One small thing to actually do with it.</b> <span class="ut">A single practice each day, so it doesn't stay on the page.</span></span></li>
+        <li><span class="uc">✓</span><span><b>Read it or listen to it.</b> <span class="ut">A couple of quiet minutes, however your morning goes.</span></span></li>
+      </ul>
     </div>
-  </div>
-</section>
-
-<!-- VALUE STACK -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <h2>What you get <span class="muted" style="font-size:15px;font-weight:600;">(instant access)</span></h2>
-    <div class="stack" id="k-stack">
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>A dated 21-day plan</b><span>Open to today's page and the reading, prayer, and reflection are already there. Nothing to plan or line up. You show up and begin.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>10 minutes, morning or night</b><span>Built for a busy life. A short reading, a guided prayer, one honest reflection. Small enough to keep.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>The "I missed a day" page</b><span>The one page most plans skip: what to do when you fall behind, so a missed day becomes your next step, not the end of the road.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>The prayer is written for you, word for word</b><span>Never sat there unsure what to say? Each day's prayer is written out in full, so you can pray it straight off the page, then grow into your own words over time.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>The whole passage, right on the page</b><span>No flipping between apps or hunting a reference. The day's Scripture is printed right there (World English Bible). Open it and read.</span></div></div>
-      <div class="item"><div class="chk">✓</div><div class="txt"><b>A simple reflection journal</b><span>One line a day. Look back in three weeks and see how far God has carried you.</span></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- GUARANTEE -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <div class="guarantee">
-      <div class="g-h"><span class="seal">✓</span> Your $7 is protected.</div>
-      <p><b style="color:var(--text)">30-day, 100% money-back, no-questions-asked.</b> Use it, and if it doesn't help you build a daily time with God that sticks, email <a style="color:var(--gold)" href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a> and get every cent back. You keep the plan. The only risk is another month of meaning to and never starting.</p>
-    </div>
-  </div>
-</section>
-
-<!-- WHY $7 -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <div class="why">
-      <h2 style="font-size:22px;">Why $7?</h2>
-      <p class="muted" style="margin-top:12px;" id="k-why">A devotional book runs $15–$25 and still leaves you deciding when and how. Free plans hand you a list and disappear the day you fall behind. This is <b>$7, once,</b> for the full 21-day dated plan, the prayers written out word for word, and the "I missed a day" page free plans leave out. Seven dollars against another season of meaning to grow closer to God and never quite starting.</p>
-    </div>
-  </div>
-</section>
-
-<!-- APP HANDOFF -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <div class="app">
-      <div class="tag">What happens after</div>
-      <h2 style="font-size:21px;margin-top:8px;" id="k-app-h">When the 21 days end, the Anchored app takes over.</h2>
-      <p class="muted" style="margin-top:10px;" id="k-app-b">Your 21 days are yours to keep either way, with no subscription and no auto-charge. If you want to keep going, the Anchored app takes over. It holds your streak, keeps the day's verse ready every morning, and your Companion is there the moment you open it — steady on the days you'd rather not — and answers your faith and Bible questions any time. Founding members lock in <b style="color:var(--text)">$59/year for life</b>, and the $7 you pay today comes off it, so your first year is <b style="color:var(--text)">$52</b> (or $8.99/month if you'd rather). Same 30-day money-back guarantee. It's optional, and the plan is yours regardless.</p>
-    </div>
-  </div>
-</section>
-
-<!-- INLINE OPT-IN -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <div class="optin">
-      <h3 id="k-opt-h">Still deciding? The whole plan is $7.</h3>
-      <p id="k-opt-p">No subscription, no risk. One payment of $7 gets you all 21 days, yours to keep, backed by a 30-day, no-questions money-back guarantee. You can start tomorrow morning.</p>
-      <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
-      <p class="consent" style="margin-top:12px;">30-day money-back guarantee · instant access · <a href="privacy.html">Privacy Policy</a></p>
-    </div>
-  </div>
-</section>
-
-<!-- A4 — SEE IT BEFORE YOU BUY (owned proof: free Piper devotion audio + transparency block above) -->
-<section style="padding-top:6px;">
-  <div class="wrap">
-    <div class="proof" id="k-proof">
-      <h2>See what you're getting — before you pay.</h2>
-      <p class="psub">Here's a real piece of the daily rhythm: a prayer from inside Anchored, read aloud in the free in-app audio. Not a preview reel — this is the actual product.</p>
-      <div class="audio">
-        <div class="albl">Anchored daily audio <span class="amute">· a prayer from the app, read aloud (free, included)</span></div>
-        <audio controls preload="none">
-          <source src="audio/lp-sample-devotion.mp3" type="audio/mpeg">
-          <source src="audio/prayers/closeness-0.ogg" type="audio/ogg">
-          Your browser can't play this sample here — it's included free inside the app.
-        </audio>
+    <div class="rhythm">
+      <h3>How a morning works — a couple of quiet minutes</h3>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><b>Read</b><span>the day's passage, printed right in the email.</span></div>
+        <div class="step"><div class="n">2</div><b>Pray</b><span>the words written for you.</span></div>
+        <div class="step"><div class="n">3</div><b>Do</b><span>one small thing, and carry it into your day.</span></div>
       </div>
+    </div>
+    <p class="promise" style="color:var(--muted);margin-top:16px;font-size:15.5px;">You don't feel your way into a walk with God. You show up your way into it — one small morning at a time. These five are a start you don't have to make alone.</p>
+  </div>
+</section>
+
+<!-- MID CAPTURE (capture point 2 of 4) — after the how-it-works / value block -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="signup" data-cap data-source="lp-mid">
+      <h3>Start your first morning tomorrow</h3>
+      <p class="formp">Give me your email and the first of your five mornings is on its way — free, no card.</p>
+      <form class="cap" novalidate>
+        <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+        <div class="ts-slot"></div>
+        <button type="submit">Send me the free 5 mornings →</button>
+      </form>
+      <div class="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+      <div class="caperr">Something hiccupped — please try that once more.</div>
+      <p class="consent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF STRIP (real authenticated app screens) -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="proof">
+      <h2>This is the real thing — not a preview reel.</h2>
+      <p class="psub">The same passage, prayer, and daily rhythm you'll get in your inbox is what lives inside Anchored. Real screens from the app:</p>
       <div class="shots">
         <figure>
           <img src="proof/app-today.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored app's Today screen: the day's anchor verse (Matthew 11:28, World English Bible) with Read, Pray, Practice and Reflect, and today's passage printed inline.">
-          <figcaption>Your day, already laid out — the passage printed right on the page.</figcaption>
+          <figcaption>The day laid out for you — the passage printed right on the page.</figcaption>
         </figure>
         <figure>
           <img src="proof/app-pray.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored app's Pray screen: a prayer written out word for word, with an option to listen to it read aloud.">
@@ -363,10 +261,19 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
         </figure>
         <figure>
           <img src="proof/app-companion.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored Companion answering 'I missed a day and I feel like I fell behind' with grace: there's no catching up to do, His mercies are new every morning.">
-          <figcaption>A Companion in your corner on the days you'd drift.</figcaption>
+          <figcaption>A Companion you can ask anything, any time.</figcaption>
         </figure>
       </div>
-      <p class="psub" style="margin-top:16px;">Real screens from inside Anchored — not a preview reel. No fake reviews, no borrowed testimonials. The honest story of who's behind this is in <b style="color:var(--text)">"Where this comes from"</b> above.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOFT APP MENTION (below the fold; no price, no reach-out claim) -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="why">
+      <h2 style="font-size:22px;">After the five mornings</h2>
+      <p class="muted" style="margin-top:12px;">Start with the free five. If they land and you want to keep going, there's the full <b>Anchored</b> app — a dated daily passage and a written prayer, a streak that keeps itself (miss a day and there's no reset to zero — you just open today), and a Companion you can ask anything about the verse, the prayer, or your walk. It's optional, and the five mornings are yours free either way. <span style="color:var(--muted)">No card needed to start.</span></p>
     </div>
   </div>
 </section>
@@ -375,40 +282,48 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
 <section style="padding-top:6px;">
   <div class="wrap">
     <h2>Questions</h2>
-    <div id="k-faq">
-      <details><summary>I'm new to the Bible. Is this too advanced? <span class="plus">+</span></summary><div class="ans">No. It's dated and day-by-day, with short readings and plain-language prompts, so you always know what to do. You don't need any background, only 10 minutes and a willingness to show up.</div></details>
-      <details><summary>What if I miss a day? <span class="plus">+</span></summary><div class="ans">That's exactly what the "I missed a day" page is for. You don't catch up or start over. You take today. Grace is the whole point, and one faithful day is a win.</div></details>
-      <details><summary>Which Bible translation do I need? <span class="plus">+</span></summary><div class="ans">Any you like. Each day's passage is printed right in the app (public-domain World English Bible), so you don't need anything else. You're welcome to read along in your own Bible too.</div></details>
-      <details><summary>How do I get it? <span class="plus">+</span></summary><div class="ans">Instant access after a $7 checkout. Yours to keep. Backed by a 30-day, no-questions money-back guarantee.</div></details>
+    <details><summary>Is it really free? <span class="plus">+</span></summary><div class="ans">Yes. Five short emails, one each morning for five days. No card, no cost, nothing to buy. Unsubscribe any time with one tap.</div></details>
+    <details><summary>What if I miss a morning? <span class="plus">+</span></summary><div class="ans">Nothing to make up. There's no reset to zero and no catching up — His mercies are new every morning. You just open the next one when you can.</div></details>
+    <details><summary>Do I need to be far along in faith? <span class="plus">+</span></summary><div class="ans">No. Each morning is short and plain, with the passage and a prayer written out for you. You only need a couple of quiet minutes and a willingness to show up.</div></details>
+    <details><summary>Which Bible translation do I need? <span class="plus">+</span></summary><div class="ans">None of your own required — the passage is printed right in each email (public-domain World English Bible). Read along in your own Bible too if you like.</div></details>
+  </div>
+</section>
+
+<!-- FAQ CAPTURE (capture point 3 of 4) — after the proof / FAQ block -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="signup" data-cap data-source="lp-faq">
+      <h3>Questions answered? Take the free five.</h3>
+      <p class="formp">One short email a morning for five days — the passage, a prayer written for you, and one small thing to do.</p>
+      <form class="cap" novalidate>
+        <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+        <div class="ts-slot"></div>
+        <button type="submit">Send me the free 5 mornings →</button>
+      </form>
+      <div class="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+      <div class="caperr">Something hiccupped — please try that once more.</div>
+      <p class="consent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
     </div>
   </div>
 </section>
 
-<!-- FINAL CTA -->
-<div class="finalcta">
+<!-- FINAL + BOTTOM CAPTURE (capture point 4 of 4) -->
+<section style="padding-top:6px;">
   <div class="wrap">
-    <h2 id="k-final">Ten minutes a day for twenty-one days. A habit that holds.</h2>
-    <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
-    <div class="ctanote">30-day money-back guarantee · instant access</div>
-    <p class="muted" id="k-ps" style="margin-top:22px;font-size:14px;font-style:italic;">P.S. Whatever you decide, the guarantee stands: if the 21-Day Anchor doesn't help you build a habit that sticks, email us any time in the first 30 days and get every cent back, no questions asked. You keep the plan either way.</p>
-  </div>
-</div>
-
-<!-- B2 #2 — BELOW-FOLD FREE CAPTURE (soft alternative; sits AFTER the final buy CTA, never above the buy path).
-     Hidden by default; JS reveals + wires it only when CAPTURE_LIVE && LEAD_ENDPOINT (same fail-closed gate as the
-     exit modal), so it never promises "5 mornings" without live delivery behind it. Posts source=below_fold. -->
-<section id="belowfold-capture" style="padding-top:6px;display:none;">
-  <div class="wrap">
-    <div class="optin">
-      <h3>Not ready to buy? Start free.</h3>
-      <p>Get a 5-day sneak peek — one devotional every morning (passage + a written prayer + one small practice). See exactly how Anchored feels before you spend a cent.</p>
-      <form class="cap" id="bfleadform" novalidate>
-        <input type="email" id="bfleademail" name="email" placeholder="you@email.com" autocomplete="email" required>
-        <div id="ts-widget-bf" style="flex:1 1 100%;min-height:65px;"></div>
+    <div class="finalcta">
+      <h2>Five mornings. A start you don't have to make alone.</h2>
+    </div>
+    <div class="signup" data-cap data-source="lp-bottom">
+      <h3>Send me the free 5 mornings</h3>
+      <p class="formp">Your first morning arrives shortly, then one each morning for five days. Free, no card, unsubscribe anytime.</p>
+      <form class="cap" novalidate>
+        <input type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+        <div class="ts-slot"></div>
         <button type="submit">Send me the free 5 mornings →</button>
       </form>
-      <div class="capdone" id="bfcapdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
-      <p class="consent" id="bfleadconsent">One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
+      <div class="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+      <div class="caperr">Something hiccupped — please try that once more.</div>
+      <p class="consent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
     </div>
   </div>
 </section>
@@ -417,362 +332,138 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   <div class="wrap">
     <div class="logo" style="font-size:16px;justify-content:center;">Anchored<span class="dot">.</span></div>
     <p style="margin-top:8px;">A daily walk with God, made simple. Questions? <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a></p>
-    <p style="margin-top:10px;">Anchored is a spiritual-growth tool for daily discipline. It is not medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. If you are in crisis or thinking about harming yourself, call or text <b>988</b> (US Suicide &amp; Crisis Lifeline) or dial 911.</p>
-    <p style="margin-top:8px;">Results depend on your own effort and consistency. Scripture quoted is the World English Bible (public domain). Bible translation names are trademarks of their respective publishers and are referenced for identification only.</p>
-    <p style="margin-top:8px;">&copy; <span id="yr"></span> Anchored. · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
+    <p style="margin-top:10px;">Anchored is a spiritual-growth tool for daily discipline. It is not medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. If you are in crisis or thinking about harming yourself, call or text <b>988</b> (US Suicide &amp; Crisis Lifeline) or dial 911. <a href="crisis.html">More crisis resources</a>.</p>
+    <p style="margin-top:8px;">Scripture quoted is the World English Bible (public domain). Bible translation names are trademarks of their respective publishers and are referenced for identification only.</p>
+    <p style="margin-top:8px;">&copy; <span id="yr"></span> Anchored. · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a> · <a href="crisis.html">Crisis Help</a></p>
   </div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
-
-<!-- sticky mobile buy bar -->
-<div class="stickybuy" id="stickybuy">
-  <div class="wrap" style="padding:0;">
-    <a class="cta" data-buy href="#"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
-  </div>
-</div>
-
-<!-- exit-intent / non-buyer capture modal -->
-<div class="modal" id="modal">
-  <div class="sheet">
-    <h3 id="k-m-h">Before you go, the whole plan is $7.</h3>
-    <p id="k-m-p">One payment of $7, yours to keep, with a 30-day money-back guarantee. Don't let another week of meaning-to slip by.</p>
-    <form class="cap" id="leadform" novalidate style="display:none;">
-      <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
-      <div id="ts-widget" style="flex:1 1 100%;min-height:65px;"></div>
-      <button type="submit">Send me the 5 mornings →</button>
-    </form>
-    <div class="capdone" id="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
-    <p class="consent" id="leadconsent" style="display:none;">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
-    <a class="cta" data-buy href="#" style="margin-top:16px;"><span>Start The 21-Day Anchor — $7</span> <span class="arrow">→</span></a>
-    <span class="skip" id="modalskip">No thanks</span>
-  </div>
-</div>
 
 <script>
 (function(){
   "use strict";
 
-  // ---- Offer config: one page, two ad sets ----
-  var OFFERS = {
-    anchor: {
-      title: "Anchored — The 21-Day Anchor ($7)",
-      // LIVE Stripe checkout ($7 one-time) for The 21-Day Anchor.
-      // (Cut over from Gumroad `tynak` 2026-08-02 — Gumroad product unpublished
-      // same day. Delivery after payment: Stripe redirects straight to
-      // anchoredfaith.app/anchored-app.html, same "create your login" flow
-      // Gumroad's receipt used to hand off to. Re-migrated 2026-08-02 later same
-      // day off the shared "Spotted" Stripe account onto Anchored's OWN dedicated
-      // account, acct_1U0BlAIP2ccetVoD — fixes a checkout branding bug where the
-      // merchant name showed as "Spotted".)
-      checkout: "https://buy.stripe.com/cNifZi18z9nF4WueUc5wI00"
-    },
-    // RE-ENABLED 2026-08-03 (was disabled 2026-07-28 over a bait-and-switch
-    // concern — Peace copy paired with the Anchor product's checkout). Real fix:
-    // this is the SAME $7 Anchored-access product as `anchor` above, marketed
-    // from the anxious-mind angle instead of the daily-habit angle. The buyer
-    // picks their own reading plan inside the app after purchase, including the
-    // "Topical — scripture for what I'm carrying" plan (anchored-app.html
-    // plan_pref="topical") that matches this copy's promise — so reusing the
-    // same real checkout is honest, not a swap. Checkout intentionally == anchor's.
-    peace: {
-      title: "Anchored — Peace: 14 Days for Anxious Hearts ($7)",
-      checkout: "https://buy.stripe.com/cNifZi18z9nF4WueUc5wI00",
-      kicker: "Anchored · Peace in 14 Days",
-      h1: 'A racing mind quiets a little easier <span class="hl">when it has something steadier to hold.</span>',
-      sub: "14 days of Scripture, prayer, and one simple practice for an anxious mind, in 10 minutes a day.",
-      promise: "Worry doesn't back down because someone tells you to calm down. It quiets when you have something truer to hold onto, day after day. This is 14 dated days of Scripture for worry, with a prayer and one small practice to steady you each morning.",
-      buy: "Start Peace in 14 Days — $7",
-      whereBody: "Anchored doesn't run on one person's story. It fixes a gap you'll find in almost every faith app and devotional: they hand you content, then go quiet the moment you fall behind. Few of them build a page for the day your mind won't quiet. Peace does exactly that: 14 dated days of Scripture for worry, with grace written into the plan itself instead of tacked on at the end.",
-      ps: "P.S. Whatever you decide, the guarantee stands: if Peace doesn't help you build a quieter, steadier daily habit, email us any time in the first 30 days and get every cent back, no questions asked. You keep the plan either way.",
-      probH: "You can't think your way out of worry.",
-      probB: "The racing thoughts, the 3am spiral, the tight chest. Willpower doesn't touch it, and 'just have more faith' only piles on guilt. A daily anchor helps: a true word to return to, a prayer to pray, one small thing to do. Peace gives you that, dated for 14 days so you don't have to decide when your mind is already loud.",
-      whyH: "Why $7?",
-      why: 'A single counseling session runs $100+, and a devotional book still leaves you deciding when and how. This is <b>$7, once,</b> for 14 dated days built for an anxious mind: Scripture, prayer, and one small daily practice. Not a replacement for a counselor if you need one, but a daily anchor you can start tomorrow.',
-      appH: "When the 14 days end, the Anchored app takes over.",
-      appB: 'Your 14 days are yours to keep either way, with no subscription and no auto-charge. If you want to keep going, the Anchored app takes over. It keeps your daily verse and a steadying practice ready every morning, holds your streak, and your Companion is there the moment you open it — steady on the hard days. Founding members lock in <b style="color:var(--text)">$59/year for life</b>, and the $7 you pay today comes off it, so your first year is <b style="color:var(--text)">$52</b> (or $8.99/month if you\'d rather). Same 30-day money-back guarantee. It stays optional, and the plan is yours regardless.',
-      optH: "Still deciding? The whole plan is $7.",
-      optP: "No subscription, no risk. One payment of $7 gets you all 14 days, yours to keep, backed by a 30-day money-back guarantee. You can start tomorrow.",
-      mH: "Before you go, the whole plan is $7.",
-      mP: "One payment of $7, yours to keep, with a 30-day money-back guarantee. A quieter mind starts with a single day.",
-      final: "Ten minutes a day for fourteen days. A quieter mind.",
-      stack: [
-        ["14 dated days for an anxious mind","Open to today and know exactly what to read, pray, and do. No deciding when your mind is already racing."],
-        ["A steadying practice each day","One small, doable thing (a breath, a moment of gratitude, a verse to carry) that meets worry in the moment."],
-        ["Scripture chosen for worry","The passages that speak straight to fear and anxiety, in plain language, in short readings."],
-        ["The \"when it spikes\" page","Exactly what to reach for when anxiety hits hard, so you're never scrambling in the moment."]
-      ],
-      faq: [
-        ["Is this a replacement for therapy or medication?","No. It's a daily spiritual anchor, not medical or mental-health treatment. If anxiety is overwhelming your daily life, please also talk to a counselor or doctor. That's a wise, faithful step, and this plan says so plainly."],
-        ["I'm not sure how strong my faith is. Is this for me?","Yes. You don't need a strong faith or any Bible background, only 10 minutes and a willingness to try. The prayers give you the words if you've never known what to say."],
-        ["What if I miss a day?","You take today. There's no catching up and no starting over. Grace is the whole point."],
-        ["How do I get it?","Instant access after a $7 checkout. Backed by a 30-day, no-questions money-back guarantee."]
-      ]
-    }
-  };
+  // ---- shared config ----
+  // Same live, Turnstile-gated worker as free.html and the old LP. Each form POSTs
+  // its own position-specific source tag (lp-hero / lp-mid / lp-faq / lp-bottom) so
+  // leads are attributable per capture point. NEVER "freedoor-test" — that tag is
+  // reserved for the /free ad test and must not be polluted here.
+  var LEAD_ENDPOINT   = "https://anchored-lead.amott1989.workers.dev";
+  var TURNSTILE_SITEKEY = "0x4AAAAAAEFkyywbuJyZkFl1"; // public managed sitekey
+  var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  var ALREADY_MSG = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam folder, just in case). 🕊️";
 
-  function qp(n){ return new URLSearchParams(location.search).get(n); }
-  // FIXED 2026-08-03: real ?offer= routing (was hardcoded to "anchor" regardless
-  // of the query param — see OFFERS.peace's re-enable note above for why that
-  // force existed and why it's safe to remove now). No param, or any value other
-  // than "peace", still defaults to Anchor — that default behavior is unchanged.
-  var key = (qp('offer') === 'peace') ? 'peace' : 'anchor';
-  var o = OFFERS[key] || OFFERS.anchor;
+  var controllers = [];   // every capture form on the page
 
-  function set(id, html){ var el=document.getElementById(id); if(el && html!=null) el.innerHTML=html; }
-  document.title = o.title;
-  if(key !== "anchor"){
-    set("k-kicker", o.kicker); set("k-h1", o.h1); set("k-sub", o.sub); set("k-promise", o.promise);
-    set("k-prob-h", o.probH); set("k-prob-b", o.probB);
-    set("k-why", o.why); set("k-app-h", o.appH); set("k-app-b", o.appB);
-    set("k-opt-h", o.optH); set("k-opt-p", o.optP); set("k-m-h", o.mH); set("k-m-p", o.mP);
-    set("k-final", o.final); set("k-where-body", o.whereBody); set("k-ps", o.ps);
-    // Anchor-only Magin-teardown copy (#3/#4): hide on the Peace variant, which has its own tuned hero/problem copy.
-    var _ok=document.getElementById("k-objkill"); if(_ok) _ok.style.display="none";
-    var _mr=document.getElementById("k-mechreframe"); if(_mr) _mr.style.display="none";
-    // A1 itemization is anchor-specific ("21-day plan", Companion): hide on Peace, which has its own value stack below.
-    var _uk=document.getElementById("k-unlock"); if(_uk) _uk.style.display="none";
-    if(o.stack){ document.getElementById("k-stack").innerHTML = o.stack.map(function(s){
-      return '<div class="item"><div class="chk">✓</div><div class="txt"><b>'+s[0]+'</b><span>'+s[1]+'</span></div></div>';
-    }).join(""); }
-    if(o.faq){ document.getElementById("k-faq").innerHTML = o.faq.map(function(f){
-      return '<details><summary>'+f[0]+' <span class="plus">+</span></summary><div class="ans">'+f[1]+'</div></details>';
-    }).join(""); }
-    document.querySelectorAll('[data-buy] span:first-child').forEach(function(s){ s.textContent = o.buy; });
+  // Flip EVERY form on the page into its success state. Called after any single
+  // form succeeds (and on load if the visitor already captured earlier).
+  function flipAllToSuccess(exceptEl, msg){
+    controllers.forEach(function(c){
+      c.form.style.display = 'none';
+      if (c.consent) c.consent.style.display = 'none';
+      if (c.err) c.err.style.display = 'none';
+      if (c.el !== exceptEl && msg) c.done.textContent = msg; // carry the "already signed up" wording to the rest
+      c.done.style.display = 'block';
+    });
   }
 
-  // ---- UTM capture + passthrough (creative attribution) ----
-  // Read utm_* on load, persist in sessionStorage, then append them (plus the
-  // offer variant) onto the checkout URL so the buyer record carries which
-  // creative (utm_content=static vs video) drove the sale. NOTE: Stripe Payment
-  // Links ignore unrecognized query params by default (no metadata capture
-  // wired yet), so today this only survives as long as Gumroad's did for
-  // on-page debugging — it does not yet land in Stripe's transaction data.
-  // Without this the hardcoded checkout URL drops every param.
-  var UTM_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
-  var UTMS = (function(){
-    var params = new URLSearchParams(location.search), stored = {};
-    try{ stored = JSON.parse(sessionStorage.getItem('anchored_utms') || '{}'); }catch(e){ stored = {}; }
-    UTM_KEYS.forEach(function(k){ var v = params.get(k); if(v) stored[k] = v; });
-    try{ sessionStorage.setItem('anchored_utms', JSON.stringify(stored)); }catch(e){}
-    return stored;
-  })();
-  function checkoutURL(){
-    if(!o.checkout) return o.checkout;
-    var u; try{ u = new URL(o.checkout); }catch(e){ return o.checkout; }
-    UTM_KEYS.forEach(function(k){ if(UTMS[k]) u.searchParams.set(k, UTMS[k]); });
-    u.searchParams.set('offer', key);
-    return u.toString();
-  }
+  function makeController(el){
+    var form    = el.querySelector('form.cap');
+    var input   = el.querySelector('input[type=email]');
+    var slot    = el.querySelector('.ts-slot');
+    var btn     = el.querySelector('button');
+    var done    = el.querySelector('.capdone');
+    var err     = el.querySelector('.caperr');
+    var consent = el.querySelector('.consent');
+    var source  = (el.getAttribute('data-source') || 'lp').slice(0, 64);
 
-  // ---- buy: to the live Stripe checkout (UTMs + offer appended) ----
-  // REVERTED 2026-08-03 (checkout-leak fix): a prior change deferred this
-  // navigation ~280ms inside a setTimeout so the InitiateCheckout beacon could
-  // finish first. That silently BROKE the redirect inside the Facebook/Instagram
-  // in-app browser — where all paid traffic lands. Those webviews only allow a
-  // top-level navigation that fires synchronously inside the tap handler, so the
-  // deferred location.href was dropped: buyers fired IC but never reached Stripe
-  // (26 InitiateCheckout, 0 purchases, Stripe $0 all-time). We now navigate
-  // synchronously inside the gesture; fbq() ships IC via navigator.sendBeacon,
-  // which survives the navigation, so attribution still holds.
-  var checkingOut = false;
-  function goCheckout(){
-    if(checkingOut) return;               // guard: no double-fire on rapid clicks
-    var dest = checkoutURL();
-    if(!dest){ return; }
-    checkingOut = true;
-    var eventID = 'ic-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
-    try{ if(window.fbq) fbq('track','InitiateCheckout',{value:7,currency:'USD'},{eventID:eventID}); }catch(e){}
-    location.href = dest;                  // synchronous nav inside the tap — do NOT defer (in-app browsers drop deferred redirects)
-  }
-  document.querySelectorAll('[data-buy]').forEach(function(a){
-    a.addEventListener('click', function(e){ e.preventDefault(); goCheckout(); });
-  });
-
-
-  // ---- sticky mobile buy bar ----
-  var sticky = document.getElementById('stickybuy');
-  var hero = document.querySelector('.hero');
-  if('IntersectionObserver' in window && hero){
-    new IntersectionObserver(function(ents){
-      ents.forEach(function(en){ sticky.classList.toggle('show', !en.isIntersecting); });
-    },{rootMargin:'-60px 0px 0px 0px'}).observe(hero);
-  }
-
-  // ---- engagement signals: tell an instant bounce from an engaged non-buyer ----
-  setTimeout(function(){ try{ if(window.fbq) fbq('trackCustom','Engaged10s'); }catch(e){} }, 10000);
-  var scrolledHalf = false;
-  window.addEventListener('scroll', function(){
-    if(scrolledHalf) return;
-    var pct = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
-    if(pct > 0.5){ scrolledHalf = true; try{ if(window.fbq) fbq('trackCustom','ScrolledHalf'); }catch(e){} }
-  }, {passive:true});
-
-  // ---- Cloudflare Turnstile: render the bot-gate widget lazily ----
-  // Public managed sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io).
-  // Rendered on demand the first time the exit modal opens so it never draws into a
-  // hidden container. Retries briefly while the async api.js finishes loading.
-  var TURNSTILE_SITEKEY = "0x4AAAAAAEFkyywbuJyZkFl1";
-  var tsWidgetId = null, tsTries = 0;
-  function renderTurnstile(){
-    if(tsWidgetId !== null) return;                         // already rendered
-    var el = document.getElementById('ts-widget');
-    if(!el) return;
-    if(!(window.turnstile && window.turnstile.render)){
-      if(tsTries++ < 40) setTimeout(renderTurnstile, 150);  // wait for api.js (~6s max)
-      return;
-    }
-    try{ tsWidgetId = window.turnstile.render(el, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
-    catch(e){ /* re-attempt on next modal open */ }
-  }
-
-  // ---- exit-intent / non-buyer prompt: once per visitor ----
-  // CAPTURE_LIVE gates the non-buyer email capture (exit modal + below-fold surface).
-  // Set TRUE 2026-08-04 in the same coordinated change that ENABLED the Resend
-  // "Anchored 5 Mornings Nurture" automation (security ALL-PASS on the rebuilt
-  // 5-mornings templates + worker v0bb82823). If ever set back to FALSE, both capture
-  // surfaces revert to a pure $7-push (no email field) so no lead is captured against
-  // a promise nothing delivers. The "5 mornings" copy below is the security-cleared wording.
-  var CAPTURE_LIVE = true;
-  var modal = document.getElementById('modal');
-  var shown = false;
-  function alreadyDone(){ try{ return localStorage.getItem('anchored_captured')==='1' || sessionStorage.getItem('anchored_modal')==='1'; }catch(e){ return false; } }
-  function showModal(){
-    if(shown || alreadyDone()) return;
-    shown = true;
-    try{ sessionStorage.setItem('anchored_modal','1'); }catch(e){}
-    modal.classList.add('show');
-    if(LEAD_ENDPOINT && CAPTURE_LIVE) renderTurnstile();    // draw the Turnstile widget only when the capture form is actually shown
-  }
-  function hideModal(){ modal.classList.remove('show'); }
-  document.getElementById('modalskip').addEventListener('click', function(){ hideModal(); });
-  modal.addEventListener('click', function(e){ if(e.target===modal) hideModal(); });
-  document.addEventListener('mouseout', function(e){ if(e.clientY<=0 && !e.relatedTarget) showModal(); });
-  var maxY=0, dwell=false;
-  setTimeout(function(){ dwell=true; }, 15000);
-  var lastY = window.scrollY;
-  window.addEventListener('scroll', function(){
-    var y = window.scrollY; maxY=Math.max(maxY,y);
-    var pct = (y+window.innerHeight)/document.body.scrollHeight;
-    if(dwell && pct>0.5 && y < lastY - 40 && maxY>600) showModal();
-    lastY = y;
-  }, {passive:true});
-
-  // ---- non-buyer lead capture: POST to the Anchored lead Worker ----
-  // LEAD_ENDPOINT is LIVE (deployed, Turnstile-gated). On submit the page POSTs
-  // { email, source, ts, turnstileToken }; the Worker verifies the challenge and
-  // TAGS the email into the Resend "Anchored Leads" segment. As of 2026-08-04 the
-  // Worker no longer sends any email itself — the Resend "Anchored Lead Magnet
-  // Nurture" automation owns delivery (Email 1 fires Day 0 on segment entry).
-  // GATED by CAPTURE_LIVE (declared above): while FALSE this whole block is skipped,
-  // the email field stays hidden, and the modal is a pure honest $7-push. Flip
-  // CAPTURE_LIVE=true only in the same change that ENABLES the Resend automation, so
-  // the "5 mornings" promise always has live delivery behind it.
-  var LEAD_ENDPOINT = "https://anchored-lead.amott1989.workers.dev"; // deployed anchored-lead Worker (Turnstile-gated)
-  if (LEAD_ENDPOINT && CAPTURE_LIVE) {
-    // the exit modal offers the free "5 mornings" devotional magnet (B2 #1)
-    set('k-m-h', 'Leaving? Take 5 mornings with you — free.');
-    set('k-m-p', 'Not ready for the app yet? No problem. Give me your email and I\'ll send you 5 days of Anchored, one each morning: the passage, a prayer written for you, and one small thing to do. Free. Unsubscribe anytime.');
-    var lf = document.getElementById('leadform');
-    var lc = document.getElementById('leadconsent');
-    if (lf) lf.style.display = '';
-    if (lc) lc.style.display = '';
-    var mcta = modal.querySelector('[data-buy] span:first-child');
-    if (mcta) mcta.textContent = 'Or start the 21-Day Anchor — $7';
-    if (lf) {
-      lf.addEventListener('submit', function(e){
-        e.preventDefault();
-        var email = (document.getElementById('leademail').value || '').trim();
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { return; }
-        // Turnstile token is required — the Worker rejects with 403 "challenge"
-        // without it. If the widget hasn't produced one yet, (re)render and let it
-        // finish; the visitor resubmits once the check clears.
-        var token = (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : '';
-        if (!token) { renderTurnstile(); return; }
-        var btn = lf.querySelector('button'); btn.disabled = true;
-        try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings', offer:key}); } catch(e){}
-        fetch(LEAD_ENDPOINT, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email: email, source: 'exit-modal', ts: Date.now(), turnstileToken: token })
-        }).then(function(r){ return r.json().catch(function(){ return {}; }); })
-          .then(function(res){
-            if (res && res.ok) {
-              lf.style.display='none';
-              if (lc) lc.style.display='none';
-              var cd = document.getElementById('capdone');
-              if (res.existing) cd.textContent = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam, just in case). 🕊️";
-              cd.style.display='block';
-              try { localStorage.setItem('anchored_captured','1'); } catch(e){}
-            } else {
-              btn.disabled=false;
-              // Turnstile tokens are single-use — reset so a retry gets a fresh one.
-              if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
-            }
-          }).catch(function(){
-            btn.disabled=false;
-            if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
-          });
-      });
-    }
-  }
-
-  // ---- B2 #2: below-the-fold free capture (soft alternative, after the buy path) ----
-  // Same fail-closed gate as the exit modal: only revealed + wired when capture is
-  // live and the Worker endpoint is set, so it never promises "5 mornings" without
-  // live delivery. Its own Turnstile widget, rendered lazily when it scrolls into view.
-  if (LEAD_ENDPOINT && CAPTURE_LIVE) {
-    var bfSection = document.getElementById('belowfold-capture');
-    var bfForm = document.getElementById('bfleadform');
-    var tsWidgetBfId = null, tsBfTries = 0;
-    function renderTurnstileBF(){
-      if(tsWidgetBfId !== null) return;
-      var el = document.getElementById('ts-widget-bf');
-      if(!el) return;
-      if(!(window.turnstile && window.turnstile.render)){
-        if(tsBfTries++ < 40) setTimeout(renderTurnstileBF, 150);   // wait for api.js (~6s max)
+    var tsWidgetId = null, tsTries = 0;
+    function renderTurnstile(){
+      if (tsWidgetId !== null) return;                       // already rendered
+      if (!(window.turnstile && window.turnstile.render)){
+        if (tsTries++ < 40) setTimeout(renderTurnstile, 150); // wait for api.js (~6s max)
         return;
       }
-      try{ tsWidgetBfId = window.turnstile.render(el, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
+      try { tsWidgetId = window.turnstile.render(slot, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
       catch(e){ /* re-attempt on next trigger */ }
     }
-    if (bfSection) {
-      bfSection.style.display = '';
-      if ('IntersectionObserver' in window) {
-        var bfObs = new IntersectionObserver(function(ents){
-          ents.forEach(function(en){ if(en.isIntersecting){ renderTurnstileBF(); bfObs.disconnect(); } });
-        }, { rootMargin: '0px 0px 200px 0px' });
-        bfObs.observe(bfSection);
-      } else { renderTurnstileBF(); }
-    }
-    if (bfForm) {
-      bfForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        var email = (document.getElementById('bfleademail').value || '').trim();
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { return; }
-        var token = (window.turnstile && tsWidgetBfId !== null) ? window.turnstile.getResponse(tsWidgetBfId) : '';
-        if (!token) { renderTurnstileBF(); return; }
-        var btn = bfForm.querySelector('button'); btn.disabled = true;
-        try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings', offer:key}); } catch(e){}
-        fetch(LEAD_ENDPOINT, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email: email, source: 'below_fold', ts: Date.now(), turnstileToken: token })
-        }).then(function(r){ return r.json().catch(function(){ return {}; }); })
-          .then(function(res){
-            if (res && res.ok) {
-              bfForm.style.display='none';
-              var bfc = document.getElementById('bfleadconsent'); if (bfc) bfc.style.display='none';
-              var bcd = document.getElementById('bfcapdone');
-              if (res.existing) bcd.textContent = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam, just in case). 🕊️";
-              bcd.style.display='block';
-              try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      err.style.display = 'none';
+      var email = (input.value || '').trim();
+      if (!EMAIL_RE.test(email)) { err.textContent = "That email doesn't look right — mind checking it?"; err.style.display='block'; return; }
+      // Turnstile token is required — the Worker rejects with 403 "challenge" without it.
+      var token = (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : '';
+      if (!token) { renderTurnstile(); err.textContent = "One sec — finishing the quick human check. Tap again."; err.style.display='block'; return; }
+      btn.disabled = true;
+
+      // Dedup id, minted BEFORE the request so the same id rides both the browser
+      // Lead (fbq eventID) and the POST body (event_id) for a future CAPI Lead.
+      var eventID = 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
+
+      fetch(LEAD_ENDPOINT, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email: email, source: source, event_id: eventID, ts: Date.now(), turnstileToken: token })
+      }).then(function(r){ return r.json().catch(function(){ return {}; }); })
+        .then(function(res){
+          if (res && res.ok) {
+            if (res.existing) {
+              // Repeat submission (worker dedup): already a contact — the drip is
+              // already on its way. Say so, and do NOT fire the Meta Lead event
+              // (a repeat is not a new lead; keeps CPL honest).
+              done.textContent = ALREADY_MSG;
+              flipAllToSuccess(el, ALREADY_MSG);
             } else {
-              btn.disabled=false;
-              if (window.turnstile && tsWidgetBfId !== null) window.turnstile.reset(tsWidgetBfId);
+              // FIRE Lead ONLY on confirmed NEW-lead success — with the dedup eventID.
+              try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings', source:source, value:0, currency:'USD'}, {eventID:eventID}); } catch(e){}
+              flipAllToSuccess(el, null);
             }
-          }).catch(function(){
+            try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+          } else {
             btn.disabled=false;
-            if (window.turnstile && tsWidgetBfId !== null) window.turnstile.reset(tsWidgetBfId);
-          });
-      });
+            err.textContent = "Something hiccupped — please try that once more.";
+            err.style.display='block';
+            if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId); // single-use token
+          }
+        }).catch(function(){
+          btn.disabled=false;
+          err.textContent = "Couldn't reach us just now — please try again in a moment.";
+          err.style.display='block';
+          if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
+        });
+    });
+
+    return { el: el, form: form, done: done, err: err, consent: consent, slot: slot, render: renderTurnstile };
+  }
+
+  // Wire every capture point.
+  var nodes = document.querySelectorAll('[data-cap]');
+  for (var i=0; i<nodes.length; i++){ controllers.push(makeController(nodes[i])); }
+
+  // If this visitor already signed up on an earlier visit, show every form as
+  // already-done (no duplicate asks). anchored_captured is the shared flag.
+  var alreadyCaptured = false;
+  try { alreadyCaptured = localStorage.getItem('anchored_captured') === '1'; } catch(e){}
+  if (alreadyCaptured) {
+    flipAllToSuccess(null, ALREADY_MSG);
+  } else {
+    // Lazily render each Turnstile widget as its form scrolls near view — the
+    // below-fold pattern, so page speed doesn't die. The hero form is in the
+    // initial viewport, so its widget renders right away.
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(ents){
+        ents.forEach(function(en){
+          if (en.isIntersecting) {
+            var c = en.target.__ctl;
+            if (c) c.render();
+            io.unobserve(en.target);
+          }
+        });
+      }, { rootMargin: '0px 0px 200px 0px' });
+      controllers.forEach(function(c){ c.el.__ctl = c; io.observe(c.el); });
+    } else {
+      controllers.forEach(function(c){ c.render(); });
     }
   }
 })();
