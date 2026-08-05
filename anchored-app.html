@@ -1598,16 +1598,11 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     if (c.indexOf(todayISO()) < 0) { c.push(todayISO()); save(LS_COMPLETES, c); }
   }
   function currentStreak() {
-    var set = {}; completes().forEach(function (d) { set[d] = 1; });
-    var streak = 0;
-    var d = new Date();
-    // count back from today (or yesterday if today not yet done)
-    if (!set[todayISO()]) d.setDate(d.getDate() - 1);
-    for (var i = 0; i < 3650; i++) {
-      var iso = d.toISOString().slice(0, 10);
-      if (set[iso]) { streak++; d.setDate(d.getDate() - 1); } else break;
-    }
-    return streak;
+    // Grace-day is the product's core promise ("no reset to zero, no catching
+    // up — just open today"), so the streak is the count of mornings taken:
+    // it only ever grows, and a missed day can never wipe it. A consecutive-day
+    // counter here would contradict every ad, the /free page, and the drip.
+    return completes().length;
   }
 
   /* ============================================================
@@ -1686,7 +1681,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     var html = '';
     html += '<h1 class="page-title">Today</h1>';
     html += '<p class="lede">Day ' + r.dayNum + ' of your walk · ' + escapeHtml(r.themeLabel) + ' · about ' + r.minutes + ' min.</p>';
-    html += '<div class="streak">🔥 ' + currentStreak() + '-day streak</div>';
+    html += '<div class="streak">🔥 ' + currentStreak() + '-morning streak</div>';
     // Anchor verse — always visible up top, it's the thread through all 4 steps.
     html += '<div class="panel"><h3>Today\'s anchor verse</h3>';
     html += '<div class="verse">&ldquo;' + escapeHtml(r.verse[0]) + '&rdquo;<span class="verse-ref">' + escapeHtml(r.verse[1]) + ' · WEB</span></div></div>';
@@ -1756,7 +1751,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
       if (isTodayComplete()) return;
       markTodayComplete();
       touchEngagement();
-      toast("Well done. Streak: " + currentStreak() + " days.");
+      toast("Well done. Your streak: " + currentStreak() + " mornings.");
       renderToday();
     });
   }
@@ -1794,7 +1789,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
 
   function renderStreakWrap() {
     var w = document.getElementById("streak-wrap"); if (!w) return;
-    w.innerHTML = '<div class="streak">🔥 ' + currentStreak() + '-day streak</div>';
+    w.innerHTML = '<div class="streak">🔥 ' + currentStreak() + '-morning streak</div>';
   }
   function renderCheckins() {
     var list = document.getElementById("ci-list"); if (!list) return;
@@ -1826,7 +1821,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     markTodayComplete();
     touchEngagement();
     var note = document.getElementById("ci-note");
-    if (note) note.textContent = "Saved. Streak: " + currentStreak() + " days.";
+    if (note) note.textContent = "Saved. Your streak: " + currentStreak() + " mornings.";
     toast("Check-in saved.");
     // Safety net: the private journal is a real place distress surfaces. If a
     // check-in mentions self-harm/abuse/ED, gently surface real help. Defined
@@ -2083,7 +2078,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     var html = '';
     html += '<div class="stat-grid">';
     html += '<div class="stat-tile"><div class="value" id="out-minutes">' + (intake.minutes || 10) + '<span class="unit">min</span></div><div class="label">Daily commitment</div></div>';
-    html += '<div class="stat-tile"><div class="value">' + currentStreak() + '<span class="unit">days</span></div><div class="label">Current streak</div></div>';
+    html += '<div class="stat-tile"><div class="value">' + currentStreak() + '<span class="unit">mornings</span></div><div class="label">Your streak</div></div>';
     html += '<div class="stat-tile"><div class="value" style="font-size:16px;line-height:1.2;" id="out-focus">' + escapeHtml(theme.label) + '</div><div class="label">Your focus</div></div>';
     html += '<div class="stat-tile"><div class="value" style="font-size:15px;line-height:1.2;">' + escapeHtml(intake.preferred_time.charAt(0).toUpperCase() + intake.preferred_time.slice(1)) + '</div><div class="label">Best time</div></div>';
     html += '</div>';

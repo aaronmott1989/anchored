@@ -119,7 +119,7 @@
       var doneBtn = document.getElementById("today-done");
       if (doneBtn) doneBtn.click();
       await sleep(80);
-      check("Today — mark complete builds a streak", has(viewText("today"), "1-day streak") || has(viewText("today"), "done for today"));
+      check("Today — mark complete builds a streak", has(viewText("today"), "1-morning streak") || has(viewText("today"), "done for today"));
 
       // 4) PLAN — reading arc renders with today marker
       tab("plan");
