@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<!-- ANCHORED FREE-DOOR LANDING (free.html) — dedicated message-match page for the
+     Phase-1 validation test (AnchoredRepositionPlan-20260804.md §3 + warroom/
+     TestAds-3Cells-DRAFT.md). The 3 test ads sell the FREE "5 Mornings" email
+     series, so this page leads with the free signup (NOT the $7 offer) to keep the
+     CPL/CTR read clean. Served at anchoredfaith.app/free (GitHub Pages serves this
+     file at both /free and /free.html). Same brand, styles, pixel, worker and
+     security-cleared consent as index.html — reused, not rebuilt.
+
+     HOOK MATCH: ?hook=brother (default — Cell 1 men + Cell 3 all-Christians, the
+     "did you read today, brother" creative) · ?hook=grace (Cell 2 men, the "no
+     reset to zero / grace" creative). Only the hero headline/subhead swap; the
+     free-signup form, proof, consent and app mention are shared.
+
+     MEASUREMENT: Meta pixel 1407254754557742 fires PageView + ViewContent on load;
+     a browser Lead event fires ONLY on a successful signup (worker HTTP 200), with
+     an eventID (also POSTed as event_id) so a future CAPI Lead can dedup on it.
+     Leads POST source=freedoor-test so they're attributable per the data contract.
+     TRUTH-FIX STANDARD: nothing here claims anything the app doesn't do today — no
+     reach-out/outbound engine claim, no $7 hero. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="anchored-icon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#12100C">
+<title>Anchored — Free: 5 Mornings</title>
+<meta name="description" content="Five free mornings with God — one short email a day for 5 days: the passage, a prayer written for you, and one small thing to do. No cost. Unsubscribe anytime.">
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --bg:#12100C; --bg2:#181510; --card:#1C1913; --line:#38311F;
+    --gold:#E5B85C; --gold-ink:#1A150C; --text:#F5F0E6; --muted:#A79B84;
+    --red:#E06A5A; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.55;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;
+  }
+  a{color:inherit;}
+  .wrap{max-width:640px;margin:0 auto;padding:0 20px;}
+  .kicker{text-transform:uppercase;letter-spacing:.2em;font-size:12px;font-weight:800;color:var(--gold);}
+  h1{font-size:clamp(30px,8.4vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.08;font-family:Georgia,"Times New Roman",serif;}
+  h1 .hl{color:var(--gold);}
+  h2{font-size:clamp(23px,6.4vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.15;font-family:Georgia,"Times New Roman",serif;}
+  p{color:var(--text);}
+  .muted{color:var(--muted);}
+  header{position:sticky;top:0;z-index:40;background:rgba(18,16,12,.85);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line);}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .logo{font-weight:800;letter-spacing:-.01em;font-size:19px;font-family:Georgia,serif;}
+  .logo .dot{color:var(--gold);}
+  .pricepill{background:var(--gold);color:var(--gold-ink);font-weight:850;font-size:13px;padding:7px 13px;border-radius:999px;letter-spacing:.01em;}
+  .hero{padding:38px 0 8px;background:
+      radial-gradient(120% 80% at 12% -10%, rgba(229,184,92,.12), transparent 60%),
+      radial-gradient(90% 60% at 100% 0%, rgba(127,176,166,.06), transparent 55%);}
+  .hero .sub{font-size:clamp(16px,4.4vw,19px);color:var(--text);margin-top:16px;font-weight:600;}
+  .hero .promise{color:var(--muted);margin-top:12px;font-size:15.5px;}
+  section{padding:30px 0;}
+  .lead{font-size:17px;}
+  .divider{height:1px;background:var(--line);margin:0;border:0;}
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 4px;}
+  .trust .t{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;}
+  .trust .t .ic{color:var(--gold);font-size:16px;line-height:1;}
+  .trust .t .lbl{font-size:11.5px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
+  .trust .t .sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
+  /* signup card (the hero's job) */
+  .signup{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .signup h3{font-size:18px;font-weight:800;}
+  .signup p{color:var(--muted);font-size:14px;margin-top:6px;}
+  form.cap{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+  form.cap input[type=email]{flex:1 1 200px;min-width:0;background:#0f0d09;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:14px 14px;font-size:16px;}
+  form.cap input[type=email]:focus{outline:none;border-color:var(--gold);}
+  form.cap button{
+    flex:0 0 auto;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;
+    padding:0 18px;min-height:50px;font-size:15px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);
+  }
+  form.cap button:disabled{opacity:.6;cursor:default;}
+  .capdone{color:var(--gold);font-weight:700;font-size:15px;margin-top:12px;display:none;line-height:1.5;}
+  .caperr{color:var(--red);font-size:13.5px;margin-top:10px;display:none;}
+  .consent{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.5;}
+  .consent a{color:var(--muted);text-decoration:underline;}
+  /* itemization */
+  .unlock{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 8px;}
+  .unlock h3{font-size:13px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+  .unlock ul{list-style:none;margin:0;padding:0;}
+  .unlock li{display:flex;gap:10px;padding:0 0 10px;font-size:14.5px;line-height:1.45;}
+  .unlock li .uc{flex:0 0 18px;color:var(--gold);font-weight:900;font-size:14px;line-height:1.5;}
+  .unlock li b{font-weight:750;color:var(--text);}
+  .unlock li .ut{color:var(--muted);}
+  /* proof strip (reused from index.html) */
+  .proof{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
+  .proof h2{font-size:22px;}
+  .proof .psub{color:var(--muted);font-size:14.5px;margin-top:10px;}
+  .proof .shots{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .proof .shots figure{margin:0;}
+  .proof .shots img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:14px;background:#0f0d0a;}
+  .proof .shots figcaption{margin-top:8px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.4;}
+  @media (max-width:640px){ .proof .shots{grid-template-columns:1fr;max-width:340px;margin-left:auto;margin-right:auto;gap:20px;} }
+  .why{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .why b{color:var(--text);}
+  details{border:1px solid var(--line);border-radius:12px;padding:0 16px;margin-top:10px;background:var(--card);}
+  details summary{list-style:none;cursor:pointer;padding:15px 0;font-weight:700;font-size:15.5px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary .plus{color:var(--gold);font-weight:900;font-size:20px;transition:transform .2s;}
+  details[open] summary .plus{transform:rotate(45deg);}
+  details .ans{color:var(--muted);font-size:14.5px;padding:0 0 16px;}
+  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;}
+  footer a{color:var(--muted);text-decoration:underline;}
+</style>
+<!-- ============================================================
+     META PIXEL — Anchored (its OWN dedicated pixel, ID 1407254754557742,
+     ad account 37985900). Fires PageView + ViewContent on load. The Lead event
+     fires later, ONLY on a successful free-door signup (see the form handler). -->
+<script>
+  const ANCHORED_PIXEL_ID = "1407254754557742";
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window,document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', ANCHORED_PIXEL_ID);
+  fbq('track','PageView');
+  (function(){
+    var hook = (new URLSearchParams(location.search).get('hook') === 'grace') ? 'grace' : 'brother';
+    fbq('track','ViewContent',{content_name:'anchored-free-door', content_category:hook, hook:hook});
+  })();
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
+<!-- Cloudflare Turnstile — invisible/managed bot gate for the free-door capture.
+     Explicit render (the widget is drawn on load into the visible form). Public
+     sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io). -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="logo">Anchored<span class="dot">.</span></div>
+    <div class="pricepill">Free · 5 mornings</div>
+  </div>
+</header>
+
+<!-- HERO = the free 5-mornings signup -->
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker" id="k-kicker">Anchored · 5 free mornings</div>
+    <h1 id="k-h1" style="margin-top:14px;">"Did you read today?" <span class="hl">The text you wish a brother would send.</span></h1>
+    <p class="sub" id="k-sub">You keep starting over — quietly, alone. Start with five mornings you don't have to do by yourself.</p>
+    <p class="promise" id="k-promise">One short email each morning for five days: the passage, a prayer written for you, and one small thing to do. Free. It's the feeling of someone in your corner — without the guilt.</p>
+
+    <div class="signup" id="k-signup" style="margin-top:24px;">
+      <h3 id="k-form-h">Send me the free 5 mornings</h3>
+      <p id="k-form-p">Drop your email. Your first morning arrives shortly, then one each morning for five days.</p>
+      <form class="cap" id="leadform" novalidate>
+        <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
+        <div id="ts-widget" style="flex:1 1 100%;min-height:65px;"></div>
+        <button type="submit" id="leadbtn">Send me the free 5 mornings →</button>
+      </form>
+      <div class="capdone" id="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
+      <div class="caperr" id="caperr">Something hiccupped — please try that once more.</div>
+      <p class="consent" id="leadconsent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
+    </div>
+
+    <div class="trust">
+      <div class="t"><div class="ic">✓</div><div class="lbl">Completely free</div><div class="sub">No card, no catch</div></div>
+      <div class="t"><div class="ic">✉</div><div class="lbl">One email a day</div><div class="sub">5 mornings, then done</div></div>
+      <div class="t"><div class="ic">↩</div><div class="lbl">Unsubscribe anytime</div><div class="sub">One tap, no hard feelings</div></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- WHAT ARRIVES -->
+<section>
+  <div class="wrap">
+    <h2 id="k-what-h">What lands in your inbox each morning</h2>
+    <div class="unlock" style="margin-top:18px;">
+      <h3>Five mornings — one short email each</h3>
+      <ul>
+        <li><span class="uc">✓</span><span><b>The day's passage, right in the email.</b> <span class="ut">No hunting a reference or flipping between apps — the Scripture is printed for you (World English Bible).</span></span></li>
+        <li><span class="uc">✓</span><span><b>A prayer written for you, word for word.</b> <span class="ut">Never sit there not knowing what to say. Read it straight off the page, then pray in your own words when you're ready.</span></span></li>
+        <li><span class="uc">✓</span><span><b>One small thing to actually do with it.</b> <span class="ut">A single practice each day, so it doesn't stay on the page.</span></span></li>
+        <li><span class="uc">✓</span><span><b>Read it or listen to it.</b> <span class="ut">A couple of quiet minutes, however your morning goes.</span></span></li>
+      </ul>
+    </div>
+    <p class="promise" id="k-mech" style="margin-top:16px;">You don't feel your way into a walk with God. You show up your way into it — one small morning at a time. These five are a start you don't have to make alone.</p>
+  </div>
+</section>
+
+<!-- PROOF STRIP (real authenticated app screens, reused from the main LP) -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="proof">
+      <h2>This is the real thing — not a preview reel.</h2>
+      <p class="psub">The same passage, prayer, and daily rhythm you'll get in your inbox is what lives inside Anchored. Real screens from the app:</p>
+      <div class="shots">
+        <figure>
+          <img src="proof/app-today.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored app's Today screen: the day's anchor verse (Matthew 11:28, World English Bible) with Read, Pray, Practice and Reflect, and today's passage printed inline.">
+          <figcaption>The day laid out for you — the passage printed right on the page.</figcaption>
+        </figure>
+        <figure>
+          <img src="proof/app-pray.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored app's Pray screen: a prayer written out word for word, with an option to listen to it read aloud.">
+          <figcaption>The prayer written for you, word for word.</figcaption>
+        </figure>
+        <figure>
+          <img src="proof/app-companion.jpg" width="720" height="1540" loading="lazy" decoding="async" alt="The Anchored Companion answering 'I missed a day and I feel like I fell behind' with grace: there's no catching up to do, His mercies are new every morning.">
+          <figcaption>A Companion you can ask anything, any time.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOFT APP MENTION (below the fold; no price hero, no reach-out claim) -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <div class="why">
+      <h2 style="font-size:22px;">After the five mornings</h2>
+      <p class="muted" style="margin-top:12px;">Start with the free five. If they land and you want to keep going, there's the full <b>Anchored</b> app — a dated daily passage and a written prayer, a streak that keeps itself, and a Companion you can ask anything about the verse, the prayer, or your walk. It's optional, and the five mornings are yours free either way. <span style="color:var(--muted)">No card needed to start.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding-top:6px;">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <details><summary>Is it really free? <span class="plus">+</span></summary><div class="ans">Yes. Five short emails, one each morning for five days. No card, no cost, nothing to buy. Unsubscribe any time with one tap.</div></details>
+    <details><summary>What if I miss a morning? <span class="plus">+</span></summary><div class="ans">Nothing to make up. There's no reset to zero and no catching up — His mercies are new every morning. You just open the next one when you can.</div></details>
+    <details><summary>Do I need to be far along in faith? <span class="plus">+</span></summary><div class="ans">No. Each morning is short and plain, with the passage and a prayer written out for you. You only need a couple of quiet minutes and a willingness to show up.</div></details>
+    <details><summary>Which Bible translation do I need? <span class="plus">+</span></summary><div class="ans">None of your own required — the passage is printed right in each email (public-domain World English Bible). Read along in your own Bible too if you like.</div></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo" style="font-size:16px;justify-content:center;">Anchored<span class="dot">.</span></div>
+    <p style="margin-top:8px;">A daily walk with God, made simple. Questions? <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a></p>
+    <p style="margin-top:10px;">Anchored is a spiritual-growth tool for daily discipline. It is not medical, psychological, or mental-health care, and it is not a substitute for a doctor, licensed counselor, pastor, or professional treatment. If you are in crisis or thinking about harming yourself, call or text <b>988</b> (US Suicide &amp; Crisis Lifeline) or dial 911.</p>
+    <p style="margin-top:8px;">Scripture quoted is the World English Bible (public domain). Bible translation names are trademarks of their respective publishers and are referenced for identification only.</p>
+    <p style="margin-top:8px;">&copy; <span id="yr"></span> Anchored. · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a></p>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- hook match: which ad creative sent them here ----
+  // brother = Cell 1 (men) + Cell 3 (all-Christians), the "did you read today, brother" creative.
+  // grace   = Cell 2 (men), the "no reset to zero / grace" creative.
+  function qp(n){ return new URLSearchParams(location.search).get(n); }
+  var hook = (qp('hook') === 'grace') ? 'grace' : 'brother';
+
+  var HOOKS = {
+    grace: {
+      kicker: "Anchored · 5 free mornings",
+      h1: 'No reset to zero. <span class="hl">Just open today.</span>',
+      sub: "Missed a few days and felt too far behind to start again? There's nothing to make up.",
+      promise: "One short email each morning for five days: the passage, a prayer written for you, and one small thing to do. Free. His mercies are new every morning — you just open today."
+    }
+  };
+  function set(id, html){ var el=document.getElementById(id); if(el && html!=null) el.innerHTML=html; }
+  document.title = (hook === 'grace') ? "Anchored — Free: No reset to zero" : "Anchored — Free: 5 Mornings";
+  if (hook === 'grace') {
+    var o = HOOKS.grace;
+    set("k-kicker", o.kicker); set("k-h1", o.h1); set("k-sub", o.sub); set("k-promise", o.promise);
+  }
+
+  // ---- Cloudflare Turnstile: render the bot-gate widget into the visible form ----
+  // Public managed sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io).
+  var TURNSTILE_SITEKEY = "0x4AAAAAAEFkyywbuJyZkFl1";
+  var tsWidgetId = null, tsTries = 0;
+  function renderTurnstile(){
+    if(tsWidgetId !== null) return;
+    var el = document.getElementById('ts-widget');
+    if(!el) return;
+    if(!(window.turnstile && window.turnstile.render)){
+      if(tsTries++ < 40) setTimeout(renderTurnstile, 150);   // wait for api.js (~6s max)
+      return;
+    }
+    try{ tsWidgetId = window.turnstile.render(el, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
+    catch(e){ /* re-attempt */ }
+  }
+  renderTurnstile();
+
+  // ---- free-door lead capture: POST to the Anchored lead Worker ----
+  // Same live, Turnstile-gated worker as the main LP. Distinct source=freedoor-test
+  // so these leads are attributable to this test page per the data contract.
+  // The Meta Lead event fires ONLY after the worker returns HTTP 200, carrying an
+  // eventID (also POSTed as event_id) so a future server-side CAPI Lead can dedup.
+  var LEAD_ENDPOINT = "https://anchored-lead.amott1989.workers.dev";
+  var form = document.getElementById('leadform');
+  var btn  = document.getElementById('leadbtn');
+  var done = document.getElementById('capdone');
+  var err  = document.getElementById('caperr');
+  var consent = document.getElementById('leadconsent');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    err.style.display = 'none';
+    var email = (document.getElementById('leademail').value || '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "That email doesn't look right — mind checking it?"; err.style.display='block'; return; }
+    // Turnstile token is required — the Worker rejects with 403 "challenge" without it.
+    var token = (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : '';
+    if (!token) { renderTurnstile(); err.textContent = "One sec — finishing the quick human check. Tap again."; err.style.display='block'; return; }
+    btn.disabled = true;
+
+    // Dedup id, minted BEFORE the request so the same id rides both the browser
+    // Lead (fbq eventID) and the POST body (event_id) for a future CAPI Lead.
+    var eventID = 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
+
+    fetch(LEAD_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: email, source: 'freedoor-test', offer: hook, event_id: eventID, ts: Date.now(), turnstileToken: token })
+    }).then(function(r){ return r.json().catch(function(){ return {}; }); })
+      .then(function(res){
+        if (res && res.ok) {
+          // FIRE Lead ONLY on confirmed 200 success — with the dedup eventID.
+          try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings-free-door', offer:hook, value:0, currency:'USD'}, {eventID:eventID}); } catch(e){}
+          form.style.display='none';
+          if (consent) consent.style.display='none';
+          done.style.display='block';
+          try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+        } else {
+          btn.disabled=false;
+          err.textContent = "Something hiccupped — please try that once more.";
+          err.style.display='block';
+          if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);   // single-use token
+        }
+      }).catch(function(){
+        btn.disabled=false;
+        err.textContent = "Couldn't reach us just now — please try again in a moment.";
+        err.style.display='block';
+        if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
+      });
+  });
+})();
+</script>
+</body>
+</html>
