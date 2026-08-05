@@ -10,9 +10,10 @@
   trial→paywall, tabs, questionnaire→plan engine, AI companion, check-ins/streak,
   installable PWA, dev self-test) re-skinned into the faith niche.
 
-  STAGED — NOT LIVE. No backend, no live Stripe links (paywall CTAs are clearly
-  marked placeholders). Accounts are client-side only, exactly like Spotted's
-  original local-profile gate. See faith-app/BUILD-CHECKLIST.md before shipping.
+  LIVE at anchoredfaith.app. Real Supabase backend (server-authoritative accounts,
+  trial + subscription), four live Stripe payment links, and a server founding
+  counter. Local-first store layered under the cloud sync. See
+  faith-app/BUILD-CHECKLIST.md and DEPLOY-SOURCE.md.
 
   Bible text embedded here is the WORLD ENGLISH BIBLE (WEB) — public domain — so
   nothing copyrighted ships. Modern translations (ESV/NIV/NLT/CSB) are a label
@@ -358,15 +359,15 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   <div class="gate-card">
     <div class="wordmark">Anchored<span> Faith</span></div>
     <div class="tagline">Never walk alone.</div>
-    <p class="gate-lede" id="gate-lede">Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet. Your walk saves here; your reminders come to you.</p>
+    <p class="gate-lede" id="gate-lede">Create your free account and your Companion will walk with you — a few faithful minutes with God every day, waiting for you every morning. Your walk saves here, ready the moment you open it.</p>
     <form id="gate-form" autocomplete="off">
       <div class="field signup-only"><label for="g-first">First name</label><input type="text" id="g-first" required></div>
       <div class="field"><label for="g-email">Email</label><input type="email" id="g-email" required></div>
       <div class="field signup-only"><label for="g-goal">What are you here for?</label><select id="g-goal"><option value="closeness">Grow closer to God</option><option value="prayer">Build a prayer habit</option><option value="scripture">Read Scripture daily</option><option value="freedom">Find freedom from a habit</option></select></div>
       <div class="field"><label for="g-pass">Password</label><input type="password" id="g-pass" required></div>
       <div class="signup-only">
-        <label class="consent-row"><input type="checkbox" id="g-consent-email"> Email me my daily verse and gentle check-in nudges. I can unsubscribe anytime.</label>
-        <p class="gate-note" style="margin-top:8px;">By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. We never sell your information, and we only email you the reminders you ask for.</p>
+        <label class="consent-row"><input type="checkbox" id="g-consent-email"> Email me reminders and encouragement for my walk. I can unsubscribe anytime.</label>
+        <p class="gate-note" style="margin-top:8px;">By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. We never sell your information, and we only email you what you opt into above.</p>
       </div>
       <div class="gate-err" id="gate-err"></div>
       <button type="submit" class="primary" id="gate-submit" style="width:100%;margin-top:6px;">Create my account</button>
@@ -379,16 +380,16 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   </div>
 </div>
 
-<!-- ============ TRIAL-ENDED PAYWALL (STAGED — placeholder checkout links) ============ -->
+<!-- ============ TRIAL-ENDED PAYWALL (live Stripe payment links) ============ -->
 <div class="paywall" id="paywall">
   <div class="paywall-card">
     <div class="wordmark">Anchored<span> Faith</span></div>
     <div class="pw-banner" id="pw-banner"><b>Founding member price &middot; first 100 only</b>Go annual for $59/yr &mdash; that's 5 months free &mdash; and lock the founding rate for life.</div>
     <h1 class="pw-head">Your free week has ended.</h1>
-    <p class="pw-lede">The plan tells you what to read and pray. Anchored is the part that helps you actually keep it: it carries your streak, sends the day's verse to you, and your Companion reaches out in the exact window you normally drift.</p>
+    <p class="pw-lede">The plan tells you what to read and pray. Anchored is the part that helps you actually keep it: it carries your streak, keeps your daily verse ready every morning, and your Companion is there the moment you open it — steady on the days you'd rather not.</p>
     <p class="pw-saved">Your walk is saved. Subscribe and you pick up right where you left off, nothing lost.</p>
     <div class="pw-guarantee"><span class="pw-guarantee-icon" aria-hidden="true">&#10003;</span>30-day money-back guarantee &mdash; every cent, no questions.</div>
-    <!-- STAGED: replace href="#staged-annual"/"#staged-monthly" with the real Stripe payment links before launch (see BUILD-CHECKLIST.md). checkFoundingAvailability() swaps these to standard pricing/links automatically once founding_counter hits its cap (schema.sql §6). Annual leads (AnchoredOfferRework.md item 3 — every proven long-runner in this category anchors on annual, monthly exists to make annual look like the deal). -->
+    <!-- Live checkout: tagPaywallLinks() injects the real Stripe payment links at runtime (with client_reference_id + prefilled_email); the #staged-* hrefs are inert fallbacks that only fire if a real https link is missing. applyFoundingUI()/checkFoundingAvailability() swap to standard pricing/links automatically once founding_counter hits its cap (schema.sql §6). Annual leads (AnchoredOfferRework.md item 3 — every proven long-runner in this category anchors on annual, monthly exists to make annual look like the deal). -->
     <a class="pw-cta pw-cta-primary" id="pw-annual" href="#staged-annual" data-staged="1">
       <span id="pw-annual-label">Go annual for $59/yr</span><span class="pw-best">Best value</span><span class="pw-sub" id="pw-annual-sub">About $4.92/mo, roughly five months free</span>
     </a>
@@ -1035,7 +1036,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     if (lede) lede.textContent = isSignup
       ? (PURCHASED
           ? "You're in — your purchase went through. Create your account to unlock your plan and start today."
-          : "Create your free account and your Companion will walk with you — a few faithful minutes with God every day, and a gentle nudge when you go quiet.")
+          : "Create your free account and your Companion will walk with you — a few faithful minutes with God every day, waiting for you every morning.")
       : "Welcome back. Log in and pick up your walk right where you left off.";
   }
 
@@ -1891,7 +1892,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     { id:9, intent:"which_translation", keywords:["which translation","what version","esv or niv","best bible version","which bible","translation should i","what bible to read"],
       answer:"The best translation is the one you'll actually read. The NLT and NIV are easy to read; the ESV and CSB balance readability and precision; the KJV is beautiful but older English. In this app we quote the World English Bible (WEB), which is public domain. Pick one that reads clearly to you and stick with it for a while." },
     { id:10, intent:"build_habit", keywords:["build a habit","stay consistent","make it stick","keep it up","consistency","cant stay consistent","daily habit","routine"],
-      answer:"Anchor it to something you already do — coffee, your commute, bedtime. Keep it small enough that you can't fail: even five honest minutes counts. Use the Check-In tab daily; watching the streak grow is quietly powerful. And your Companion will nudge you in the window you tend to drift. Small and daily beats big and rare." },
+      answer:"Anchor it to something you already do — coffee, your commute, bedtime. Keep it small enough that you can't fail: even five honest minutes counts. Use the Check-In tab daily; watching the streak grow is quietly powerful. And your Companion is here every morning the moment you open the app. Small and daily beats big and rare." },
     { id:11, intent:"gospel", keywords:["what is the gospel","who is jesus","what do christians believe","good news","how to be saved","become a christian","what is christianity"],
       answer:"In one breath: God made us, we all fall short, and out of love He sent Jesus — who lived, died, and rose again — so that anyone who trusts Him is forgiven and made new (John 3:16, Ephesians 2:8-9). It's a gift you receive, not a grade you earn. If you want to explore what it means to follow Jesus, a local church or a pastor is the best next conversation." },
     { id:12, intent:"church_community", keywords:["find a church","should i go to church","community","alone in my faith","need people","church","fellowship","other believers"],
@@ -1915,7 +1916,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     { id:21, intent:"app_help", keywords:["how does this work","how do i use","how the app works","what do the tabs do","how to use anchored","whats today tab"],
       answer:"Simple: Today gives you the day's verse, a prayer, a small practice, and a reflection — tap Mark today complete when you're done. Plan shows your whole reading arc. Check-In is your daily minute of honesty and your streak. And I'm your Companion — ask me about faith, the Bible, or the app, anytime." },
     { id:22, intent:"data_privacy", keywords:["is my data private","data private","who sees my journal","privacy","is my info safe","do you sell my data","private journal"],
-      answer:"Once you have an account, your check-ins, plan progress, and private journal notes are stored on our secure backend, locked to your login only — nobody else can read them. Your contact info lives only where we can reach you for the reminders you asked for. We never sell or share your journal, check-ins, or contact info, and none of it is ever used to target ads. You can unsubscribe from email any time." },
+      answer:"Once you have an account, your check-ins, plan progress, and private journal notes are stored on our secure backend, locked to your login only — nobody else can read them. Your contact info lives only where we can reach you about the emails you opt into. We never sell or share your journal, check-ins, or contact info, and none of it is ever used to target ads. You can unsubscribe from email any time." },
     { id:23, intent:"fallback_escalate", keywords:[],
       answer:"That's a good and honest question, and I want to point you well rather than guess. For something this personal, a trusted pastor, a mature believer, or a Christian counselor is the best next conversation. In the meantime, your reading and prayer for today are on the Today tab, and I'm always here for questions about faith, the Bible, or the app. — your Companion" }
   ];
