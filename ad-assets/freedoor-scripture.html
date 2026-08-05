@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Anchored — FreeDoor D "Psalm 5:3 (WEB)"</title>
+<style>
+  :root{
+    --bg:#12100C; --bg2:#181510; --card:#1C1913; --line:#38311F;
+    --gold:#E5B85C; --gold-soft:#C9A24A; --gold-ink:#1A150C;
+    --text:#F5F0E6; --muted:#A79B84;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1080px;height:1080px;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(90% 60% at 50% -8%, rgba(229,184,92,.24), transparent 60%),
+      radial-gradient(120% 90% at 50% 118%, rgba(229,184,92,.06), transparent 60%);
+    color:var(--text);
+    font-family:Georgia,"Times New Roman",serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    overflow:hidden;
+  }
+  .frame{
+    width:1080px;height:1080px;padding:84px 96px 74px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;
+  }
+  .brand{font-weight:700;font-size:33px;letter-spacing:-.01em;}
+  .brand .dot{color:var(--gold);}
+  /* dawn sun motif */
+  .sun{margin-top:40px;width:96px;height:96px;position:relative;}
+  .sun .orb{position:absolute;left:22px;top:22px;width:52px;height:52px;border-radius:50%;
+    background:radial-gradient(circle at 50% 42%, #FCE4A6, var(--gold));
+    box-shadow:0 0 40px rgba(229,184,92,.8), 0 0 90px rgba(229,184,92,.4);}
+  .sun .ray{position:absolute;left:45px;top:0;width:5px;height:14px;border-radius:4px;
+    background:linear-gradient(180deg,var(--gold),rgba(229,184,92,.15));transform-origin:2.5px 48px;opacity:.9;}
+  .mark{
+    text-transform:uppercase;letter-spacing:.26em;font-size:16px;font-weight:700;
+    color:var(--gold);font-family:-apple-system,"Segoe UI",Arial,sans-serif;margin-top:26px;
+  }
+  .verse{
+    margin-top:30px;font-size:47px;line-height:1.32;font-weight:400;font-style:italic;
+    letter-spacing:-.006em;max-width:840px;color:var(--text);
+  }
+  .verse .hl{color:var(--gold);font-style:italic;}
+  .rule{width:78px;height:3px;border-radius:3px;background:var(--gold);margin:36px auto 0;opacity:.85;}
+  .attrib{
+    margin-top:22px;font-family:-apple-system,"Segoe UI",Arial,sans-serif;
+    font-size:22px;font-weight:800;letter-spacing:.02em;color:var(--gold-soft);
+  }
+  .sub{
+    margin-top:44px;font-size:29px;line-height:1.4;font-weight:400;color:var(--text);max-width:800px;
+  }
+  .sub b{color:var(--gold);font-weight:700;font-style:italic;}
+  .foot{
+    position:absolute;bottom:5.4%;left:0;right:0;text-align:center;
+    font-family:-apple-system,"Segoe UI",Arial,sans-serif;
+    font-size:17px;font-weight:600;letter-spacing:.04em;color:var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="brand">Anchored<span class="dot">.</span></div>
+
+    <div class="sun" id="sun"></div>
+    <div class="mark">The morning you keep</div>
+
+    <div class="verse">&ldquo;Yahweh, in <span class="hl">the morning</span> you shall hear my voice. In the morning I will lay my requests before you, and will watch expectantly.&rdquo;</div>
+
+    <div class="rule"></div>
+    <div class="attrib">Psalm 5:3 (WEB)</div>
+
+    <div class="sub">The accountability there isn&rsquo;t a man watching you &mdash; it&rsquo;s <b>the morning you keep.</b> Start with five free mornings.</div>
+
+    <div class="foot">anchoredfaith.app</div>
+  </div>
+  <script>
+    var sun=document.getElementById('sun');
+    for(var i=0;i<10;i++){var r=document.createElement('div');r.className='ray';r.style.transform='rotate('+(i*36-90)+'deg)';sun.appendChild(r);}
+    var orb=document.createElement('div');orb.className='orb';sun.appendChild(orb);
+  </script>
+</body>
+</html>

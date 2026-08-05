@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Anchored — FreeDoor C "A morning that shows up on its own"</title>
+<style>
+  :root{
+    --bg:#12100C; --bg2:#181510; --card:#1C1913; --line:#38311F;
+    --gold:#E5B85C; --gold-soft:#C9A24A; --gold-ink:#1A150C;
+    --text:#F5F0E6; --muted:#A79B84;
+    --paper:#F5EAD2; --paper2:#E7D8B4; --paper-ink:#2A2313;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1080px;height:1080px;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(85% 55% at 50% -6%, rgba(229,184,92,.22), transparent 60%),
+      radial-gradient(120% 80% at 15% 8%, rgba(229,184,92,.07), transparent 55%),
+      radial-gradient(150% 130% at 50% 60%, rgba(229,184,92,.05), transparent 62%);
+    color:var(--text);
+    font-family:Georgia,"Times New Roman",serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    overflow:hidden;
+  }
+  .frame{
+    width:1080px;height:1080px;padding:80px 84px 120px;
+    display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;
+  }
+  .brand{font-weight:700;font-size:33px;letter-spacing:-.01em;}
+  .brand .dot{color:var(--gold);}
+  .headline{
+    margin-top:18px;font-size:48px;line-height:1.15;font-weight:700;letter-spacing:-.014em;
+    max-width:900px;
+  }
+  .headline .hl{color:var(--gold);font-style:italic;}
+  /* scene */
+  .scene{flex:1 1 auto;width:100%;position:relative;margin-top:2px;
+    display:flex;align-items:center;justify-content:center;}
+  .stage{position:relative;width:560px;height:404px;}
+  /* dawn sun rising behind the envelope */
+  .sun{position:absolute;left:50%;top:24px;transform:translateX(-50%);width:150px;height:150px;}
+  .sun .orb{position:absolute;left:33px;top:33px;width:84px;height:84px;border-radius:50%;
+    background:radial-gradient(circle at 50% 42%, #FCE4A6, var(--gold));
+    box-shadow:0 0 60px rgba(229,184,92,.85), 0 0 130px rgba(229,184,92,.45);}
+  .sun .ray{position:absolute;left:71px;top:0;width:6px;height:18px;border-radius:4px;
+    background:linear-gradient(180deg,var(--gold),rgba(229,184,92,.15));transform-origin:4px 75px;opacity:.9;}
+  /* stacked "5 mornings" cards behind */
+  .stack{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);width:400px;height:250px;}
+  .stack .s{position:absolute;left:50%;bottom:0;border-radius:16px;background:var(--card);
+    border:1px solid var(--line);box-shadow:0 20px 40px rgba(0,0,0,.45);}
+  .stack .s1{width:300px;height:186px;transform:translateX(-50%) translateY(-52px) scale(.82);opacity:.30;}
+  .stack .s2{width:330px;height:196px;transform:translateX(-50%) translateY(-30px) scale(.91);opacity:.55;}
+  /* the morning email that has arrived */
+  .env{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    width:360px;border-radius:18px;overflow:hidden;
+    background:linear-gradient(180deg,#221D15,#17130C);
+    border:1px solid #4a3f28;
+    box-shadow:0 30px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(229,184,92,.14), 0 0 46px rgba(229,184,92,.16);
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:left;}
+  .env .hd{display:flex;align-items:center;gap:13px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);}
+  .env .seal{width:46px;height:46px;border-radius:12px;flex:0 0 auto;
+    background:linear-gradient(160deg,var(--gold),#b98a34);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,.45);}
+  .env .seal svg{width:26px;height:26px;}
+  .env .from{flex:1 1 auto;min-width:0;}
+  .env .from .nm{font-size:17px;font-weight:800;color:var(--text);letter-spacing:.005em;}
+  .env .from .to{font-size:12px;color:var(--muted);margin-top:2px;}
+  .env .time{font-size:12px;font-weight:700;color:var(--gold);flex:0 0 auto;}
+  .env .bd{padding:15px 20px 20px;}
+  .env .subj{font-size:19px;font-weight:800;color:var(--text);line-height:1.28;}
+  .env .prev{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.4;}
+  .env .rows{margin-top:15px;display:flex;flex-direction:column;gap:9px;}
+  .env .row{display:flex;align-items:center;gap:11px;font-size:14px;color:#D9CFBB;}
+  .env .row .d{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:0 0 auto;box-shadow:0 0 10px rgba(229,184,92,.6);}
+  /* recurring badge */
+  .recur{position:absolute;left:50%;bottom:-52px;transform:translateX(-50%);
+    display:inline-flex;align-items:center;gap:9px;white-space:nowrap;
+    font-family:-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;font-weight:700;letter-spacing:.03em;
+    color:var(--gold);background:rgba(229,184,92,.09);border:1px solid rgba(229,184,92,.30);
+    padding:9px 18px;border-radius:999px;}
+  .recur svg{width:17px;height:17px;}
+  .sub{
+    margin-top:38px;font-size:27px;line-height:1.38;font-weight:400;color:var(--text);max-width:790px;
+  }
+  .sub b{color:var(--gold);font-weight:700;font-style:italic;}
+  .foot{
+    position:absolute;bottom:5.4%;left:0;right:0;text-align:center;
+    font-family:-apple-system,"Segoe UI",Arial,sans-serif;
+    font-size:17px;font-weight:600;letter-spacing:.04em;color:var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="brand">Anchored<span class="dot">.</span></div>
+    <div class="headline">A morning that <span class="hl">shows up on its own</span> &mdash; whether or not you remember it.</div>
+
+    <div class="scene">
+      <div class="stage">
+        <div class="sun" id="sun"></div>
+        <div class="stack">
+          <div class="s s1"></div>
+          <div class="s s2"></div>
+        </div>
+        <div class="env">
+          <div class="hd">
+            <div class="seal">
+              <!-- anchor glyph -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="#1A150C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="4.2" r="1.9"/><line x1="12" y1="6.1" x2="12" y2="21"/>
+                <line x1="7.5" y1="10" x2="16.5" y2="10"/>
+                <path d="M4.5 14.5c0 4 3.4 6.2 7.5 6.2s7.5-2.2 7.5-6.2"/>
+                <path d="M4.5 14.5l-2 .8 2 1.9M19.5 14.5l2 .8-2 1.9"/>
+              </svg>
+            </div>
+            <div class="from">
+              <div class="nm">Anchored</div>
+              <div class="to">to you</div>
+            </div>
+            <div class="time">6:00 AM</div>
+          </div>
+          <div class="bd">
+            <div class="subj">Your morning &mdash; Day 1 of 5</div>
+            <div class="prev">It&rsquo;s here. Two minutes, before the day gets loud.</div>
+            <div class="rows">
+              <div class="row"><span class="d"></span>One passage to read</div>
+              <div class="row"><span class="d"></span>One prayer, written out</div>
+              <div class="row"><span class="d"></span>One small thing to do</div>
+            </div>
+          </div>
+        </div>
+        <div class="recur">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#E5B85C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8"/><path d="M20 4v4h-4"/>
+            <path d="M20 12a8 8 0 0 1-13.7 5.6L4 16"/><path d="M4 20v-4h4"/>
+          </svg>
+          Arrives every morning &middot; you don&rsquo;t have to remember
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">Nothing shows up to hold the time, so men fall off alone. <b>This shows up.</b> Five free mornings &mdash; the first lands tomorrow.</div>
+
+    <div class="foot">anchoredfaith.app</div>
+  </div>
+  <script>
+    var sun=document.getElementById('sun');
+    for(var i=0;i<10;i++){var r=document.createElement('div');r.className='ray';r.style.transform='rotate('+(i*36-90)+'deg)';sun.appendChild(r);}
+    var orb=document.createElement('div');orb.className='orb';sun.appendChild(orb);
+  </script>
+</body>
+</html>
