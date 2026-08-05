@@ -326,8 +326,15 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     }).then(function(r){ return r.json().catch(function(){ return {}; }); })
       .then(function(res){
         if (res && res.ok) {
-          // FIRE Lead ONLY on confirmed 200 success — with the dedup eventID.
-          try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings-free-door', offer:hook, value:0, currency:'USD'}, {eventID:eventID}); } catch(e){}
+          // Repeat submission (worker dedup, 2026-08-05): already a contact — the
+          // 5-morning series is already on its way. Say so plainly, and do NOT
+          // fire the Meta Lead event (a repeat is not a new lead; keeps CPL honest).
+          if (res.existing) {
+            done.textContent = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam folder, just in case). 🕊️";
+          } else {
+            // FIRE Lead ONLY on confirmed NEW-lead success — with the dedup eventID.
+            try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings-free-door', offer:hook, value:0, currency:'USD'}, {eventID:eventID}); } catch(e){}
+          }
           form.style.display='none';
           if (consent) consent.style.display='none';
           done.style.display='block';

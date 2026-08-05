@@ -698,7 +698,9 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
             if (res && res.ok) {
               lf.style.display='none';
               if (lc) lc.style.display='none';
-              document.getElementById('capdone').style.display='block';
+              var cd = document.getElementById('capdone');
+              if (res.existing) cd.textContent = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam, just in case). 🕊️";
+              cd.style.display='block';
               try { localStorage.setItem('anchored_captured','1'); } catch(e){}
             } else {
               btn.disabled=false;
@@ -758,7 +760,9 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
             if (res && res.ok) {
               bfForm.style.display='none';
               var bfc = document.getElementById('bfleadconsent'); if (bfc) bfc.style.display='none';
-              document.getElementById('bfcapdone').style.display='block';
+              var bcd = document.getElementById('bfcapdone');
+              if (res.existing) bcd.textContent = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam, just in case). 🕊️";
+              bcd.style.display='block';
               try { localStorage.setItem('anchored_captured','1'); } catch(e){}
             } else {
               btn.disabled=false;
