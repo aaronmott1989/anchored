@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!-- ============================================================================
+     ANCHORED — SMS OPT-IN DEMONSTRATION / VERIFICATION SURFACE
+     Built 2026-08-06 for the A2P/10DLC campaign resubmission (GHL Trust Center
+     "Opt-in Form URL"). Carriers must be able to VERIFY the SMS call-to-action
+     without an app login or JS. So EVERYTHING required for verification is
+     server-rendered raw static HTML, visible on first load with JS disabled:
+       - brand name "Anchored (operated by LEADLOCK LLC)"
+       - a mobile phone input
+       - a SEPARATE, UNCHECKED, optional SMS-consent checkbox
+       - the full required consent language (verbatim, always visible)
+       - Privacy Policy + Terms links (/privacy.html, /terms.html)
+       - business contact (support@anchoredfaith.app + P.O. Box)
+
+     HONESTY GUARD (locked): SMS is NOT live yet. The consent language is
+     future-framed ("once text messaging becomes available") and this page is a
+     demonstration form that does not transmit — no claim that texting is active,
+     no reach-out/"we check on you" claims anywhere. When SMS goes live this form
+     is wired to the existing Turnstile-gated worker; until then it is static.
+
+     Mirror byte-identical to aarons-loop/faith-app/sms-optin.html.
+     Does NOT touch /free, the root LP capture forms, the buy path, or ads.
+     ============================================================================ -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="anchored-icon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#12100C">
+<meta name="robots" content="noindex,follow">
+<title>Anchored — SMS Reminder Opt-In</title>
+<meta name="description" content="Opt in to receive optional automated reminder and encouragement text messages from Anchored (operated by LEADLOCK LLC). Consent is optional and not a condition of purchase. Reply STOP to opt out.">
+<style>
+  :root{
+    --bg:#12100C; --bg2:#181510; --card:#1C1913; --line:#38311F;
+    --gold:#E5B85C; --gold-ink:#1A150C; --text:#F5F0E6; --muted:#A79B84;
+    --red:#E06A5A; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.55;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;
+  }
+  a{color:var(--gold);}
+  .wrap{max-width:640px;margin:0 auto;padding:0 20px;}
+  .kicker{text-transform:uppercase;letter-spacing:.2em;font-size:12px;font-weight:800;color:var(--gold);}
+  h1{font-size:clamp(26px,7vw,38px);font-weight:800;letter-spacing:-.025em;line-height:1.1;font-family:Georgia,"Times New Roman",serif;margin-top:12px;}
+  h1 .hl{color:var(--gold);}
+  p{color:var(--text);}
+  .muted{color:var(--muted);}
+  header{position:sticky;top:0;z-index:40;background:rgba(18,16,12,.85);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line);}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .logo{font-weight:800;letter-spacing:-.01em;font-size:19px;font-family:Georgia,serif;}
+  .logo .dot{color:var(--gold);}
+  .brandtag{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.02em;}
+  .hero{padding:34px 0 8px;background:
+      radial-gradient(120% 80% at 12% -10%, rgba(229,184,92,.12), transparent 60%),
+      radial-gradient(90% 60% at 100% 0%, rgba(127,176,166,.06), transparent 55%);}
+  .hero .sub{font-size:clamp(15px,4vw,18px);color:var(--text);margin-top:14px;font-weight:600;}
+  section{padding:24px 0;}
+  /* opt-in card */
+  .signup{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .signup h2{font-size:20px;font-weight:800;font-family:Georgia,serif;}
+  .signup p.formp{color:var(--muted);font-size:14px;margin-top:6px;}
+  .field{margin-top:16px;}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:7px;}
+  .phone-row{display:flex;align-items:stretch;gap:8px;}
+  .phone-row .cc{display:flex;align-items:center;padding:0 13px;background:#0f0d09;border:1px solid var(--line);border-radius:11px;color:var(--muted);font-weight:700;font-size:15px;}
+  input[type=tel]{flex:1 1 auto;min-width:0;background:#0f0d09;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:14px 14px;font-size:16px;}
+  input[type=tel]:focus{outline:none;border-color:var(--gold);}
+  /* consent checkbox — separate, UNCHECKED by default */
+  .consent-box{display:flex;gap:11px;align-items:flex-start;margin-top:18px;padding:15px 15px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);}
+  .consent-box input[type=checkbox]{flex:0 0 auto;width:20px;height:20px;margin-top:2px;accent-color:var(--gold);}
+  .consent-box .ctext{font-size:13px;line-height:1.55;color:var(--muted);}
+  .optlabel{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+  .btn{margin-top:18px;width:100%;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;padding:0 18px;min-height:52px;font-size:16px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);}
+  .notice{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.55;border-left:2px solid var(--gold);padding:2px 0 2px 12px;}
+  /* always-visible static SMS disclosure (mirrors the carrier-passed pattern) */
+  .sms-disclosure{margin:18px 0 0;padding:14px 15px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--muted);font-size:12.5px;line-height:1.6;}
+  .sms-disclosure strong{color:var(--text);font-weight:700;}
+  .sms-disclosure a{color:var(--gold);}
+  .helprow{margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.6;}
+  .helprow b{color:var(--text);}
+  footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;margin-top:8px;}
+  footer a{color:var(--muted);text-decoration:underline;}
+  footer .biz{color:var(--text);font-weight:600;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div>
+      <div class="logo">Anchored<span class="dot">.</span></div>
+      <div class="brandtag">operated by LEADLOCK LLC</div>
+    </div>
+    <div class="brandtag">SMS reminders</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">Anchored (operated by LEADLOCK LLC)</div>
+    <h1>Get your daily <span class="hl">Anchored reminder</span> by text.</h1>
+    <p class="sub">Add your mobile number and opt in below to receive optional reminder and encouragement text messages from Anchored — daily reminders and check-in nudges — once text messaging becomes available.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="signup">
+      <h2>Anchored SMS reminders</h2>
+      <p class="formp">Anchored (operated by LEADLOCK LLC). Enter your mobile number and check the optional consent box to opt in.</p>
+
+      <!-- Demonstration opt-in form. It does not transmit: SMS is not yet active,
+           so no message is sent and no data leaves this page (honest, future-framed).
+           When SMS goes live this form is wired to the existing Turnstile-gated
+           worker. The phone input and the consent checkbox below are the actual
+           opt-in mechanism carriers/GHL are verifying. -->
+      <form action="#" method="post" novalidate onsubmit="return false;">
+        <div class="field">
+          <label for="phone">Mobile phone number</label>
+          <div class="phone-row">
+            <span class="cc">+1</span>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(555) 555-0123">
+          </div>
+        </div>
+
+        <!-- SEPARATE, UNCHECKED, OPTIONAL SMS-consent checkbox -->
+        <label class="consent-box" for="sms-consent">
+          <input type="checkbox" id="sms-consent" name="sms_consent" value="yes">
+          <span class="ctext">
+            <span class="optlabel">Optional</span><br>
+            I agree to receive recurring automated reminder and encouragement text messages from Anchored (daily reminders and check-in nudges) at the mobile number I provide, once text messaging becomes available. Consent is optional and not a condition of purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.
+          </span>
+        </label>
+
+        <button type="submit" class="btn">Opt in to text reminders</button>
+
+        <p class="notice">Text messaging is not active yet. This page shows how you will opt in; no text messages are sent until you check the box above and confirm once the service becomes available. Opting in is optional and is never required to use Anchored.</p>
+      </form>
+
+      <!-- Static SMS disclosure block — mirrors the carrier-passed .sms-disclosure
+           pattern (LeadLock report page): the full required terms rendered in raw
+           HTML, readable on first load with or without JS. -->
+      <div class="sms-disclosure">
+        <strong>SMS reminders (optional).</strong>
+        If you opt in above, Anchored (operated by LEADLOCK LLC) will send recurring automated reminder and encouragement text messages (daily reminders and check-in nudges) to the mobile number you provide, once text messaging becomes available. Consent is optional and is not a condition of purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.
+      </div>
+
+      <p class="helprow">
+        <b>Questions or help?</b> Email <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a> or write to us at P.O. Box 1232, Peoria, AZ 85383. Reply <b>HELP</b> to any message for help, or <b>STOP</b> to opt out at any time.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo" style="font-size:16px;">Anchored<span class="dot">.</span></div>
+    <p style="margin-top:8px;" class="biz">Anchored — operated by LEADLOCK LLC</p>
+    <p style="margin-top:6px;">P.O. Box 1232, Peoria, AZ 85383 · <a href="mailto:support@anchoredfaith.app">support@anchoredfaith.app</a></p>
+    <p style="margin-top:10px;">&copy; <span id="yr">2026</span> Anchored. · <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms</a> · <a href="/crisis.html">Crisis Help</a></p>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>
