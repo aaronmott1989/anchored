@@ -363,10 +363,12 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     <form id="gate-form" autocomplete="off">
       <div class="field signup-only"><label for="g-first">First name</label><input type="text" id="g-first" required></div>
       <div class="field"><label for="g-email">Email</label><input type="email" id="g-email" required></div>
+      <div class="field signup-only"><label for="g-phone">Phone (mobile) — optional, for texts</label><input type="tel" id="g-phone" placeholder="+1 555 123 4567"></div>
       <div class="field signup-only"><label for="g-goal">What are you here for?</label><select id="g-goal"><option value="closeness">Grow closer to God</option><option value="prayer">Build a prayer habit</option><option value="scripture">Read Scripture daily</option><option value="freedom">Find freedom from a habit</option></select></div>
       <div class="field"><label for="g-pass">Password</label><input type="password" id="g-pass" required></div>
       <div class="signup-only">
         <label class="consent-row"><input type="checkbox" id="g-consent-email"> Email me reminders and encouragement for my walk. I can unsubscribe anytime.</label>
+        <label class="consent-row" style="margin-top:8px;"><input type="checkbox" id="g-consent-sms"> <span>I agree to receive recurring automated reminder and encouragement text messages from <strong>Anchored</strong> (daily reminders and check-in nudges) at the mobile number I provide, once text messaging becomes available. Consent is optional and not a condition of purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="privacy.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Privacy Policy</a> and <a href="terms.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Terms</a>.</span></label>
         <p class="gate-note" style="margin-top:8px;">By creating an account you agree to our <a href="terms.html" style="color:var(--accent)">Terms</a> and <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>. We never sell your information, and we only email you what you opt into above.</p>
       </div>
       <div class="gate-err" id="gate-err"></div>
@@ -1049,6 +1051,7 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
   function doSignup() {
     var first = trim((document.getElementById("g-first") || {}).value);
     var email = trim((document.getElementById("g-email") || {}).value);
+    var phone = trim((document.getElementById("g-phone") || {}).value);
     var goal = (document.getElementById("g-goal") || {}).value;
     var pass = (document.getElementById("g-pass") || {}).value;
     var err = document.getElementById("gate-err");
@@ -1058,8 +1061,9 @@ posthog.init('phc_xywGCAAu77VDx3rapkBMC8GRQ4WJ8EJP9jiN5UjTzWh6', {
     m.member_id = m.member_id || ("m_" + Math.random().toString(16).slice(2, 8));
     m.identity = { first_name: first, created_at: new Date().toISOString() };
     m.contact = {
-      email: email, preferred_channel: "email",
-      consent_email: !!(document.getElementById("g-consent-email") || {}).checked
+      email: email, phone: phone, preferred_channel: "email",
+      consent_email: !!(document.getElementById("g-consent-email") || {}).checked,
+      consent_sms: !!(document.getElementById("g-consent-sms") || {}).checked
     };
     m.status = m.status || { goal: goal, buyer: false, source: "app_signup" };
     m.engagement = m.engagement || { last_reply: null, quiet_days: 0, status_flags: [] };
