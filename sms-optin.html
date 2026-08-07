@@ -75,15 +75,16 @@
   .consent-box input[type=checkbox]{flex:0 0 auto;width:20px;height:20px;margin-top:2px;accent-color:var(--gold);}
   .consent-box .ctext{font-size:13px;line-height:1.55;color:var(--muted);}
   .consent-box .ctext a{color:var(--gold);}
+  /* full verbatim consent sentence, kept intact inside the label */
+  .consent-box .cfull{display:block;color:var(--muted);}
+  /* each required disclosure as its own discrete, visible child element INSIDE the label */
+  .consent-box .dh{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-top:12px;margin-bottom:2px;}
+  .consent-box .drow{display:block;font-size:13px;line-height:1.5;color:var(--text);padding:5px 0;border-top:1px solid var(--line);}
+  .consent-box .drow:first-of-type{border-top:0;}
+  .consent-box .drow b{color:var(--muted);font-weight:700;}
+  .consent-box .drow a{color:var(--gold);}
   .btn{margin-top:18px;width:100%;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;padding:0 18px;min-height:52px;font-size:16px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);}
   .notice{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.55;border-left:2px solid var(--gold);padding:2px 0 2px 12px;}
-  /* machine-parseable disclosures — each required disclosure is its own distinct, visible text element */
-  .disclosures{margin-top:16px;padding:15px 16px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);list-style:none;}
-  .disclosures .dh{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px;}
-  .disclosures li{font-size:13px;line-height:1.5;color:var(--text);padding:5px 0;border-top:1px solid var(--line);}
-  .disclosures li:first-of-type{border-top:0;}
-  .disclosures li b{color:var(--muted);font-weight:700;}
-  .disclosures li a{color:var(--gold);}
   .helprow{margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.6;}
   .helprow b{color:var(--text);}
   footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;margin-top:8px;}
@@ -132,35 +133,31 @@
         </div>
 
         <!-- SEPARATE, UNCHECKED, OPTIONAL SMS-consent checkbox.
-             The FULL consent sentence is the checkbox's DIRECT adjacent label text
-             (single block, no nested styled node between input and sentence) so an
-             automated "checkbox -> adjacent text" compliance parser associates them.
-             All 8 required disclosures live inside this one sentence: brand + registered
-             entity (Anchored, operated by LEADLOCK LLC), program description, consent
-             optional / not a condition of purchase, frequency varies, message & data
-             rates, STOP, HELP, Privacy + Terms links. -->
+             The checkbox and EVERY required disclosure live inside ONE <label for="sms-consent">
+             so GHL's A2P compliance scorer — which extracts disclosure text only from within the
+             consent checkbox's label scope — sees each disclosure as its own discrete, directly-
+             associated child element. Structure inside the label:
+               1. the FULL verbatim registered consent sentence (.cfull), kept intact, and
+               2. each required disclosure as its own discrete visible line (.drow):
+                  business name/registered entity, message type, frequency varies, message & data
+                  rates, STOP/HELP opt-out, optional/not-a-condition, Privacy + Terms links.
+             Nothing is display:none — all text is visible to scorer, carriers, and humans. The
+             former duplicate sibling <ul class="disclosures"> block is removed; these lines
+             replace it inside the label so there is one clean render. -->
         <label class="consent-box" for="sms-consent">
           <input type="checkbox" id="sms-consent" name="sms_consent" value="yes">
-          <span class="ctext">Optional — I agree to receive recurring automated reminder and encouragement text messages from Anchored, operated by LEADLOCK LLC, (daily reminders and check-in nudges) at the mobile number I provide, once text messaging becomes available. Consent is optional and not a condition of purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.</span>
+          <span class="ctext">
+            <span class="cfull">I agree to receive recurring automated reminder and encouragement text messages from Anchored (daily reminders and check-in nudges) at the mobile number I provide, once text messaging becomes available. Consent is optional and not a condition of purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.</span>
+            <span class="dh">SMS program details</span>
+            <span class="drow"><b>Program:</b> Anchored, operated by LEADLOCK LLC</span>
+            <span class="drow"><b>Message type:</b> recurring automated reminder and encouragement text messages (daily reminders and check-in nudges)</span>
+            <span class="drow">Message frequency varies.</span>
+            <span class="drow">Message and data rates may apply.</span>
+            <span class="drow">Reply STOP to opt out, HELP for help.</span>
+            <span class="drow">Consent is optional and not a condition of purchase.</span>
+            <span class="drow">See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.</span>
+          </span>
         </label>
-
-        <!-- MACHINE-PARSEABLE DISCLOSURES. The same required disclosures that live in the
-             consent sentence above are ALSO rendered here as separate, distinct, visible
-             text elements (one per line, plain static HTML, readable with JS disabled) so
-             GHL's opt-in compliance scorer can extract each disclosure individually instead
-             of parsing them out of one prose sentence. Do not remove: business name, message
-             type, frequency, message & data rates, STOP, HELP, optional/not-a-condition. -->
-        <ul class="disclosures" aria-label="SMS program disclosures">
-          <li class="dh">SMS program details</li>
-          <li><b>Program:</b> Anchored, operated by LEADLOCK LLC</li>
-          <li><b>Message type:</b> recurring automated reminder and encouragement text messages (daily reminders and check-in nudges)</li>
-          <li>Message frequency varies.</li>
-          <li>Message and data rates may apply.</li>
-          <li>Reply STOP to opt out.</li>
-          <li>Reply HELP for help.</li>
-          <li>Consent is optional and not a condition of purchase.</li>
-          <li>See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.</li>
-        </ul>
 
         <button type="submit" class="btn">Opt in to text reminders</button>
 
