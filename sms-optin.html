@@ -77,6 +77,13 @@
   .consent-box .ctext a{color:var(--gold);}
   .btn{margin-top:18px;width:100%;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;padding:0 18px;min-height:52px;font-size:16px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);}
   .notice{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.55;border-left:2px solid var(--gold);padding:2px 0 2px 12px;}
+  /* machine-parseable disclosures — each required disclosure is its own distinct, visible text element */
+  .disclosures{margin-top:16px;padding:15px 16px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);list-style:none;}
+  .disclosures .dh{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px;}
+  .disclosures li{font-size:13px;line-height:1.5;color:var(--text);padding:5px 0;border-top:1px solid var(--line);}
+  .disclosures li:first-of-type{border-top:0;}
+  .disclosures li b{color:var(--muted);font-weight:700;}
+  .disclosures li a{color:var(--gold);}
   .helprow{margin-top:16px;font-size:12.5px;color:var(--muted);line-height:1.6;}
   .helprow b{color:var(--text);}
   footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12.5px;text-align:center;margin-top:8px;}
@@ -136,6 +143,24 @@
           <input type="checkbox" id="sms-consent" name="sms_consent" value="yes">
           <span class="ctext">Optional — I agree to receive recurring automated reminder and encouragement text messages from Anchored, operated by LEADLOCK LLC, (daily reminders and check-in nudges) at the mobile number I provide, once text messaging becomes available. Consent is optional and not a condition of purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.</span>
         </label>
+
+        <!-- MACHINE-PARSEABLE DISCLOSURES. The same required disclosures that live in the
+             consent sentence above are ALSO rendered here as separate, distinct, visible
+             text elements (one per line, plain static HTML, readable with JS disabled) so
+             GHL's opt-in compliance scorer can extract each disclosure individually instead
+             of parsing them out of one prose sentence. Do not remove: business name, message
+             type, frequency, message & data rates, STOP, HELP, optional/not-a-condition. -->
+        <ul class="disclosures" aria-label="SMS program disclosures">
+          <li class="dh">SMS program details</li>
+          <li><b>Program:</b> Anchored, operated by LEADLOCK LLC</li>
+          <li><b>Message type:</b> recurring automated reminder and encouragement text messages (daily reminders and check-in nudges)</li>
+          <li>Message frequency varies.</li>
+          <li>Message and data rates may apply.</li>
+          <li>Reply STOP to opt out.</li>
+          <li>Reply HELP for help.</li>
+          <li>Consent is optional and not a condition of purchase.</li>
+          <li>See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms</a>.</li>
+        </ul>
 
         <button type="submit" class="btn">Opt in to text reminders</button>
 
