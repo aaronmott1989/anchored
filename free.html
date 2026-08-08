@@ -290,7 +290,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     <!-- SCREEN F — email capture, reframed + personalized (WRAPS the existing form) -->
     <div class="screen" id="screen-capture">
       <h1 id="cap-h" style="font-size:clamp(26px,7vw,36px);">Your <span class="hl">plan is ready</span> — where do we send it?</h1>
-      <p class="sub" id="cap-sub" style="font-weight:500;">Five mornings built around the answers you just gave — the passage, a prayer written for you, and one small thing to do. Your first one arrives the moment you're in.</p>
+      <p class="sub" id="cap-sub" style="font-weight:500;">Five mornings to meet you right where you are — the passage, a prayer written for you, and one small thing to do. Your first one arrives the moment you're in.</p>
       <div class="signup" id="k-signup" style="margin-top:22px;">
         <form class="cap" id="leadform" novalidate>
           <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
@@ -309,7 +309,7 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
       <!-- BLOCK (a) — pick your morning (commitment device) -->
       <div class="bk">
         <h3>Set your morning.</h3>
-        <p class="bsub">This is the time you're choosing to show up. Pick it and we'll shape your plan around it.</p>
+        <p class="bsub">This is the time you're choosing to show up. Pick it and make it yours — the one appointment that doesn't move.</p>
         <div class="times" id="times">
           <button type="button" class="time" data-t="6:00">6:00</button>
           <button type="button" class="time" data-t="6:30">6:30</button>
@@ -492,10 +492,10 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   // ---- Q1–Q4: one tap selects + advances ----
   function advanceTo(next){
     if (next === 'screen-capture'){
-      // last question done → personalize Screen F, fire quiz_complete, render Turnstile
+      // last question done → fire quiz_complete, render Turnstile. Heading stays
+      // generic (security tightening): the drip is identical for everyone, so a
+      // per-answer heading token would imply personalization we don't do.
       var answered = 0; for (var k in answers){ if (answers[k]) answered++; }
-      var word = whenWord || 'first';
-      set('cap-h', 'Your <span class="hl">' + word + ' plan is ready</span> — where do we send it?');
       fire('quiz_complete','quiz_complete',{hook:hook, answered:answered});
       showScreen('screen-capture');
       renderTurnstile();
