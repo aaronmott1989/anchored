@@ -7,17 +7,28 @@
      file at both /free and /free.html). Same brand, styles, pixel, worker and
      security-cleared consent as index.html — reused, not rebuilt.
 
+     ER-STEAL QUIZ (2026-08-07, warroom/AnchoredERSteal-FunnelSpec-20260807.md):
+     wraps an escalating-commitment quiz ladder around the EXISTING capture —
+     Screen A intro → Q1..Q4 taps → Screen F (the existing signup card, reframed)
+     → Screen S (booking moment: pick-your-morning + start-now + founding offer).
+     Single page, JS-driven show/hide (no new URLs). All capture plumbing preserved
+     verbatim: form, Turnstile, worker POST, source=freedoor-test, offer:hook,
+     event_id/eventID dedup, existing:true handling, Lead-only-after-worker-200.
+
      HOOK MATCH: ?hook=brother (default — Cell 1 men + Cell 3 all-Christians, the
      "did you read today, brother" creative) · ?hook=grace (Cell 2 men, the "no
      reset to zero / grace" creative). Only the hero headline/subhead swap; the
-     free-signup form, proof, consent and app mention are shared.
+     quiz, free-signup form, proof, consent and app mention are shared.
 
      MEASUREMENT: Meta pixel 1407254754557742 fires PageView + ViewContent on load;
-     a browser Lead event fires ONLY on a successful signup (worker HTTP 200), with
-     an eventID (also POSTed as event_id) so a future CAPI Lead can dedup on it.
-     Leads POST source=freedoor-test so they're attributable per the data contract.
+     quiz_start + quiz_complete (custom) around the quiz; a browser Lead event fires
+     ONLY on a successful NEW-lead signup (worker HTTP 200), with an eventID (also
+     POSTed as event_id) so a future CAPI Lead can dedup; Schedule (standard) fires
+     on the morning-time pick (Screen S). Leads POST source=freedoor-test so they're
+     attributable per the data contract.
      TRUTH-FIX STANDARD: nothing here claims anything the app doesn't do today — no
-     reach-out/outbound engine claim, no $7 hero. -->
+     reach-out/outbound engine claim, no reminder/timed-delivery claim on the morning
+     pick (it is the user's own standing appointment + a personalization token). -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -66,7 +77,36 @@
   .trust .t .ic{color:var(--gold);font-size:16px;line-height:1;}
   .trust .t .lbl{font-size:11.5px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
   .trust .t .sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
-  /* signup card (the hero's job) */
+
+  /* ---- ER-steal flow: one screen visible at a time ---- */
+  .screen{display:none;}
+  .screen.active{display:block;}
+  /* big gold primary button (Screen A start + Screen S start-now) */
+  .btn-primary{
+    display:block;width:100%;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;
+    border-radius:13px;padding:16px 18px;min-height:54px;font-size:17px;cursor:pointer;text-align:center;
+    text-decoration:none;box-shadow:0 8px 22px rgba(229,184,92,.22);letter-spacing:.005em;
+  }
+  .btn-primary:active{transform:translateY(1px);}
+  .microline{color:var(--muted);font-size:13px;margin-top:12px;text-align:center;}
+
+  /* quiz screens — one question, tap-only, no keyboard */
+  .quiz{min-height:62vh;padding:14px 0 8px;}
+  .screen.quiz.active{display:flex;flex-direction:column;justify-content:center;}
+  .progress{text-transform:uppercase;letter-spacing:.16em;font-size:11.5px;font-weight:800;color:var(--gold);}
+  .q-head{font-family:Georgia,"Times New Roman",serif;font-weight:800;font-size:clamp(24px,7vw,32px);letter-spacing:-.02em;line-height:1.14;margin-top:14px;}
+  .chips{display:flex;flex-direction:column;gap:12px;margin-top:26px;}
+  .chip{
+    width:100%;min-height:56px;background:var(--card);border:1.5px solid var(--line);color:var(--text);
+    border-radius:13px;padding:14px 16px;font-size:16px;font-weight:650;text-align:left;cursor:pointer;
+    transition:border-color .12s,background .12s,transform .06s;
+  }
+  .chip:hover{border-color:var(--gold);}
+  .chip:active{transform:translateY(1px);}
+  .chip.sel{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);font-weight:800;}
+  .skiplink{display:inline-block;margin-top:20px;color:var(--muted);font-size:14px;text-decoration:underline;cursor:pointer;background:none;border:0;}
+
+  /* signup card (Screen F) */
   .signup{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25);}
   .signup h3{font-size:18px;font-weight:800;}
   .signup p{color:var(--muted);font-size:14px;margin-top:6px;}
@@ -74,14 +114,44 @@
   form.cap input[type=email]{flex:1 1 200px;min-width:0;background:#0f0d09;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:14px 14px;font-size:16px;}
   form.cap input[type=email]:focus{outline:none;border-color:var(--gold);}
   form.cap button{
-    flex:0 0 auto;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;
-    padding:0 18px;min-height:50px;font-size:15px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);
+    flex:1 1 100%;background:var(--gold);color:var(--gold-ink);font-weight:850;border:0;border-radius:11px;
+    padding:0 18px;min-height:52px;font-size:16px;cursor:pointer;box-shadow:0 8px 22px rgba(229,184,92,.22);
   }
   form.cap button:disabled{opacity:.6;cursor:default;}
-  .capdone{color:var(--gold);font-weight:700;font-size:15px;margin-top:12px;display:none;line-height:1.5;}
   .caperr{color:var(--red);font-size:13.5px;margin-top:10px;display:none;}
   .consent{color:var(--muted);font-size:12px;margin-top:12px;line-height:1.5;}
   .consent a{color:var(--muted);text-decoration:underline;}
+
+  /* Screen S — booking moment */
+  .confirm{font-size:clamp(19px,5.2vw,23px);font-weight:800;font-family:Georgia,"Times New Roman",serif;line-height:1.22;letter-spacing:-.01em;}
+  .bk{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-top:18px;}
+  .bk h3{font-size:19px;font-weight:800;font-family:Georgia,"Times New Roman",serif;letter-spacing:-.01em;}
+  .bk .bsub{color:var(--muted);font-size:14.5px;margin-top:8px;line-height:1.5;}
+  .times{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;}
+  .time{min-height:54px;background:#0f0d09;border:1.5px solid var(--line);color:var(--text);border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;transition:border-color .12s,background .12s;}
+  .time:hover{border-color:var(--gold);}
+  .time.sel{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);}
+  .time.near{border-color:var(--gold);}
+  .timeconf{color:var(--gold);font-weight:700;font-size:14.5px;margin-top:14px;display:none;line-height:1.5;}
+  /* founding offer block (secondary path — outlined so free start stays the least-resistance route) */
+  .founding{border:1.5px solid var(--gold);border-radius:var(--radius);padding:20px;margin-top:18px;background:linear-gradient(180deg,rgba(229,184,92,.06),transparent);}
+  .founding .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:850;color:var(--gold);}
+  .founding h3{font-size:21px;font-weight:800;font-family:Georgia,"Times New Roman",serif;margin-top:8px;letter-spacing:-.01em;}
+  .founding .price{margin-top:14px;font-size:17px;font-weight:750;}
+  .founding .price .badge{display:inline-block;background:var(--gold);color:var(--gold-ink);font-size:10.5px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;}
+  .founding .price .amt{color:var(--gold);font-weight:850;}
+  .founding .price2{margin-top:6px;font-size:15px;color:var(--muted);}
+  .founding .price2 .amt{color:var(--text);font-weight:800;}
+  .founding .math{margin-top:14px;font-size:14px;color:var(--muted);line-height:1.55;}
+  .founding .math b{color:var(--text);font-weight:800;}
+  .btn-outline{
+    display:block;width:100%;margin-top:16px;background:transparent;color:var(--gold);font-weight:850;
+    border:1.5px solid var(--gold);border-radius:13px;padding:15px 18px;min-height:52px;font-size:16px;
+    cursor:pointer;text-align:center;text-decoration:none;letter-spacing:.005em;
+  }
+  .btn-outline:active{transform:translateY(1px);}
+  .foundcount{color:var(--muted);font-size:12.5px;margin-top:12px;text-align:center;}
+
   /* itemization */
   .unlock{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 8px;}
   .unlock h3{font-size:13px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
@@ -135,8 +205,8 @@
 src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
 <!-- Cloudflare Turnstile — invisible/managed bot gate for the free-door capture.
-     Explicit render (the widget is drawn on load into the visible form). Public
-     sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io). -->
+     Explicit render (the widget is drawn when Screen F becomes visible — see build
+     note B4). Public sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io). -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
@@ -148,32 +218,126 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   </div>
 </header>
 
-<!-- HERO = the free 5-mornings signup -->
+<!-- HERO region = the ER-steal flow (Screen A → quiz → capture → booking) -->
 <div class="hero">
-  <div class="wrap">
-    <div class="kicker" id="k-kicker">Anchored · 5 free mornings</div>
-    <h1 id="k-h1" style="margin-top:14px;">"Did you read today?" <span class="hl">The text you wish a brother would send.</span></h1>
-    <p class="sub" id="k-sub">You keep starting over — quietly, alone. Start with five mornings you don't have to do by yourself.</p>
-    <p class="promise" id="k-promise">One short email each morning for five days: the passage, a prayer written for you, and one small thing to do. Free. It's the feeling of someone in your corner — without the guilt.</p>
+  <div class="wrap" id="flow">
 
-    <div class="signup" id="k-signup" style="margin-top:24px;">
-      <h3 id="k-form-h">Send me the free 5 mornings</h3>
-      <p id="k-form-p">Drop your email. Your first morning arrives shortly, then one each morning for five days.</p>
-      <form class="cap" id="leadform" novalidate>
-        <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
-        <div id="ts-widget" style="flex:1 1 100%;min-height:65px;"></div>
-        <button type="submit" id="leadbtn">Send me the free 5 mornings →</button>
-      </form>
-      <div class="capdone" id="capdone">You're in. Your first morning arrives in your inbox shortly, then one each morning for 5 days. 🕊️</div>
-      <div class="caperr" id="caperr">Something hiccupped — please try that once more.</div>
-      <p class="consent" id="leadconsent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
+    <!-- SCREEN A — hook-matched intro (opens the quiz) -->
+    <div class="screen active" id="screen-intro">
+      <div class="kicker" id="k-kicker">Anchored · 5 free mornings</div>
+      <h1 id="k-h1" style="margin-top:14px;">"Did you read today?" <span class="hl">The text you wish a brother would send.</span></h1>
+      <p class="sub" id="k-sub">You keep starting over — quietly, alone. Answer 4 quick taps and I'll set up five mornings you don't have to do by yourself.</p>
+      <div style="margin-top:26px;">
+        <button type="button" class="btn-primary" id="startBtn">Start — takes 20 seconds →</button>
+        <p class="microline">Free. No card. 4 taps, then your email — that's it.</p>
+      </div>
+      <div class="trust">
+        <div class="t"><div class="ic">✓</div><div class="lbl">Completely free</div><div class="sub">No card, no catch</div></div>
+        <div class="t"><div class="ic">✉</div><div class="lbl">One email a day</div><div class="sub">5 mornings, then done</div></div>
+        <div class="t"><div class="ic">↩</div><div class="lbl">Unsubscribe anytime</div><div class="sub">One tap, no hard feelings</div></div>
+      </div>
     </div>
 
-    <div class="trust">
-      <div class="t"><div class="ic">✓</div><div class="lbl">Completely free</div><div class="sub">No card, no catch</div></div>
-      <div class="t"><div class="ic">✉</div><div class="lbl">One email a day</div><div class="sub">5 mornings, then done</div></div>
-      <div class="t"><div class="ic">↩</div><div class="lbl">Unsubscribe anytime</div><div class="sub">One tap, no hard feelings</div></div>
+    <!-- Q1 — your walk -->
+    <div class="screen quiz" id="screen-q1">
+      <div class="progress">1 of 4</div>
+      <div class="q-head">Where's your walk with God right now?</div>
+      <div class="chips" data-q="walk" data-next="screen-q2">
+        <button type="button" class="chip">Just starting back</button>
+        <button type="button" class="chip">On and off</button>
+        <button type="button" class="chip">Steady, want deeper</button>
+        <button type="button" class="chip">Honestly, cold right now</button>
+      </div>
     </div>
+
+    <!-- Q2 — mornings (drives Screen-F + morning-chip personalization) -->
+    <div class="screen quiz" id="screen-q2">
+      <div class="progress">2 of 4</div>
+      <div class="q-head">When do your mornings actually start?</div>
+      <div class="chips" data-q="mornings" data-next="screen-q3">
+        <button type="button" class="chip" data-when="early" data-time="6:00">Before 6</button>
+        <button type="button" class="chip" data-when="6 AM" data-time="6:30">6 – 7</button>
+        <button type="button" class="chip" data-when="7 AM" data-time="7:30">7 – 8</button>
+        <button type="button" class="chip" data-when="first" data-time="6:30">It's chaos every day</button>
+      </div>
+    </div>
+
+    <!-- Q3 — what breaks the streak -->
+    <div class="screen quiz" id="screen-q3">
+      <div class="progress">3 of 4</div>
+      <div class="q-head">What usually breaks your streak?</div>
+      <div class="chips" data-q="breaks" data-next="screen-q4">
+        <button type="button" class="chip">I forget</button>
+        <button type="button" class="chip">Too busy / kids</button>
+        <button type="button" class="chip">Miss one, quit</button>
+        <button type="button" class="chip">Don't know what to read</button>
+      </div>
+    </div>
+
+    <!-- Q4 — what you're carrying (OPTIONAL / skippable) -->
+    <div class="screen quiz" id="screen-q4">
+      <div class="progress">4 of 4 · optional</div>
+      <div class="q-head">Anything you're carrying into these mornings?</div>
+      <div class="chips" data-q="carrying" data-next="screen-capture">
+        <button type="button" class="chip">Stress / anxiety</button>
+        <button type="button" class="chip">A hard season</button>
+        <button type="button" class="chip">Just want to grow</button>
+        <button type="button" class="chip">Rather not say</button>
+      </div>
+      <button type="button" class="skiplink" id="q4skip">Skip this one →</button>
+    </div>
+
+    <!-- SCREEN F — email capture, reframed + personalized (WRAPS the existing form) -->
+    <div class="screen" id="screen-capture">
+      <h1 id="cap-h" style="font-size:clamp(26px,7vw,36px);">Your <span class="hl">plan is ready</span> — where do we send it?</h1>
+      <p class="sub" id="cap-sub" style="font-weight:500;">Five mornings built around the answers you just gave — the passage, a prayer written for you, and one small thing to do. Your first one arrives the moment you're in.</p>
+      <div class="signup" id="k-signup" style="margin-top:22px;">
+        <form class="cap" id="leadform" novalidate>
+          <input type="email" id="leademail" name="email" placeholder="you@email.com" autocomplete="email" required>
+          <div id="ts-widget" style="flex:1 1 100%;min-height:65px;"></div>
+          <button type="submit" id="leadbtn">Send my 5 mornings →</button>
+        </form>
+        <div class="caperr" id="caperr">Something hiccupped — please try that once more.</div>
+        <p class="consent" id="leadconsent">No spam. One short email a day for 5 days, plus occasional notes from Anchored — unsubscribe anytime · <a href="privacy.html">Privacy Policy</a></p>
+      </div>
+    </div>
+
+    <!-- SCREEN S — success = the booking moment -->
+    <div class="screen" id="screen-success">
+      <p class="confirm" id="s-confirm">You're in. 🕊️ Your first morning is on its way to your inbox right now.</p>
+
+      <!-- BLOCK (a) — pick your morning (commitment device) -->
+      <div class="bk">
+        <h3>Set your morning.</h3>
+        <p class="bsub">This is the time you're choosing to show up. Pick it and we'll shape your plan around it.</p>
+        <div class="times" id="times">
+          <button type="button" class="time" data-t="6:00">6:00</button>
+          <button type="button" class="time" data-t="6:30">6:30</button>
+          <button type="button" class="time" data-t="7:00">7:00</button>
+          <button type="button" class="time" data-t="7:30">7:30</button>
+        </div>
+        <p class="timeconf" id="timeconf"></p>
+      </div>
+
+      <!-- BLOCK (b) — start your first morning right now -->
+      <div class="bk">
+        <h3>Don't wait for tomorrow.</h3>
+        <p class="bsub">Your first morning is already inside the app — the passage, the prayer, and a Companion you can ask anything. Open it and start now, free.</p>
+        <a class="btn-primary" id="startNowBtn" style="margin-top:16px;" href="https://anchoredfaith.app/anchored-app.html?src=freedoor&utm_source=freedoor&utm_medium=success&hook=brother">Start my first morning now →</a>
+      </div>
+
+      <!-- BLOCK (c) — founding offer, dollar-framed, annual-first -->
+      <div class="founding">
+        <div class="eyebrow">Founding member · first 100 only</div>
+        <h3>Lock founding pricing for life.</h3>
+        <p class="price"><span class="amt">$59/yr</span> — about $4.92/mo. Roughly five months free vs. monthly.<span class="badge">Best value</span></p>
+        <p class="price2">or <span class="amt">$8.99/mo</span> — founding rate, locked for life.</p>
+        <p class="math">When the first 100 fill, founding closes: it becomes <b>$11.99/mo / $79/yr</b>. Lock in now and you keep founding <b>forever</b> — <b>$36 less every year on monthly, $20 less every year on annual — guaranteed never to rise.</b></p>
+        <a class="btn-outline" id="foundingBtn" href="https://anchoredfaith.app/anchored-app.html?src=freedoor&intent=founding&hook=brother">Claim my founding spot →</a>
+        <p class="foundcount" id="foundcount">first 100, locked for life</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -220,12 +384,12 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   </div>
 </section>
 
-<!-- SOFT APP MENTION (below the fold; no price hero, no reach-out claim) -->
+<!-- AFTER THE FIVE MORNINGS (upgraded with the founding dollar-math) -->
 <section style="padding-top:6px;">
   <div class="wrap">
     <div class="why">
       <h2 style="font-size:22px;">After the five mornings</h2>
-      <p class="muted" style="margin-top:12px;">Start with the free five. If they land and you want to keep going, there's the full <b>Anchored</b> app — a dated daily passage and a written prayer, a streak that keeps itself, and a Companion you can ask anything about the verse, the prayer, or your walk. It's optional, and the five mornings are yours free either way. <span style="color:var(--muted)">No card needed to start.</span></p>
+      <p class="muted" style="margin-top:12px;">Start with the free five. If they land and you want to keep going, there's the full <b>Anchored</b> app — a dated daily passage, a written prayer, a streak that keeps itself, and a Companion you can ask anything. Founding members lock <b style="color:var(--text)">$8.99/mo — or $59/yr (about $4.92/mo, roughly five months free)</b> — for life. When the first 100 fill, it becomes $11.99/mo, and founders keep $8.99 forever — about <b style="color:var(--text)">$36 less every year, guaranteed never to rise.</b> It's optional, and the five mornings are yours free either way. <span style="color:var(--muted)">No card needed to start.</span></p>
     </div>
   </div>
 </section>
@@ -262,23 +426,49 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
   function qp(n){ return new URLSearchParams(location.search).get(n); }
   var hook = (qp('hook') === 'grace') ? 'grace' : 'brother';
 
+  // Screen-A hook copy (default brother lives in the HTML; grace overrides here).
   var HOOKS = {
     grace: {
       kicker: "Anchored · 5 free mornings",
       h1: 'No reset to zero. <span class="hl">Just open today.</span>',
-      sub: "Missed a few days and felt too far behind to start again? There's nothing to make up.",
-      promise: "One short email each morning for five days: the passage, a prayer written for you, and one small thing to do. Free. His mercies are new every morning — you just open today."
+      sub: "Missed a few days and felt too far behind to start again? Answer 4 quick taps — there's nothing to make up, and your first morning is ready when you are."
     }
   };
   function set(id, html){ var el=document.getElementById(id); if(el && html!=null) el.innerHTML=html; }
   document.title = (hook === 'grace') ? "Anchored — Free: No reset to zero" : "Anchored — Free: 5 Mornings";
   if (hook === 'grace') {
     var o = HOOKS.grace;
-    set("k-kicker", o.kicker); set("k-h1", o.h1); set("k-sub", o.sub); set("k-promise", o.promise);
+    set("k-kicker", o.kicker); set("k-h1", o.h1); set("k-sub", o.sub);
   }
 
-  // ---- Cloudflare Turnstile: render the bot-gate widget into the visible form ----
-  // Public managed sitekey (allowed domains: anchoredfaith.app + aaronmott1989.github.io).
+  // Pass the hook through to both app buttons (plain <a href>, synchronous nav —
+  // per checkout-redirect-must-be-synchronous-in-tap; survives FB/IG in-app browser).
+  var startNow = document.getElementById('startNowBtn');
+  var foundBtn = document.getElementById('foundingBtn');
+  if (startNow) startNow.href = "https://anchoredfaith.app/anchored-app.html?src=freedoor&utm_source=freedoor&utm_medium=success&hook=" + hook;
+  if (foundBtn) foundBtn.href = "https://anchoredfaith.app/anchored-app.html?src=freedoor&intent=founding&hook=" + hook;
+
+  // ---- session state ----
+  var answers = { walk:null, mornings:null, breaks:null, carrying:null };
+  var whenWord = null;        // Q2 → Screen-F heading token
+  var nearTime = null;        // Q2 → nearest morning chip to pre-highlight
+  var morningTime = null;     // Screen-S pick (localStorage, option 2 — no worker follow-up)
+  var evFired = { quiz_start:false, quiz_complete:false, schedule:false };
+  function fire(kind, name, params){
+    if (evFired[kind]) return; evFired[kind] = true;
+    try { if (window.fbq) fbq(name === 'Schedule' ? 'track' : 'trackCustom', name, params); } catch(e){}
+  }
+
+  // ---- screen switching ----
+  function showScreen(id){
+    var all = document.querySelectorAll('#flow .screen');
+    for (var i=0;i<all.length;i++){ all[i].classList.remove('active'); }
+    var el = document.getElementById(id); if (el) el.classList.add('active');
+    // keep the flow in view when advancing (esp. after the keyboard on Screen F)
+    try { window.scrollTo(0, 0); } catch(e){}
+  }
+
+  // ---- Cloudflare Turnstile: render when Screen F becomes visible (B4) ----
   var TURNSTILE_SITEKEY = "0x4AAAAAAEFkyywbuJyZkFl1";
   var tsWidgetId = null, tsTries = 0;
   function renderTurnstile(){
@@ -292,17 +482,98 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
     try{ tsWidgetId = window.turnstile.render(el, { sitekey: TURNSTILE_SITEKEY, theme: 'dark' }); }
     catch(e){ /* re-attempt */ }
   }
-  renderTurnstile();
+
+  // ---- Screen A: start the quiz ----
+  document.getElementById('startBtn').addEventListener('click', function(){
+    fire('quiz_start','quiz_start',{hook:hook});
+    showScreen('screen-q1');
+  });
+
+  // ---- Q1–Q4: one tap selects + advances ----
+  function advanceTo(next){
+    if (next === 'screen-capture'){
+      // last question done → personalize Screen F, fire quiz_complete, render Turnstile
+      var answered = 0; for (var k in answers){ if (answers[k]) answered++; }
+      var word = whenWord || 'first';
+      set('cap-h', 'Your <span class="hl">' + word + ' plan is ready</span> — where do we send it?');
+      fire('quiz_complete','quiz_complete',{hook:hook, answered:answered});
+      showScreen('screen-capture');
+      renderTurnstile();
+      // pre-highlight the morning chip nearest their Q2 answer
+      prehighlightTime();
+    } else {
+      showScreen(next);
+    }
+  }
+  var chipGroups = document.querySelectorAll('.chips[data-q]');
+  for (var g=0; g<chipGroups.length; g++){
+    (function(group){
+      var qname = group.getAttribute('data-q');
+      var next  = group.getAttribute('data-next');
+      var chips = group.querySelectorAll('.chip');
+      for (var c=0; c<chips.length; c++){
+        chips[c].addEventListener('click', function(){
+          // mark selection (back-tap safe: clear siblings, set this)
+          for (var j=0;j<chips.length;j++){ chips[j].classList.remove('sel'); }
+          this.classList.add('sel');
+          answers[qname] = (this.textContent || '').trim();
+          if (qname === 'mornings'){
+            whenWord = this.getAttribute('data-when') || 'first';
+            nearTime = this.getAttribute('data-time') || null;
+          }
+          advanceTo(next);
+        });
+      }
+    })(chipGroups[g]);
+  }
+  // Q4 skip (carrying stays null)
+  document.getElementById('q4skip').addEventListener('click', function(){
+    answers.carrying = null;
+    advanceTo('screen-capture');
+  });
+
+  // ---- Screen S: pre-highlight nearest morning chip ----
+  function prehighlightTime(){
+    if (!nearTime) return;
+    var t = document.querySelector('.time[data-t="' + nearTime + '"]');
+    if (t) t.classList.add('near');
+  }
+
+  // ---- Screen S: morning-time pick (commitment device → Schedule) ----
+  var times = document.querySelectorAll('#times .time');
+  var timeconf = document.getElementById('timeconf');
+  for (var t=0; t<times.length; t++){
+    times[t].addEventListener('click', function(){
+      for (var j=0;j<times.length;j++){ times[j].classList.remove('sel'); }
+      this.classList.add('sel');
+      morningTime = this.getAttribute('data-t');
+      try { localStorage.setItem('anchored_morning_time', morningTime); } catch(e){}
+      // HONESTY LOCK: user's own standing appointment — NOT a reminder/timed-send claim.
+      timeconf.textContent = morningTime + " it is. That's your standing time with God now — the one appointment that doesn't move.";
+      timeconf.style.display = 'block';
+      fire('schedule','Schedule',{content_name:'morning-time', morning_time:morningTime, hook:hook});
+    });
+  }
+
+  // ---- move to the booking screen; set the confirmation line by lead type ----
+  function goToSuccess(isExisting){
+    var line = isExisting
+      ? "You're already signed up — your 5 mornings are on the way (check your inbox, and spam just in case). 🕊️ While you're here:"
+      : "You're in. 🕊️ Your first morning is on its way to your inbox right now.";
+    document.getElementById('s-confirm').textContent = line;
+    showScreen('screen-success');
+    prehighlightTime();
+  }
 
   // ---- free-door lead capture: POST to the Anchored lead Worker ----
   // Same live, Turnstile-gated worker as the main LP. Distinct source=freedoor-test
-  // so these leads are attributable to this test page per the data contract.
-  // The Meta Lead event fires ONLY after the worker returns HTTP 200, carrying an
-  // eventID (also POSTed as event_id) so a future server-side CAPI Lead can dedup.
+  // so these leads are attributable to this test page per the data contract. The
+  // Meta Lead event fires ONLY after the worker returns HTTP 200 AND it's a NEW lead,
+  // carrying an eventID (also POSTed as event_id) so a future server-side CAPI Lead
+  // can dedup. POST body EXTENDED with quiz answers (worker ignores unknown fields).
   var LEAD_ENDPOINT = "https://anchored-lead.amott1989.workers.dev";
   var form = document.getElementById('leadform');
   var btn  = document.getElementById('leadbtn');
-  var done = document.getElementById('capdone');
   var err  = document.getElementById('caperr');
   var consent = document.getElementById('leadconsent');
 
@@ -322,23 +593,26 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
 
     fetch(LEAD_ENDPOINT, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email: email, source: 'freedoor-test', offer: hook, event_id: eventID, ts: Date.now(), turnstileToken: token })
+      body: JSON.stringify({
+        email: email, source: 'freedoor-test', offer: hook, event_id: eventID, ts: Date.now(), turnstileToken: token,
+        // --- NEW (worker ignores until extended; storage is a security-cleared follow-on) ---
+        quiz: { walk: answers.walk, mornings: answers.mornings, breaks: answers.breaks, carrying: answers.carrying },
+        morning_time: morningTime   // null at capture (picked on Screen S); kept in localStorage
+      })
     }).then(function(r){ return r.json().catch(function(){ return {}; }); })
       .then(function(res){
         if (res && res.ok) {
-          // Repeat submission (worker dedup, 2026-08-05): already a contact — the
-          // 5-morning series is already on its way. Say so plainly, and do NOT
-          // fire the Meta Lead event (a repeat is not a new lead; keeps CPL honest).
+          // Repeat submission (worker dedup): already a contact — do NOT fire the
+          // Meta Lead event (a repeat is not a new lead; keeps CPL honest).
           if (res.existing) {
-            done.textContent = "You're already signed up — your 5 mornings are on the way. Check your inbox (and spam folder, just in case). 🕊️";
+            try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+            goToSuccess(true);
           } else {
             // FIRE Lead ONLY on confirmed NEW-lead success — with the dedup eventID.
             try { if (window.fbq) fbq('track','Lead',{content_name:'5-mornings-free-door', offer:hook, value:0, currency:'USD'}, {eventID:eventID}); } catch(e){}
+            try { localStorage.setItem('anchored_captured','1'); } catch(e){}
+            goToSuccess(false);
           }
-          form.style.display='none';
-          if (consent) consent.style.display='none';
-          done.style.display='block';
-          try { localStorage.setItem('anchored_captured','1'); } catch(e){}
         } else {
           btn.disabled=false;
           err.textContent = "Something hiccupped — please try that once more.";
@@ -352,6 +626,19 @@ src="https://www.facebook.com/tr?id=1407254754557742&ev=PageView&noscript=1"/></
         if (window.turnstile && tsWidgetId !== null) window.turnstile.reset(tsWidgetId);
       });
   });
+
+  // ---- captured-on-load: a returning visitor who already signed up jumps straight
+  // to the booking moment (no duplicate quiz/ask, still escalate). No Lead fires.
+  var alreadyCaptured = false;
+  try { alreadyCaptured = localStorage.getItem('anchored_captured') === '1'; } catch(e){}
+  try { morningTime = localStorage.getItem('anchored_morning_time') || null; } catch(e){}
+  if (alreadyCaptured) {
+    goToSuccess(true);
+    if (morningTime){
+      var pre = document.querySelector('.time[data-t="' + morningTime + '"]');
+      if (pre){ pre.classList.add('sel'); }
+    }
+  }
 })();
 </script>
 </body>
